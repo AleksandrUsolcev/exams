@@ -5,11 +5,13 @@ from .models import Question, Quiz, QuizTheme, Variant
 
 class QuizThemeAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'priority')
+    readonly_fields = ('slug',)
     list_editable = ('priority',)
 
 
 class QuizAdmin(admin.ModelAdmin):
     list_display = ('title', 'theme', 'author', 'created')
+    readonly_fields = ('slug',)
 
 
 class QuestionAdmin(admin.ModelAdmin):

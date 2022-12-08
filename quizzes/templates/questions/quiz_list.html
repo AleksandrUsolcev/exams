@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{ theme.title }}
+{% endblock %}
+{% block content %}
+  <h1 class="fw-bold">{{ theme.title }}</h1>
+  <p class="py-3 fs-5">{{ theme.description }}</p>
+  <div>
+    {% for quiz in quizzes %}
+      <div class="bg-light shadow p-4 my-5 row">
+        <div class="col-9">
+          <a href="{% url 'questions:quiz_detail' quiz.slug %}" class="text-decoration-none"><h4>{{ quiz.title }}</h4></a>
+          <p>{{ quiz.description }}</p>
+        </div>
+        <div class="col-3 d-flex align-items-center flex-row-reverse">
+          <a href="#" class="btn btn-primary">Пройти тест</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

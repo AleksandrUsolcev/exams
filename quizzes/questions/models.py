@@ -1,6 +1,9 @@
+from random import randrange
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from slugify import slugify
 
 User = get_user_model()
 
@@ -9,6 +12,11 @@ class QuizTheme(models.Model):
     title = models.CharField(
         verbose_name='Название',
         max_length=200
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=340,
+        verbose_name='ЧПУ'
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -30,11 +38,24 @@ class QuizTheme(models.Model):
     def __str__(self):
         return f'{self.title}'
 
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            code = randrange(10000, 99999)
+        else:
+            code = self.slug[-5:]
+        self.slug = slugify(self.title) + '-' + str(code)
+        super().save(*args, **kwargs)
+
 
 class Quiz(models.Model):
     title = models.CharField(
         verbose_name='Название',
         max_length=200
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=340,
+        verbose_name='ЧПУ'
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -73,6 +94,14 @@ class Quiz(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            code = randrange(10000, 99999)
+        else:
+            code = self.slug[-5:]
+        self.slug = slugify(self.title) + '-' + str(code)
+        super().save(*args, **kwargs)
 
 
 class Question(models.Model):

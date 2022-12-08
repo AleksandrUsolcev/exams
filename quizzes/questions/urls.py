@@ -10,4 +10,14 @@ urlpatterns = [
         views.IndexView.as_view(),
         name='index'
     ),
+    path(
+        'theme/<slug:slug>/',
+        views.QuizListView.as_view(),
+        name='quiz_list'
+    ),
+    path(
+        'quiz/<slug:slug>/',
+        views.QuizDetailView.as_view(),
+        name='quiz_detail'
+    ),
 ]

@@ -1,2 +1,4 @@
 Django==3.2.16
+django-debug-toolbar==3.8.1
 python-dotenv==0.21.0
+python-slugify==7.0.0
