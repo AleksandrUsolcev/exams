@@ -15,10 +15,10 @@ class QuizTheme(models.Model):
     )
     priority = models.PositiveIntegerField(
         verbose_name='Приоритет',
-        default=999,
+        default=99,
         validators=[
             MinValueValidator(1),
-            MaxValueValidator(999)
+            MaxValueValidator(99)
         ]
     )
 
