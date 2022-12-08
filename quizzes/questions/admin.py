@@ -1,22 +1,28 @@
 from django.contrib import admin
 
-from .models import Answer, Question, Quiz
+from .models import Question, Quiz, QuizTheme, Variant
+
+
+class QuizThemeAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'priority')
+    list_editable = ('priority',)
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'created')
+    list_display = ('title', 'theme', 'author', 'created')
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'quiz', 'queue')
-    list_editable = ('queue',)
+    list_display = ('text', 'quiz', 'priority')
+    list_editable = ('priority',)
 
 
-class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'correct')
-    list_editable = ('correct',)
+class VariantAdmin(admin.ModelAdmin):
+    list_display = ('text', 'question', 'correct', 'priority')
+    list_editable = ('correct', 'priority')
 
 
+admin.site.register(QuizTheme, QuizThemeAdmin)
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(Answer, AnswerAdmin)
+admin.site.register(Variant, VariantAdmin)
