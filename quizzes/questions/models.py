@@ -166,3 +166,59 @@ class Variant(models.Model):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
+
+
+class Answer(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        related_name='answers',
+        on_delete=models.CASCADE
+    )
+    variant = models.ForeignKey(
+        Variant,
+        verbose_name='Ответ',
+        related_name='answers',
+        on_delete=models.CASCADE
+    )
+    result = models.BooleanField(
+        verbose_name='Результат'
+    )
+    date = models.DateTimeField(
+        verbose_name='Дата ответа',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Ответ пользователя'
+        verbose_name_plural = 'Ответы пользователей'
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'{self.user.id} answer {self.variant.id}'
+
+
+class Progress(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        related_name='progression',
+        on_delete=models.CASCADE
+    )
+    quiz = models.ForeignKey(
+        Quiz,
+        verbose_name='Квиз',
+        related_name='progress',
+        on_delete=models.CASCADE
+    )
+    stage = models.PositiveIntegerField(
+        verbose_name='Этап',
+        default=1
+    )
+
+    class Meta:
+        verbose_name = 'Прогресс пользователя'
+        verbose_name_plural = 'Прогресс пользователя'
+
+    def __str__(self):
+        return f'{self.user.id} stage in {self.quiz.id} ({self.stage})'

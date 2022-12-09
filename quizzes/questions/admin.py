@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Question, Quiz, QuizTheme, Variant
+from .models import Progress, Question, Quiz, QuizTheme, Variant
 
 
 class QuizThemeAdmin(admin.ModelAdmin):
@@ -24,7 +24,13 @@ class VariantAdmin(admin.ModelAdmin):
     list_editable = ('correct', 'priority')
 
 
+class ProgressAdmin(admin.ModelAdmin):
+    list_display = ('user', 'quiz', 'stage')
+    readonly_fields = ('user', 'quiz', 'stage')
+
+
 admin.site.register(QuizTheme, QuizThemeAdmin)
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Variant, VariantAdmin)
+admin.site.register(Progress, ProgressAdmin)

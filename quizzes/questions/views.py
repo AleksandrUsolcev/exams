@@ -1,7 +1,8 @@
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import DetailView, ListView, TemplateView
 
-from .models import Quiz, QuizTheme
+from .forms import QuizProcessForm
+from .models import Progress, Quiz, QuizTheme
 
 
 class IndexView(ListView):
@@ -41,3 +42,24 @@ class QuizListView(ListView):
 class QuizDetailView(DetailView):
     model = Quiz
     template_name = 'questions/quiz_detail.html'
+
+
+class QuizProcessView(TemplateView):
+    template_name = 'questions/quiz_process.html'
+    from_class = QuizProcessForm
+
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        stage = self.kwargs.get('pk')
+        quiz = get_object_or_404(Quiz, slug=slug)
+        progress, just_created = Progress.objects.get_or_create(
+            user=self.request.user,
+            quiz=quiz
+        )
+        if stage != progress.stage:
+            return redirect(
+                'questions:quiz_process',
+                slug=slug,
+                pk=progress.stage
+            )
+        return super().get(request)

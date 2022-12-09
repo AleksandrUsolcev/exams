@@ -20,4 +20,9 @@ urlpatterns = [
         views.QuizDetailView.as_view(),
         name='quiz_detail'
     ),
+    path(
+        'quiz/<slug:slug>/in-progress/<int:pk>/',
+        views.QuizProcessView.as_view(),
+        name='quiz_process'
+    ),
 ]

@@ -13,7 +13,7 @@
           <p>{{ quiz.description }}</p>
         </div>
         <div class="col-3 d-flex align-items-center flex-row-reverse">
-          <a href="#" class="btn btn-primary">Пройти тест</a>
+          <a href="{% url 'questions:quiz_process' quiz.slug 1 %}" class="btn btn-primary">Пройти тест</a>
         </div>
       </div>
     {% endfor %}
