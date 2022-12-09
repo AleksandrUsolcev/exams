@@ -1,7 +1,28 @@
 {% extends 'base.html' %}
+{% load user_filters %}
 {% block title %}
   {{ quiz.title }} - {{ quiz.theme.title}}
 {% endblock %}
 {% block content %}
-  proccess
+  <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
+  <h1 class="fw-bold">{{ quiz.title }}</h1>
+  <h3 class="pt-3 fw-bold">Вопрос {{ stage }}</h3>
+  {% if just_created %}
+    Тут инфо, если прогресс только что начат
+  {% endif %}
+  <p class="py-3 fs-5">{{ question.text }}</p>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-check">
+        {{ field|addclass:'form-check-input' }}
+        <label class="form-check-label" for="flexCheckDefault">
+          {{ field.label }}
+        </label>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary my-3">
+      Ответить
+    </button>
+  </form>
 {% endblock %}
