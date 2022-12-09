@@ -86,6 +86,15 @@ class Quiz(models.Model):
         verbose_name='Перемешивать варианты ответов, игнорируя приоритет',
         default=True
     )
+    # in future:
+    empty_answers = models.BooleanField(
+        verbose_name='Разрешить оставлять выбор пустым',
+        default=False
+    )
+    allow_skipping = models.BooleanField(
+        verbose_name='Разрешить пропуск вопросов',
+        default=False
+    )
 
     class Meta:
         verbose_name = 'Квиз'
@@ -105,6 +114,17 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
+
+    ONE_CORRECT = 'one_correct'
+    MANY_CORRECT = 'many_correct'
+    ONLY_TEXT = 'only_text'
+
+    TYPES = (
+        (ONE_CORRECT, 'Допустим только один правильный ответ'),
+        (MANY_CORRECT, 'Допустимы есколько вариантов ответов'),
+        (ONLY_TEXT, 'Только текст, без ответов')
+    )
+
     text = models.TextField(
         verbose_name='Вопрос'
     )
@@ -122,6 +142,24 @@ class Question(models.Model):
         related_name='questions',
         on_delete=models.CASCADE
     )
+    type = models.CharField(
+        verbose_name='Тип',
+        choices=TYPES,
+        max_length=32,
+        default='many_correct'
+    )
+
+    @property
+    def one_correct(self):
+        return self.type == self.ONE_CORRECT
+
+    @property
+    def many_correct(self):
+        return self.type == self.MANY_CORRECT
+
+    @property
+    def only_text(self):
+        return self.type == self.ONLY_TEXT
 
     class Meta:
         verbose_name = 'Вопрос'

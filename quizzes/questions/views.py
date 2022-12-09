@@ -88,10 +88,7 @@ class QuizProcessView(FormView):
 
     def form_valid(self, form):
         if self.progress.stage < self.stage + 1:
-            Progress.objects.filter(
-                user=self.request.user,
-                quiz=self.quiz
-            ).update(stage=self.stage + 1)
+            self.progress.update(stage=self.stage + 1)
         return redirect(
             'questions:quiz_process',
             slug=self.slug,
