@@ -10,8 +10,8 @@ class QuizThemeAdmin(admin.ModelAdmin):
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'theme', 'author', 'created')
-    readonly_fields = ('slug',)
+    list_display = ('title', 'theme', 'author', 'revision', 'created')
+    readonly_fields = ('slug', 'revision')
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -25,8 +25,10 @@ class VariantAdmin(admin.ModelAdmin):
 
 
 class ProgressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'quiz', 'stage')
-    readonly_fields = ('user', 'quiz', 'stage')
+    list_display = ('user', 'quiz', 'stage', 'answers', 'passed')
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(QuizTheme, QuizThemeAdmin)

@@ -48,6 +48,13 @@ class QuizTheme(models.Model):
 
 
 class Quiz(models.Model):
+    revision = models.PositiveIntegerField(
+        verbose_name='Редакция квиза',
+        help_text=('Меняется автоматически при изменении/удалении вопросов'
+                   ' и вариантов ответов'),
+        default=1,
+        editable=False
+    )
     title = models.CharField(
         verbose_name='Название',
         max_length=200
@@ -121,7 +128,7 @@ class Question(models.Model):
 
     TYPES = (
         (ONE_CORRECT, 'Допустим только один правильный ответ'),
-        (MANY_CORRECT, 'Допустимы есколько вариантов ответов'),
+        (MANY_CORRECT, 'Допустимы несколько вариантов ответов'),
         (ONLY_TEXT, 'Только текст, без ответов')
     )
 
@@ -164,12 +171,22 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
-        ordering = ['priority', 'text']
+        ordering = ['priority', 'id', 'text']
 
     def __str__(self):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
+
+    def save(self, *args, **kwargs):
+        new_version = self.quiz.revision + 1
+        Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        new_version = self.quiz.revision + 1
+        Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
+        super().delete(*args, **kwargs)
 
 
 class Variant(models.Model):
@@ -198,12 +215,24 @@ class Variant(models.Model):
     class Meta:
         verbose_name = 'Вариант ответа'
         verbose_name_plural = 'Варианты ответов'
-        ordering = ['priority', 'text']
+        ordering = ['priority', 'id', 'text']
 
     def __str__(self):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
+
+    def save(self, *args, **kwargs):
+        new_version = self.question.quiz.revision + 1
+        quiz_id = self.question.quiz.id
+        Quiz.objects.filter(id=quiz_id).update(revision=new_version)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        new_version = self.question.quiz.revision + 1
+        quiz_id = self.question.quiz.id
+        Quiz.objects.filter(id=quiz_id).update(revision=new_version)
+        super().delete(*args, **kwargs)
 
 
 class Answer(models.Model):
@@ -213,11 +242,43 @@ class Answer(models.Model):
         related_name='answers',
         on_delete=models.CASCADE
     )
+    quiz = models.ForeignKey(
+        Quiz,
+        verbose_name='Квиз',
+        related_name='answers',
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    quiz_revision = models.PositiveIntegerField(
+        verbose_name='Редакция квиза',
+        null=True,
+    )
+    quiz_title = models.CharField(
+        verbose_name='Заголовок квиза',
+        max_length=200,
+        null=True
+    )
+    question = models.ForeignKey(
+        Question,
+        verbose_name='Вопрос',
+        related_name='answers',
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    question_text = models.TextField(
+        verbose_name='Текст вопроса',
+        null=True
+    )
     variant = models.ForeignKey(
         Variant,
         verbose_name='Ответ',
         related_name='answers',
-        on_delete=models.CASCADE
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    variant_text = models.TextField(
+        verbose_name='Вариант ответа',
+        null=True
     )
     result = models.BooleanField(
         verbose_name='Результат'
@@ -252,6 +313,15 @@ class Progress(models.Model):
     stage = models.PositiveIntegerField(
         verbose_name='Этап',
         default=1
+    )
+    # in future
+    answers = models.PositiveIntegerField(
+        verbose_name='Ответов',
+        default=0
+    )
+    passed = models.DateTimeField(
+        verbose_name='Дата завершения',
+        null=True
     )
 
     class Meta:
