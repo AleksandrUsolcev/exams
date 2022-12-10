@@ -25,4 +25,9 @@ urlpatterns = [
         views.QuizProcessView.as_view(),
         name='quiz_process'
     ),
+    path(
+        'quiz/<slug:slug>/finally/',
+        views.QuizFinallyView.as_view(),
+        name='quiz_finally'
+    ),
 ]

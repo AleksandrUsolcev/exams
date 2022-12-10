@@ -66,6 +66,11 @@ class QuizProcessView(FormView):
                 slug=self.slug,
                 pk=self.progress.stage
             )
+        if self.stage > self.quiz.questions.count():
+            return redirect(
+                'questions:quiz_finally',
+                slug=self.slug
+            )
         return super().get(request)
 
     def get_context_data(self, **kwargs):
@@ -84,6 +89,8 @@ class QuizProcessView(FormView):
     def get_initial(self):
         initial = super().get_initial()
         initial['question'] = self.question[self.stage - 1]
+        initial['quiz'] = self.quiz
+        initial['user'] = self.request.user
         return initial
 
     def form_valid(self, form):
@@ -91,10 +98,16 @@ class QuizProcessView(FormView):
             Progress.objects.filter(
                 user=self.request.user,
                 quiz=self.quiz
-            ).update(stage=self.stage + 1)
+            ).update(stage=self.stage + 1, answers=self.stage)
+        form.answer()
         return redirect(
             'questions:quiz_process',
             slug=self.slug,
             pk=self.stage + 1
         )
         # return super().form_valid(form)
+
+
+class QuizFinallyView(DetailView):
+    model = Quiz
+    template_name = 'questions/quiz_finally.html'

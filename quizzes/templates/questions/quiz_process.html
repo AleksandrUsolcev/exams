@@ -14,12 +14,18 @@
   <form method="post">
     {% csrf_token %}
     {% for field in form %}
-      <div class="form-check">
-        {{ field|addclass:'form-check-input' }}
-        <label class="form-check-label" for="flexCheckDefault">
-          {{ field.label }}
-        </label>
-      </div>
+      {% if question.many_correct %}
+        <div class="form-check">
+          {{ field|addclass:'form-check-input' }}
+          <label class="form-check-label" for="flexCheckDefault">
+            {{ field.label }}
+          </label>
+        </div>
+      {% elif question.one_correct %}
+        <div class="form-check">
+          {{ field|addclass:'p-0 m-0' }}
+        </div>
+      {% endif %}
     {% endfor %}
     <button type="submit" class="btn btn-primary my-3">
       Ответить

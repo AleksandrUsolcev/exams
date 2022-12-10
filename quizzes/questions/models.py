@@ -280,7 +280,7 @@ class Answer(models.Model):
         verbose_name='Вариант ответа',
         null=True
     )
-    result = models.BooleanField(
+    correct = models.BooleanField(
         verbose_name='Результат'
     )
     date = models.DateTimeField(
