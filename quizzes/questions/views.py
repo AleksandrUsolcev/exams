@@ -1,9 +1,9 @@
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import CreateView, DetailView, FormView, ListView
 
-from .forms import QuizProcessForm
+from .forms import QuizAddUpdateView, QuizProcessForm
 from .models import Progress, Question, Quiz, QuizTheme
 
 
@@ -11,25 +11,27 @@ class IndexView(ListView):
     model = QuizTheme
     template_name = 'questions/index.html'
     context_object_name = 'themes'
-    queryset = QuizTheme.objects.all()
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Квизы!'
         return context
 
+    def get_queryset(self):
+        return QuizTheme.objects.prefetch_related('quizzes')
+
 
 class QuizListView(ListView):
     model = Quiz
     template_name = 'questions/quiz_list.html'
     context_object_name = 'quizzes'
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         theme = get_object_or_404(QuizTheme, slug=self.kwargs.get('slug'))
-        extra_context = {
-            'theme': theme
-        }
+        extra_context = {}
         if self.request.user.is_authenticated:
             progress = Progress.objects.select_related('quiz').filter(
                 user=self.request.user,
@@ -52,6 +54,7 @@ class QuizListView(ListView):
                 'passed_percent': passed_percent,
                 'current_stages': current_stages
             }
+        extra_context['theme'] = theme
         context.update(extra_context)
         return context
 
@@ -59,12 +62,21 @@ class QuizListView(ListView):
         return Quiz.objects.filter(
             theme__slug=self.kwargs.get('slug')).annotate(
             questions_count=Count('questions')
-        )
+        ).order_by('-created')
 
 
 class QuizDetailView(DetailView):
     model = Quiz
     template_name = 'questions/quiz_detail.html'
+
+
+class QuizAddView(CreateView):
+    form_class = QuizAddUpdateView
+    template_name = 'questions/quiz_add.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 
 class QuizProcessView(FormView):
@@ -135,9 +147,14 @@ class QuizProcessView(FormView):
             slug=self.slug,
             pk=self.stage + 1
         )
-        # return super().form_valid(form)
 
 
 class QuizFinallyView(DetailView):
     model = Quiz
     template_name = 'questions/quiz_finally.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        extra_context = {}
+        context.update(extra_context)
+        return context

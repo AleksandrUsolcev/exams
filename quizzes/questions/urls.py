@@ -30,4 +30,9 @@ urlpatterns = [
         views.QuizFinallyView.as_view(),
         name='quiz_finally'
     ),
+    path(
+        'quiz-add',
+        views.QuizAddView.as_view(),
+        name='quiz_add'
+    ),
 ]

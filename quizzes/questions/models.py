@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from slugify import slugify
-
+from django.urls import reverse
 User = get_user_model()
 
 
@@ -118,6 +118,9 @@ class Quiz(models.Model):
             code = self.slug[-5:]
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('questions:quiz_detail', kwargs={'slug': self.slug})
 
 
 class Question(models.Model):

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Answer
+from .models import Answer, Quiz
 
 
 class QuizProcessForm(forms.Form):
@@ -68,3 +68,10 @@ class QuizProcessForm(forms.Form):
                     results.append(int(variant_id))
             if results and not answer.exists():
                 self.add_results(results)
+
+
+class QuizAddUpdateView(forms.ModelForm):
+    class Meta:
+        model = Quiz
+        fields = '__all__'
+        exclude = ('slug', 'author')

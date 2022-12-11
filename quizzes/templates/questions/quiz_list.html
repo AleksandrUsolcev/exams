@@ -15,14 +15,14 @@
         </div>
         <div class="col-3 d-flex align-items-center flex-row-reverse">
           {% if quiz.id in passed %}
-            <a href="{% url 'questions:quiz_process' quiz.slug current_stages|get_item:quiz.id %}" class="btn btn-success">Мои результаты</a>
+            <a href="{% url 'questions:quiz_process' quiz.slug current_stages|get_item:quiz.id %}" class="btn btn-success">Результаты</a>
           {% elif quiz.id in in_progress and quiz.id not in passed %}
-            <a href="{% url 'questions:quiz_process' quiz.slug current_stages|get_item:quiz.id %}" class="btn btn-warning">Продолжить</a>
+            <a href="{% url 'questions:quiz_process' quiz.slug current_stages|get_item:quiz.id %}" class="btn btn-primary">Продолжить</a>
           {% else %}
             <a href="{% url 'questions:quiz_process' quiz.slug 1 %}" class="btn btn-primary">Пройти</a>
           {% endif %}
         </div>
-        {% if quiz.questions_count %}
+        {% if request.user.is_authenticated and quiz.questions_count and passed_percent|get_item:quiz.id > 0 %}
           <div class="col-12 py-3">
             <div class="progress">
               <div class="progress-bar {% if passed_percent|get_item:quiz.id >= 100 %}bg-success{% endif %}" 
@@ -33,4 +33,5 @@
       </div>
     {% endfor %}
   </div>
+  {% include '../includes/paginator.html' %}
 {% endblock %}
