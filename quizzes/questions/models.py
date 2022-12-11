@@ -247,7 +247,7 @@ class Answer(models.Model):
         verbose_name='Квиз',
         related_name='answers',
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.CASCADE
     )
     quiz_revision = models.PositiveIntegerField(
         verbose_name='Редакция квиза',

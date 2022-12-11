@@ -1,4 +1,6 @@
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import QuizProcessForm
@@ -21,22 +23,43 @@ class QuizListView(ListView):
     model = Quiz
     template_name = 'questions/quiz_list.html'
     context_object_name = 'quizzes'
-    queryset = Quiz.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         theme = get_object_or_404(QuizTheme, slug=self.kwargs.get('slug'))
-        quizes = Quiz.objects.filter(theme=theme)
         extra_context = {
-            'theme': theme,
-            'quizes': quizes
+            'theme': theme
         }
+        if self.request.user.is_authenticated:
+            progress = Progress.objects.select_related('quiz').filter(
+                user=self.request.user,
+                quiz__theme__slug=self.kwargs.get('slug')
+            ).annotate(
+                questions_count=Count('quiz__questions')
+            )
+            in_progress = [fields.quiz.id for fields in progress]
+            passed = [fields.quiz.id for fields in progress if fields.passed]
+            passed_percent = {}
+            current_stages = {}
+            for f in progress:
+                if f.questions_count:
+                    result = int(((f.stage - 1) * 100) / f.questions_count)
+                    passed_percent[f.quiz.id] = result
+                current_stages[f.quiz.id] = f.stage
+            extra_context = {
+                'in_progress': in_progress,
+                'passed': passed,
+                'passed_percent': passed_percent,
+                'current_stages': current_stages
+            }
         context.update(extra_context)
         return context
 
     def get_queryset(self):
-        theme = get_object_or_404(QuizTheme, slug=self.kwargs.get('slug'))
-        return Quiz.objects.filter(theme=theme)
+        return Quiz.objects.filter(
+            theme__slug=self.kwargs.get('slug')).annotate(
+            questions_count=Count('questions')
+        )
 
 
 class QuizDetailView(DetailView):
@@ -67,6 +90,10 @@ class QuizProcessView(FormView):
                 pk=self.progress.stage
             )
         if self.stage > self.quiz.questions.count():
+            Progress.objects.filter(
+                user=self.request.user,
+                quiz=self.quiz
+            ).update(passed=timezone.now())
             return redirect(
                 'questions:quiz_finally',
                 slug=self.slug
@@ -88,9 +115,12 @@ class QuizProcessView(FormView):
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['question'] = self.question[self.stage - 1]
-        initial['quiz'] = self.quiz
-        initial['user'] = self.request.user
+        initial_data = {
+            'question': self.question[self.stage - 1],
+            'quiz': self.quiz,
+            'user': self.request.user
+        }
+        initial.update(initial_data)
         return initial
 
     def form_valid(self, form):
