@@ -6,5 +6,30 @@
 {% block content %}
   <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
   <h1 class="fw-bold">{{ quiz.title }}</h1>
-  <p class="py-3 fs-5">Пройдено, дальше текст бла бла бла</p>
+  <p class="py-3 fs-5">Тест пройден</p>
+  {% if latest_answers %}
+  <h3 class="pb-2">Результаты</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">id</th>
+        <th scope="col">answer</th>
+        <th scope="col">variant</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for answer in latest_answers %}
+        <tr class="
+        {% if answer.correct %}
+          table-success
+        {% endif %}
+        ">
+          <th scope="row">{{ answer.question.id }}</th>
+          <td>{{ answer.question_text }}</td>
+          <td>{{ answer.variant_text }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 {% endblock %}

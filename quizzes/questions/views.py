@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.views.generic import CreateView, DetailView, FormView, ListView
 
 from .forms import QuizAddUpdateView, QuizProcessForm
-from .models import Progress, Question, Quiz, QuizTheme
+from .models import Answer, Progress, Question, Quiz, QuizTheme
 
 
 class IndexView(ListView):
@@ -155,6 +155,19 @@ class QuizFinallyView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        extra_context = {}
+        get_object_or_404(
+            Progress,
+            quiz=self.object,
+            user=self.request.user
+        )
+        latest_answers = Answer.objects.select_related('question').filter(
+            user=self.request.user,
+            quiz=self.object,
+            quiz_revision=self.object.revision
+        ).order_by('date')
+        extra_context = {
+            'latest_answers': latest_answers,
+            'questions_count': self.object.questions.count()
+        }
         context.update(extra_context)
         return context

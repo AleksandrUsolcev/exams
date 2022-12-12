@@ -12,6 +12,9 @@
         <div class="col-9">
           <a href="{% url 'questions:quiz_detail' quiz.slug %}" class="text-decoration-none"><h4>{{ quiz.title }}</h4></a>
           <p>{{ quiz.description }}</p>
+          {% if quiz.questions_count %}
+            <p><span>Вопросов: </span>{{ quiz.questions_count }}</p>
+          {% endif %}
         </div>
         <div class="col-3 d-flex align-items-center flex-row-reverse">
           {% if quiz.id in passed %}
