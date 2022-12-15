@@ -76,8 +76,12 @@ class QuizProcessForm(forms.Form):
                 status = self.cleaned_data.get(variant_id)
                 if status is True:
                     results.append(int(variant_id))
-            variants = Variant.objects.filter(id__in=results, correct=False)
-            if variants.exists():
+            uncorrects = Variant.objects.filter(id__in=results, correct=False)
+            corrects_count = Variant.objects.filter(
+                question=self.question,
+                correct=True
+            ).count()
+            if uncorrects.exists() or len(results) < corrects_count:
                 correct = False
             if results and not answer.exists():
                 self.add_results(results, correct)

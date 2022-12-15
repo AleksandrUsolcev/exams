@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Вход на сайт{% endblock %}
+{% block content %}
+{% load user_filters %}
+{% load widget_tweaks %}
+<div class="col-xl-4 col-lg-6 col-md-8 col-xs-12 pt-3">
+  <form method="post">
+    {% csrf_token %}
+    <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% for field in form %}
+      <p class="mt-2 mb-2 fw-bold">{{ field.label}}</p>
+      <p>{{ field|addclass:'form-control' }}</p>
+      <p class="fw-light">{{ field.help_text }}</p>
+    {% endfor %}
+    <button class="btn btn-primary mb-3 mt-2 me-4" type="submit">
+      Вход
+    </button>
+    <a href="{% url 'users:password_reset_form' %}">Забыли пароль?</a>
+  </form>
+</div>
+{% endblock %}

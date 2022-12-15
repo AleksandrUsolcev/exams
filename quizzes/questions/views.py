@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -79,13 +80,15 @@ class QuizAddView(CreateView):
         return super().form_valid(form)
 
 
-class QuizProcessView(FormView):
+class QuizProcessView(LoginRequiredMixin, FormView):
     template_name = 'questions/quiz_process.html'
     form_class = QuizProcessForm
 
     def dispatch(self, request, *args, **kwargs):
         self.slug = self.kwargs.get('slug')
         self.stage = self.kwargs.get('pk')
+        if not self.request.user.is_authenticated:
+            return redirect('users:signup')
         self.quiz = get_object_or_404(Quiz, slug=self.slug)
         self.progress, self.just_created = Progress.objects.get_or_create(
             user=self.request.user,
@@ -105,7 +108,7 @@ class QuizProcessView(FormView):
             user=self.request.user,
             question=self.question[self.stage - 1],
             quiz_revision=self.quiz.revision
-        )
+        ).prefetch_related('variants')
         self.already_answered = False
         if self.answers.exists():
             self.already_answered = True
@@ -160,7 +163,7 @@ class QuizProcessView(FormView):
         )
 
 
-class QuizFinallyView(DetailView):
+class QuizFinallyView(LoginRequiredMixin, DetailView):
     model = Quiz
     template_name = 'questions/quiz_finally.html'
 

@@ -30,9 +30,11 @@
     </button>
   </form>
   {% else %}
-    <p class="fw-bold">{% if answers.count > 1 %}Ваши ответы{% else %}Ваш ответ{% endif %}</p>
+    <p class="fw-bold">Ваши ответы</p>
   {% for answer in answers %}
-    <p>{{ answer.variant_text }}</p>
+    {% for variant in answer.variants.all %}
+      <p>{{ variant.variant_text }}</p>
+    {% endfor %}
   {% endfor %}
   {% endif %}
 {% endblock %}
