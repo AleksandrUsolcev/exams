@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.views.generic import CreateView, DetailView, FormView, ListView
 
 from .forms import QuizAddUpdateView, QuizProcessForm
-from .models import Answer, Progress, Question, Quiz, QuizTheme
+from .models import Progress, Question, Quiz, QuizTheme, UserAnswer
 
 
 class IndexView(ListView):
@@ -92,15 +92,6 @@ class QuizProcessView(FormView):
             quiz=self.quiz
         )
         self.question = Question.objects.filter(quiz=self.quiz)
-        return super(QuizProcessView, self).dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        if self.stage > self.progress.stage:
-            return redirect(
-                'questions:quiz_process',
-                slug=self.slug,
-                pk=self.progress.stage
-            )
         if self.stage > self.quiz.questions.count():
             Progress.objects.filter(
                 user=self.request.user,
@@ -109,6 +100,23 @@ class QuizProcessView(FormView):
             return redirect(
                 'questions:quiz_finally',
                 slug=self.slug
+            )
+        self.answers = UserAnswer.objects.filter(
+            user=self.request.user,
+            question=self.question[self.stage - 1],
+            quiz_revision=self.quiz.revision
+        )
+        self.already_answered = False
+        if self.answers.exists():
+            self.already_answered = True
+        return super(QuizProcessView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if self.stage > self.progress.stage:
+            return redirect(
+                'questions:quiz_process',
+                slug=self.slug,
+                pk=self.progress.stage
             )
         return super().get(request)
 
@@ -121,6 +129,8 @@ class QuizProcessView(FormView):
             'just_created': self.just_created,
             'question': question,
             'stage': self.stage,
+            'already_answered': self.already_answered,
+            'answers': self.answers
         }
         context.update(extra_context)
         return context
@@ -130,7 +140,8 @@ class QuizProcessView(FormView):
         initial_data = {
             'question': self.question[self.stage - 1],
             'quiz': self.quiz,
-            'user': self.request.user
+            'user': self.request.user,
+            'already_answered': self.already_answered
         }
         initial.update(initial_data)
         return initial
@@ -160,14 +171,21 @@ class QuizFinallyView(DetailView):
             quiz=self.object,
             user=self.request.user
         )
-        latest_answers = Answer.objects.select_related('question').filter(
+        latest_answers = UserAnswer.objects.prefetch_related(
+            'variants'
+        ).filter(
             user=self.request.user,
             quiz=self.object,
             quiz_revision=self.object.revision
         ).order_by('date')
+        correct_count = latest_answers.filter(correct=True).count()
+        questions_count = self.object.questions.count()
+        correct_percentage = int((correct_count / questions_count) * 100)
         extra_context = {
             'latest_answers': latest_answers,
-            'questions_count': self.object.questions.count()
+            'questions_count': questions_count,
+            'correct_count': correct_count,
+            'correct_percentage': correct_percentage
         }
         context.update(extra_context)
         return context

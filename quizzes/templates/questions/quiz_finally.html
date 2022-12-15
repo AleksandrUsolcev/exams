@@ -9,12 +9,18 @@
   <p class="py-3 fs-5">Тест пройден</p>
   {% if latest_answers %}
   <h3 class="pb-2">Результаты</h3>
+  {% if questions_count %}
+    <p>Верных ответов: <span class="fw-bold">{{ correct_count }}</span> из <span class="fw-bold">{{ questions_count }}</span>
+    {% if correct_percentage > 0 %}
+      ({{ correct_percentage }}%)
+    {% endif %}
+    </p>
+  {% endif %}
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th scope="col">id</th>
-        <th scope="col">answer</th>
-        <th scope="col">variant</th>
+        <th scope="col">Вопрос</th>
+        <th scope="col">Ответ(ы)</th>
       </tr>
     </thead>
     <tbody>
@@ -24,9 +30,12 @@
           table-success
         {% endif %}
         ">
-          <th scope="row">{{ answer.question.id }}</th>
           <td>{{ answer.question_text }}</td>
-          <td>{{ answer.variant_text }}</td>
+          <td>
+            {% for variant in answer.variants.all %}
+              <p>{{ variant }}</p>
+            {% endfor %}
+          </td>
         </tr>
       {% endfor %}
     </tbody>

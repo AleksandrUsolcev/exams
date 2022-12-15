@@ -3,8 +3,9 @@ from random import randrange
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from slugify import slugify
 from django.urls import reverse
+from slugify import slugify
+
 User = get_user_model()
 
 
@@ -183,11 +184,17 @@ class Question(models.Model):
 
     def save(self, *args, **kwargs):
         new_version = self.quiz.revision + 1
+        progress = Progress.objects.filter(quiz=self.quiz)
+        if progress.exists():
+            progress.delete()
         Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         new_version = self.quiz.revision + 1
+        progress = Progress.objects.filter(quiz=self.quiz)
+        if progress.exists():
+            progress.delete()
         Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
         super().delete(*args, **kwargs)
 
@@ -227,18 +234,26 @@ class Variant(models.Model):
 
     def save(self, *args, **kwargs):
         new_version = self.question.quiz.revision + 1
-        quiz_id = self.question.quiz.id
-        Quiz.objects.filter(id=quiz_id).update(revision=new_version)
+        progress = Progress.objects.filter(quiz=self.question.quiz)
+        if progress.exists():
+            progress.delete()
+        Quiz.objects.filter(id=self.question.quiz.id).update(
+            revision=new_version
+        )
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         new_version = self.question.quiz.revision + 1
-        quiz_id = self.question.quiz.id
-        Quiz.objects.filter(id=quiz_id).update(revision=new_version)
+        progress = Progress.objects.filter(quiz=self.question.quiz)
+        if progress.exists():
+            progress.delete()
+        Quiz.objects.filter(id=self.question.quiz.id).update(
+            revision=new_version
+        )
         super().delete(*args, **kwargs)
 
 
-class Answer(models.Model):
+class UserAnswer(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='Пользователь',
@@ -249,7 +264,6 @@ class Answer(models.Model):
         Quiz,
         verbose_name='Квиз',
         related_name='answers',
-        null=True,
         on_delete=models.CASCADE
     )
     quiz_revision = models.PositiveIntegerField(
@@ -272,6 +286,35 @@ class Answer(models.Model):
         verbose_name='Текст вопроса',
         null=True
     )
+    correct = models.BooleanField(
+        verbose_name='Результат',
+        null=True,
+    )
+    skipped = models.BooleanField(
+        verbose_name='Пропущено',
+        null=True,
+    )
+    date = models.DateTimeField(
+        verbose_name='Дата ответа',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Ответ пользователя'
+        verbose_name_plural = 'Ответы пользователей'
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'{self.user} answer {self.question}'
+
+
+class UserVariant(models.Model):
+    answer = models.ForeignKey(
+        UserAnswer,
+        verbose_name='Ответ',
+        related_name='variants',
+        on_delete=models.CASCADE
+    )
     variant = models.ForeignKey(
         Variant,
         verbose_name='Ответ',
@@ -286,18 +329,13 @@ class Answer(models.Model):
     correct = models.BooleanField(
         verbose_name='Результат'
     )
-    date = models.DateTimeField(
-        verbose_name='Дата ответа',
-        auto_now_add=True
-    )
 
     class Meta:
-        verbose_name = 'Ответ пользователя'
-        verbose_name_plural = 'Ответы пользователей'
-        ordering = ['-date']
+        verbose_name = 'Вариант ответа пользователя'
+        verbose_name_plural = 'Варианты ответов пользователей'
 
     def __str__(self):
-        return f'{self.user.id} answer {self.variant.id}'
+        return f'{self.variant_text}'
 
 
 class Progress(models.Model):
@@ -329,7 +367,7 @@ class Progress(models.Model):
 
     class Meta:
         verbose_name = 'Прогресс пользователя'
-        verbose_name_plural = 'Прогресс пользователя'
+        verbose_name_plural = 'Прогресс пользователей'
 
     def __str__(self):
         return f'{self.user.id} stage in {self.quiz.id} ({self.stage})'
