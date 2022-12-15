@@ -11,6 +11,9 @@ class SignupForm(UserCreationForm):
 
     def clean(self):
         email = self.cleaned_data.get('email').lower()
+        username = self.cleaned_data.get('username')
         if User.objects.filter(email=email):
             raise ValidationError('Указанный email уже занят')
+        if User.objects.filter(username__iexact=username):
+            raise ValidationError('Пользователь с такими ником уже существует')
         return self.cleaned_data
