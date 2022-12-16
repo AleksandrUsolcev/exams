@@ -117,8 +117,18 @@ class Quiz(models.Model):
             code = randrange(10000, 99999)
         else:
             code = self.slug[-5:]
+            self.revision += 1
+            progress = Progress.objects.filter(quiz=self.pk)
+            if progress.exists():
+                progress.delete()
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        progress = Progress.objects.filter(quiz=self.pk)
+        if progress.exists():
+            progress.delete()
+        super().delete(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('questions:quiz_detail', kwargs={'slug': self.slug})
@@ -292,6 +302,10 @@ class UserAnswer(models.Model):
     )
     skipped = models.BooleanField(
         verbose_name='Пропущено',
+        null=True,
+    )
+    no_answers = models.BooleanField(
+        verbose_name='Без ответов',
         null=True,
     )
     date = models.DateTimeField(

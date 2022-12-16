@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import ValidationError
 
 from .models import Quiz, UserAnswer, UserVariant, Variant
 
@@ -31,7 +32,15 @@ class QuizProcessForm(forms.Form):
                     choices=RADIOS,
                 )
 
-    def add_results(self, results, correct):
+    def clean(self):
+        v_count = [v for v in self.cleaned_data.values() if v is False]
+        if (self.question.many_correct
+            and len(v_count) == len(self.cleaned_data.keys())
+                and self.quiz.empty_answers is False):
+            raise ValidationError('Выберите хотя бы один вариант ответа')
+        return self.cleaned_data
+
+    def add_results(self, results, correct, no_answers=False):
         variants = self.question.variants.all()
         answer = UserAnswer.objects.create(
             user=self.user,
@@ -40,7 +49,8 @@ class QuizProcessForm(forms.Form):
             quiz_title=self.quiz.title,
             question=self.question,
             question_text=self.question.text,
-            correct=correct
+            correct=correct,
+            no_answers=no_answers
         )
         for_create = []
         for v_id in results:
@@ -76,6 +86,14 @@ class QuizProcessForm(forms.Form):
                 status = self.cleaned_data.get(variant_id)
                 if status is True:
                     results.append(int(variant_id))
+            if self.quiz.empty_answers and not results:
+                variants = Variant.objects.filter(
+                    question=self.question,
+                    correct=True
+                )
+                if variants.exists():
+                    correct = False
+                self.add_results(results, correct, no_answers=True)
             uncorrects = Variant.objects.filter(id__in=results, correct=False)
             corrects_count = Variant.objects.filter(
                 question=self.question,

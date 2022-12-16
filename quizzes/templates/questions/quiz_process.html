@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load user_filters %}
+{% load widget_tweaks %}
 {% block title %}
   {{ quiz.title }} - {{ quiz.theme.title}}
 {% endblock %}
@@ -11,6 +12,11 @@
   {% if not already_answered %}
   <form method="post">
     {% csrf_token %}
+      <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
     {% for field in form %}
       {% if question.many_correct %}
         <div class="form-check">
@@ -20,9 +26,7 @@
           </label>
         </div>
       {% elif question.one_correct %}
-        <div class="form-check">
-          {{ field|addclass:'p-0 m-0' }}
-        </div>
+          {{ field|addclass:'list-unstyled p-0 m-0 mb-2' }}
       {% endif %}
     {% endfor %}
     <button type="submit" class="btn btn-primary my-3">
