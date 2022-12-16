@@ -63,4 +63,5 @@ urlpatterns = [
             template_name='users/password_change_done.html'),
         name='password_change_done'
     ),
+    path('@<slug:username>', views.UserProfileView.as_view(), name='profile'),
 ]

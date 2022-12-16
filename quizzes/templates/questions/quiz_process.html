@@ -7,6 +7,23 @@
 {% block content %}
   <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
   <h1 class="fw-bold">{{ quiz.title }}</h1>
+  <div class="pt-3">
+    {% for q in quiz.questions.all %}
+      <a href="{% url 'questions:quiz_process' quiz.slug forloop.counter %}" class="text-decoration-none">
+        <div class="d-inline-block pe-1 pb-1">
+          <div class="p-2 rounded-1
+            {% if question.id == q.id %}
+            bg-info border border-info
+            {% elif q.id in answered %}
+            bg-success border border-success
+            {% else %}
+            bg-light border
+            {% endif %}">
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
   <h3 class="pt-3 fw-bold">Вопрос {{ stage }}</h3>
   <p class="py-3 fs-5">{{ question.text }}</p>
   {% if not already_answered %}

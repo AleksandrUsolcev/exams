@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
-{% load user_filters %}
-{% load widget_tweaks %}
 <div class="col-xl-4 col-lg-6 col-md-8 col-xs-12 pt-3">
   <form method="post">
     {% include '../includes/auth_form_body.html' %}

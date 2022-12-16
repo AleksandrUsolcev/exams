@@ -302,7 +302,7 @@ class UserAnswer(models.Model):
     )
     skipped = models.BooleanField(
         verbose_name='Пропущено',
-        null=True,
+        default=False,
     )
     no_answers = models.BooleanField(
         verbose_name='Без ответов',

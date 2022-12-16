@@ -109,6 +109,11 @@ class QuizProcessView(LoginRequiredMixin, FormView):
             question=self.question[self.stage - 1],
             quiz_revision=self.quiz.revision
         ).prefetch_related('variants')
+        self.answered = UserAnswer.objects.filter(
+            user=self.request.user,
+            skipped=False,
+            quiz_revision=self.quiz.revision
+        ).values_list('question__id', flat=True)
         self.already_answered = False
         if self.answers.exists():
             self.already_answered = True
@@ -133,7 +138,8 @@ class QuizProcessView(LoginRequiredMixin, FormView):
             'question': question,
             'stage': self.stage,
             'already_answered': self.already_answered,
-            'answers': self.answers
+            'answers': self.answers,
+            'answered': self.answered
         }
         context.update(extra_context)
         return context
