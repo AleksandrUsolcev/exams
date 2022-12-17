@@ -19,7 +19,7 @@
           <div class="col-8 col-lg-8 d-flex align-items-center flex-row-reverse text-white">
             {% if request.user.is_authenticated %}
               <a href="{% url 'users:logout' %}" class="fw-bold text-white text-decoration-none">Выход</a>
-              <a href="#" class="fw-bold text-white text-decoration-none pe-4">{{ request.user.username }}</a>
+              <a href="{% url 'users:profile' request.user.username %}" class="fw-bold text-white text-decoration-none pe-4">{{ request.user.username }}</a>
             {% else %}
               <a href="{% url 'users:signup' %}" class="fw-bold text-white text-decoration-none">Регистрация</a>
               <a href="{% url 'users:login' %}" class="fw-bold text-white text-decoration-none pe-4">Вход</a>

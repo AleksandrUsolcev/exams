@@ -27,6 +27,11 @@ class QuizAdmin(admin.ModelAdmin):
     raw_id_fields = ('author',)
     inlines = (QuestionInline,)
 
+    def save_model(self, request, obj, form, change):
+        if getattr(obj, 'author', None) is None:
+            obj.author = request.user
+        obj.save()
+
 
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('text', 'quiz', 'priority')

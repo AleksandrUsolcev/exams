@@ -111,7 +111,6 @@ class QuizProcessView(LoginRequiredMixin, FormView):
         ).prefetch_related('variants')
         self.answered = UserAnswer.objects.filter(
             user=self.request.user,
-            skipped=False,
             quiz_revision=self.quiz.revision
         ).values_list('question__id', flat=True)
         self.already_answered = False
@@ -189,7 +188,10 @@ class QuizFinallyView(LoginRequiredMixin, DetailView):
         ).order_by('date')
         correct_count = latest_answers.filter(correct=True).count()
         questions_count = self.object.questions.count()
-        correct_percentage = int((correct_count / questions_count) * 100)
+        try:
+            correct_percentage = int((correct_count / questions_count) * 100)
+        except ZeroDivisionError:
+            correct_percentage = 0
         extra_context = {
             'latest_answers': latest_answers,
             'questions_count': questions_count,

@@ -7,6 +7,11 @@ class User(AbstractUser):
         verbose_name='Электронная почта',
         unique=True
     )
+    about = models.TextField(
+        verbose_name='Обо мне',
+        null=True,
+        blank=True
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 

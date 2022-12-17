@@ -3,6 +3,8 @@ from random import randrange
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from slugify import slugify
 
@@ -73,6 +75,7 @@ class Quiz(models.Model):
         verbose_name='Автор',
         related_name='quizzes',
         null=True,
+        blank=True,
         on_delete=models.SET_NULL
     )
     theme = models.ForeignKey(
@@ -94,13 +97,8 @@ class Quiz(models.Model):
         verbose_name='Перемешивать варианты ответов, игнорируя приоритет',
         default=True
     )
-    # in future:
     empty_answers = models.BooleanField(
         verbose_name='Разрешить оставлять выбор пустым',
-        default=False
-    )
-    allow_skipping = models.BooleanField(
-        verbose_name='Разрешить пропуск вопросов',
         default=False
     )
 
@@ -138,12 +136,10 @@ class Question(models.Model):
 
     ONE_CORRECT = 'one_correct'
     MANY_CORRECT = 'many_correct'
-    ONLY_TEXT = 'only_text'
 
     TYPES = (
         (ONE_CORRECT, 'Допустим только один правильный ответ'),
-        (MANY_CORRECT, 'Допустимы несколько вариантов ответов'),
-        (ONLY_TEXT, 'Только текст, без ответов')
+        (MANY_CORRECT, 'Допустимы несколько вариантов ответов')
     )
 
     text = models.TextField(
@@ -178,10 +174,6 @@ class Question(models.Model):
     def many_correct(self):
         return self.type == self.MANY_CORRECT
 
-    @property
-    def only_text(self):
-        return self.type == self.ONLY_TEXT
-
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
@@ -191,14 +183,6 @@ class Question(models.Model):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
-
-    def save(self, *args, **kwargs):
-        new_version = self.quiz.revision + 1
-        progress = Progress.objects.filter(quiz=self.quiz)
-        if progress.exists():
-            progress.delete()
-        Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
-        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         new_version = self.quiz.revision + 1
@@ -232,6 +216,10 @@ class Variant(models.Model):
         on_delete=models.CASCADE
     )
 
+    @property
+    def quiz(self):
+        return self.question.quiz
+
     class Meta:
         verbose_name = 'Вариант ответа'
         verbose_name_plural = 'Варианты ответов'
@@ -241,16 +229,6 @@ class Variant(models.Model):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
-
-    def save(self, *args, **kwargs):
-        new_version = self.question.quiz.revision + 1
-        progress = Progress.objects.filter(quiz=self.question.quiz)
-        if progress.exists():
-            progress.delete()
-        Quiz.objects.filter(id=self.question.quiz.id).update(
-            revision=new_version
-        )
-        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         new_version = self.question.quiz.revision + 1
@@ -299,10 +277,6 @@ class UserAnswer(models.Model):
     correct = models.BooleanField(
         verbose_name='Результат',
         null=True,
-    )
-    skipped = models.BooleanField(
-        verbose_name='Пропущено',
-        default=False,
     )
     no_answers = models.BooleanField(
         verbose_name='Без ответов',
@@ -369,7 +343,6 @@ class Progress(models.Model):
         verbose_name='Этап',
         default=1
     )
-    # in future
     answers = models.PositiveIntegerField(
         verbose_name='Ответов',
         default=0
@@ -385,3 +358,13 @@ class Progress(models.Model):
 
     def __str__(self):
         return f'{self.user.id} stage in {self.quiz.id} ({self.stage})'
+
+
+@receiver(post_save, sender=Variant)
+@receiver(post_save, sender=Question)
+def update_revision(sender, instance, **kwargs):
+    new_version = instance.quiz.revision + 1
+    progress = Progress.objects.filter(quiz=instance.quiz)
+    if progress.exists():
+        progress.delete()
+    Quiz.objects.filter(id=instance.quiz.id).update(revision=new_version)
