@@ -308,6 +308,7 @@ class UserVariant(models.Model):
     class Meta:
         verbose_name = 'Вариант ответа пользователя'
         verbose_name_plural = 'Варианты ответов пользователей'
+        ordering = ['-correct', '-selected']
 
     def __str__(self):
         return f'{self.variant_text}'
@@ -344,7 +345,7 @@ class Progress(models.Model):
         verbose_name_plural = 'Прогресс пользователей'
 
     def __str__(self):
-        return f'{self.user.id} stage in {self.quiz.id} ({self.stage})'
+        return f'{self.user} stage in {self.quiz} ({self.stage})'
 
 
 @receiver(post_save, sender=Variant)

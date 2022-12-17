@@ -6,6 +6,7 @@ from django.views.generic import DetailView, FormView, ListView
 
 from .forms import QuizProcessForm
 from .models import Progress, Question, Quiz, QuizTheme, UserAnswer
+from .utils import get_quizzes_with_progress
 
 
 class IndexView(ListView):
@@ -32,38 +33,12 @@ class QuizListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         theme = get_object_or_404(QuizTheme, slug=self.kwargs.get('slug'))
-        extra_context = {}
-        if self.request.user.is_authenticated:
-            progress = Progress.objects.select_related('quiz').filter(
-                user=self.request.user,
-                quiz__theme__slug=self.kwargs.get('slug')
-            ).annotate(
-                questions_count=Count('quiz__questions')
-            )
-            in_progress = [fields.quiz.id for fields in progress]
-            passed = [fields.quiz.id for fields in progress if fields.passed]
-            passed_percent = {}
-            current_stages = {}
-            for f in progress:
-                if f.questions_count:
-                    result = int(((f.stage - 1) * 100) / f.questions_count)
-                    passed_percent[f.quiz.id] = result
-                current_stages[f.quiz.id] = f.stage
-            extra_context = {
-                'in_progress': in_progress,
-                'passed': passed,
-                'passed_percent': passed_percent,
-                'current_stages': current_stages
-            }
-        extra_context['theme'] = theme
-        context.update(extra_context)
+        context.update({'theme': theme},)
         return context
 
     def get_queryset(self):
-        return Quiz.objects.filter(
-            theme__slug=self.kwargs.get('slug')).annotate(
-            questions_count=Count('questions')
-        ).order_by('-created')
+        slug = self.kwargs.get('slug')
+        return get_quizzes_with_progress(self.request.user, slug)
 
 
 class QuizDetailView(DetailView):
