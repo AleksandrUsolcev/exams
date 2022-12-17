@@ -353,8 +353,8 @@ class Progress(models.Model):
 @receiver(post_delete, sender=Variant)
 @receiver(post_delete, sender=Question)
 def update_revision(sender, instance, **kwargs):
-    new_version = instance.quiz.revision + 1
     progress = Progress.objects.filter(quiz=instance.quiz)
     if progress.exists():
         progress.delete()
-    Quiz.objects.filter(id=instance.quiz.id).update(revision=new_version)
+    Quiz.objects.filter(id=instance.quiz.id).update(
+        revision=models.F('revision') + 1)

@@ -2,7 +2,7 @@ from itertools import chain
 from operator import attrgetter
 
 from django.db.models import (BooleanField, Case, Count, ExpressionWrapper, F,
-                              IntegerField, When)
+                              IntegerField, Q, When)
 
 from .models import Quiz
 
@@ -26,9 +26,9 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
             )
         )
         query_without_user = Quiz.objects.filter(
-            theme__slug=theme_slug).annotate(
-            questions_count=Count('questions')
-        ).exclude(id__in=query_with_user_progress.values_list('id', flat=True))
+            Q(theme__slug=theme_slug) &
+            ~Q(id__in=query_with_user_progress.values_list('id', flat=True))
+        ).annotate(questions_count=Count('questions'))
         queryset = sorted(
             list(chain(query_without_user, query_with_user_progress)),
             key=attrgetter('created'), reverse=True
