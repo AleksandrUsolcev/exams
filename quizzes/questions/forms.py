@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ValidationError
 
-from .models import Quiz, UserAnswer, UserVariant, Variant
+from .models import UserAnswer, UserVariant, Variant
 
 
 class QuizProcessForm(forms.Form):
@@ -11,26 +11,30 @@ class QuizProcessForm(forms.Form):
         self.question = self.initial.get('question')
         self.quiz = self.initial.get('quiz')
         self.user = self.initial.get('user')
-        already_answered = self.initial.get('already_answered')
-        if not already_answered:
+        if not self.initial.get('already_answered'):
             if self.quiz.shuffle_variants:
-                question_set = self.question.variants.all().order_by('?')
+                self.variants = self.question.variants.all().order_by('?')
             else:
-                question_set = self.question.variants.all()
-            if self.question.many_correct:
-                for variant in question_set:
-                    self.fields[str(variant.id)] = forms.BooleanField(
-                        label=variant.text,
-                        required=False
-                    )
-            if self.question.one_correct:
-                RADIOS = []
-                for variant in question_set:
-                    RADIOS.append((str(variant.id), variant.text))
-                self.fields['result'] = forms.ChoiceField(
-                    widget=forms.RadioSelect,
-                    choices=RADIOS,
+                self.variants = self.question.variants.all()
+            self.corrected = self.variants.filter(
+                correct=True).values_list('id', flat=True)
+            self.add_variants_fields(self.variants)
+
+    def add_variants_fields(self, variants_list: list) -> None:
+        if self.question.many_correct:
+            for variant in variants_list:
+                self.fields[str(variant.id)] = forms.BooleanField(
+                    label=variant.text,
+                    required=False
                 )
+        if self.question.one_correct:
+            RADIOS = []
+            for variant in variants_list:
+                RADIOS.append((str(variant.id), variant.text))
+            self.fields['result'] = forms.ChoiceField(
+                widget=forms.RadioSelect,
+                choices=RADIOS,
+            )
 
     def clean(self):
         v_count = [v for v in self.cleaned_data.values() if v is False]
@@ -40,7 +44,12 @@ class QuizProcessForm(forms.Form):
             raise ValidationError('Выберите хотя бы один вариант ответа')
         return self.cleaned_data
 
-    def add_results(self, results, correct, no_answers=False):
+    def add_results(
+            self,
+            results: list,
+            correct: bool,
+            no_answers: bool = False
+    ) -> None:
         variants = self.question.variants.all()
         answer = UserAnswer.objects.create(
             user=self.user,
@@ -53,14 +62,20 @@ class QuizProcessForm(forms.Form):
             no_answers=no_answers
         )
         for_create = []
-        for v_id in results:
-            variant = variants.get(id=v_id)
+        for variant in variants:
+            selected = False
+            corrected = False
+            if variant.id in results:
+                selected = True
+            if variant.id in self.corrected:
+                corrected = True
             for_create.append(
                 UserVariant(
                     answer=answer,
                     variant=variant,
                     variant_text=variant.text,
-                    correct=variant.correct
+                    selected=selected,
+                    correct=corrected,
                 )
             )
         UserVariant.objects.bulk_create(for_create)
@@ -103,10 +118,3 @@ class QuizProcessForm(forms.Form):
                 correct = False
             if results and not answer.exists():
                 self.add_results(results, correct)
-
-
-class QuizAddUpdateView(forms.ModelForm):
-    class Meta:
-        model = Quiz
-        fields = '__all__'
-        exclude = ('slug', 'author')

@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
-from django.views.generic import CreateView, DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView
 
-from .forms import QuizAddUpdateView, QuizProcessForm
+from .forms import QuizProcessForm
 from .models import Progress, Question, Quiz, QuizTheme, UserAnswer
 
 
@@ -69,15 +69,6 @@ class QuizListView(ListView):
 class QuizDetailView(DetailView):
     model = Quiz
     template_name = 'questions/quiz_detail.html'
-
-
-class QuizAddView(CreateView):
-    form_class = QuizAddUpdateView
-    template_name = 'questions/quiz_add.html'
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
 
 
 class QuizProcessView(LoginRequiredMixin, FormView):
@@ -185,6 +176,11 @@ class QuizFinallyView(LoginRequiredMixin, DetailView):
             user=self.request.user,
             quiz=self.object,
             quiz_revision=self.object.revision
+        ).annotate(
+            corrected_count=Count('variants', filter=Q(
+                variants__correct=True, variants__selected=True
+            )),
+            selected_count=Count('variants', filter=Q(variants__selected=True))
         ).order_by('date')
         correct_count = latest_answers.filter(correct=True).count()
         questions_count = self.object.questions.count()

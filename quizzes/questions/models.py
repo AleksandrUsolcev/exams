@@ -3,7 +3,7 @@ from random import randrange
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from slugify import slugify
@@ -184,14 +184,6 @@ class Question(models.Model):
             return f'{self.text[:48]}...'
         return f'{self.text}'
 
-    def delete(self, *args, **kwargs):
-        new_version = self.quiz.revision + 1
-        progress = Progress.objects.filter(quiz=self.quiz)
-        if progress.exists():
-            progress.delete()
-        Quiz.objects.filter(id=self.quiz.id).update(revision=new_version)
-        super().delete(*args, **kwargs)
-
 
 class Variant(models.Model):
     text = models.TextField(
@@ -229,16 +221,6 @@ class Variant(models.Model):
         if len(self.text) > 48:
             return f'{self.text[:48]}...'
         return f'{self.text}'
-
-    def delete(self, *args, **kwargs):
-        new_version = self.question.quiz.revision + 1
-        progress = Progress.objects.filter(quiz=self.question.quiz)
-        if progress.exists():
-            progress.delete()
-        Quiz.objects.filter(id=self.question.quiz.id).update(
-            revision=new_version
-        )
-        super().delete(*args, **kwargs)
 
 
 class UserAnswer(models.Model):
@@ -314,8 +296,13 @@ class UserVariant(models.Model):
         verbose_name='Вариант ответа',
         null=True
     )
+    selected = models.BooleanField(
+        verbose_name='Выбран пользователем',
+        default=False
+    )
     correct = models.BooleanField(
-        verbose_name='Результат'
+        verbose_name='Ответ верен',
+        default=False
     )
 
     class Meta:
@@ -362,6 +349,8 @@ class Progress(models.Model):
 
 @receiver(post_save, sender=Variant)
 @receiver(post_save, sender=Question)
+@receiver(post_delete, sender=Variant)
+@receiver(post_delete, sender=Question)
 def update_revision(sender, instance, **kwargs):
     new_version = instance.quiz.revision + 1
     progress = Progress.objects.filter(quiz=instance.quiz)

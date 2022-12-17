@@ -2,4 +2,10 @@
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
 <h1 class="fw-bold">{{ user.username }}</h1>
+{% if user.first_name %}
+  <h3 class="text-secondary">{{ user.first_name }} {{ user.last_name }}</h3>
+{% endif %}
+{% if user.about %}
+  <p class="pt-3 col-lg-6 col-md-8 col-12">{{ user.about }}</p>
+{% endif %}
 {% endblock %}
