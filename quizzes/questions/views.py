@@ -14,14 +14,12 @@ class IndexView(ListView):
     template_name = 'questions/index.html'
     context_object_name = 'themes'
     paginate_by = 15
+    queryset = QuizTheme.objects.prefetch_related('quizzes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Квизы!'
         return context
-
-    def get_queryset(self):
-        return QuizTheme.objects.prefetch_related('quizzes')
 
 
 class QuizListView(ListView):
@@ -33,7 +31,7 @@ class QuizListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         theme = get_object_or_404(QuizTheme, slug=self.kwargs.get('slug'))
-        context.update({'theme': theme},)
+        context.update({'theme': theme})
         return context
 
     def get_queryset(self):
