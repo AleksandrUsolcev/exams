@@ -64,4 +64,9 @@ urlpatterns = [
         name='password_change_done'
     ),
     path('@<slug:username>', views.UserProfileView.as_view(), name='profile'),
+    path(
+        '@<slug:username>/edit/',
+        views.UserEditView.as_view(),
+        name='profile_edit'
+    ),
 ]

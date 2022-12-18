@@ -27,6 +27,7 @@ class QuizProcessForm(forms.Form):
                     label=variant.text,
                     required=False
                 )
+
         if self.question.one_correct:
             RADIOS = []
             for variant in variants_list:

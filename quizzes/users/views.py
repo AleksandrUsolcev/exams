@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
-
+from django.views.generic import CreateView, DetailView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import SignupForm
 from .models import User
 
@@ -16,3 +16,14 @@ class UserProfileView(DetailView):
     template_name = 'users/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
+
+
+class UserEditView(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ['first_name', 'last_name', 'about']
+    template_name = 'users/profile_edit.html'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_object(self, *args, **kwargs):
+        return self.request.user

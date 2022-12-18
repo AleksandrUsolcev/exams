@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.urls import reverse
 
 
 class User(AbstractUser):
@@ -18,6 +19,9 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def get_absolute_url(self):
+        return reverse('users:profile', kwargs={'username': self.username})
 
     def __str__(self):
         return self.email

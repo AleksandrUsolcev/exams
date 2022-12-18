@@ -17,7 +17,6 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
             current_stage=F('progress__stage'),
             passed=Case(
                 When(progress__passed__isnull=False, then=True),
-                default=False,
                 output_field=BooleanField()
             ),
             percentage=ExpressionWrapper(
@@ -25,15 +24,18 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
                 output_field=IntegerField()
             )
         )
+
         query_without_user = Quiz.objects.filter(
             Q(theme__slug=theme_slug) &
-            ~Q(id__in=query_with_user_progress.values_list('id', flat=True))
+            ~Q(id__in=query_with_user_progress)
         ).annotate(questions_count=Count('questions'))
+
         queryset = sorted(
             list(chain(query_without_user, query_with_user_progress)),
             key=attrgetter('created'), reverse=True
         )
         return queryset
+
     queryset = Quiz.objects.filter(theme__slug=theme_slug).annotate(
         questions_count=Count('questions')).order_by('-created')
     return queryset

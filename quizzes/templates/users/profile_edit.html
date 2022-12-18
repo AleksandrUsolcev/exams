@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Редактирование {{ user.username }}{% endblock %}
+{% block content %}
+<a href="{% url 'users:profile' user.username %}" class="text-decoration-none fs-5 fw-bold">{{ user.username }}</a>
+<h1 class="fw-bold">Редактирование профиля</h1>
+<div class="pt-3 col-lg-6 col-md-8 col-12">
+  <form method="post">
+    {% include '../includes/auth_form_body.html' %}
+    <button class="btn btn-primary mb-3 mt-2 me-4" type="submit">
+      Сохранить
+    </button>
+      <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
+  </form>
+</div>
+{% endblock %}
