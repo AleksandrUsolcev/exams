@@ -335,6 +335,10 @@ class Progress(models.Model):
         verbose_name='Ответов',
         default=0
     )
+    started = models.DateTimeField(
+        verbose_name='Дата начала',
+        null=True
+    )
     passed = models.DateTimeField(
         verbose_name='Дата завершения',
         null=True
@@ -353,8 +357,5 @@ class Progress(models.Model):
 @receiver(post_delete, sender=Variant)
 @receiver(post_delete, sender=Question)
 def update_revision(sender, instance, **kwargs):
-    progress = Progress.objects.filter(quiz=instance.quiz)
-    if progress.exists():
-        progress.delete()
     Quiz.objects.filter(id=instance.quiz.id).update(
         revision=models.F('revision') + 1)
