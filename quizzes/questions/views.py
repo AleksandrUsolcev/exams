@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView
@@ -14,7 +14,9 @@ class IndexView(ListView):
     template_name = 'questions/index.html'
     context_object_name = 'themes'
     paginate_by = 15
-    queryset = QuizTheme.objects.prefetch_related('quizzes')
+    queryset = QuizTheme.objects.prefetch_related(
+        Prefetch('quizzes', queryset=Quiz.objects.filter(
+            active=True, visibility=True)))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

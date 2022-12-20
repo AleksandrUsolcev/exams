@@ -54,7 +54,7 @@ class Quiz(models.Model):
     revision = models.PositiveIntegerField(
         verbose_name='Редакция квиза',
         help_text=('Меняется автоматически при изменении/удалении вопросов'
-                   ' и вариантов ответов'),
+                   ' и вариантов ответов, если квиз активен и не скрыт'),
         default=1,
         editable=False
     )
@@ -101,6 +101,15 @@ class Quiz(models.Model):
         verbose_name='Разрешить оставлять выбор пустым',
         default=False
     )
+    active = models.BooleanField(
+        verbose_name='Активен',
+        help_text=('Статус принимает положительное состояние, '
+                   'если есть хотя бы один не скрытый/активный вопрос'),
+        default=False)
+    visibility = models.BooleanField(
+        verbose_name='Виден всем',
+        default=False
+    )
 
     class Meta:
         verbose_name = 'Квиз'
@@ -115,10 +124,11 @@ class Quiz(models.Model):
             code = randrange(10000, 99999)
         else:
             code = self.slug[-5:]
-            self.revision += 1
-            progress = Progress.objects.filter(quiz=self.pk)
-            if progress.exists():
-                progress.delete()
+            if self.active and self.visibility:
+                self.revision += 1
+                progress = Progress.objects.filter(quiz=self.pk)
+                if progress.exists():
+                    progress.delete()
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
 
@@ -164,6 +174,16 @@ class Question(models.Model):
         choices=TYPES,
         max_length=32,
         default='many_correct'
+    )
+    active = models.BooleanField(
+        verbose_name='Активен',
+        help_text=('Статус принимает положительное состояние, если '
+                   'есть хотя бы один не скрытый/активный вариант ответа'),
+        default=False
+    )
+    visibility = models.BooleanField(
+        verbose_name='Виден всем',
+        default=False
     )
 
     @property
@@ -357,5 +377,15 @@ class Progress(models.Model):
 @receiver(post_delete, sender=Variant)
 @receiver(post_delete, sender=Question)
 def update_revision(sender, instance, **kwargs):
-    Quiz.objects.filter(id=instance.quiz.id).update(
-        revision=models.F('revision') + 1)
+    quiz = instance.quiz
+    if quiz.active and quiz.visibility:
+        Quiz.objects.filter(id=quiz.id).update(
+            revision=models.F('revision') + 1)
+
+
+@receiver(post_save, sender=Variant)
+@receiver(post_save, sender=Question)
+@receiver(post_delete, sender=Variant)
+@receiver(post_delete, sender=Question)
+def update_active_status(sender, instance, **kwargs):
+    pass

@@ -4,28 +4,47 @@ from .models import Progress, Question, Quiz, QuizTheme, Variant
 
 
 class QuizThemeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'priority')
+    list_display = ('title', 'description', 'quizzes_count', 'priority')
     readonly_fields = ('slug',)
     list_editable = ('priority',)
+    readonly_fields = ('quizzes_count',)
+
+    def quizzes_count(self, obj):
+        return obj.quizzes.filter(visibility=False, active=False).count()
+
+    quizzes_count.short_description = 'Квизов'
 
 
 class QuestionInline(admin.StackedInline):
     model = Question
     show_change_link = True
     extra = 0
+    readonly_fields = ('active', 'variants_count')
+
+    def variants_count(self, obj):
+        return obj.variants.all().count()
+
+    variants_count.short_description = 'Вариантов ответа'
 
 
 class VariantInline(admin.TabularInline):
     model = Variant
-    show_change_link = True
     extra = 0
 
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('title', 'theme', 'author', 'revision', 'created')
-    readonly_fields = ('slug', 'revision')
+    list_display = ('title', 'theme', 'author',
+                    'revision', 'questions_count', 'visibility', 'created')
+    list_editable = ('visibility',)
+    readonly_fields = ('slug', 'active', 'revision', 'questions_count')
     raw_id_fields = ('author',)
     inlines = (QuestionInline,)
+    save_on_top = True
+
+    def questions_count(self, obj):
+        return obj.questions.all().count()
+
+    questions_count.short_description = 'Вопросов'
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'author', None) is None:
@@ -38,12 +57,8 @@ class QuestionAdmin(admin.ModelAdmin):
     list_editable = ('priority',)
     raw_id_fields = ('quiz',)
     inlines = (VariantInline,)
-
-
-class VariantAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'correct', 'priority')
-    list_editable = ('correct', 'priority')
-    raw_id_fields = ('question',)
+    save_on_top = True
+    readonly_fields = ('active',)
 
 
 class ProgressAdmin(admin.ModelAdmin):
@@ -56,5 +71,4 @@ class ProgressAdmin(admin.ModelAdmin):
 admin.site.register(QuizTheme, QuizThemeAdmin)
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(Variant, VariantAdmin)
 admin.site.register(Progress, ProgressAdmin)

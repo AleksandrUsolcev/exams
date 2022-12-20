@@ -11,7 +11,9 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
     if user.is_authenticated:
         query_with_user_progress = Quiz.objects.filter(
             theme__slug=theme_slug,
-            progress__user=user
+            progress__user=user,
+            visibility=True,
+            active=True
         ).prefetch_related('progress').annotate(
             questions_count=Count('questions'),
             current_stage=F('progress__stage'),
@@ -27,7 +29,9 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
 
         query_without_user = Quiz.objects.filter(
             Q(theme__slug=theme_slug) &
-            ~Q(id__in=query_with_user_progress)
+            ~Q(id__in=query_with_user_progress),
+            visibility=True,
+            active=True
         ).annotate(questions_count=Count('questions'))
 
         queryset = sorted(
@@ -36,6 +40,7 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
         )
         return queryset
 
-    queryset = Quiz.objects.filter(theme__slug=theme_slug).annotate(
+    queryset = Quiz.objects.filter(
+        theme__slug=theme_slug, visibility=True, active=True).annotate(
         questions_count=Count('questions')).order_by('-created')
     return queryset
