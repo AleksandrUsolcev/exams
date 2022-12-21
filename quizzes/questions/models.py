@@ -3,8 +3,6 @@ from random import randrange
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.urls import reverse
 from slugify import slugify
 
@@ -178,7 +176,7 @@ class Question(models.Model):
     active = models.BooleanField(
         verbose_name='Активен',
         help_text=('Статус принимает положительное состояние, если '
-                   'есть хотя бы один не скрытый/активный вариант ответа'),
+                   'есть хотя бы один вариант ответа'),
         default=False
     )
     visibility = models.BooleanField(
@@ -370,22 +368,3 @@ class Progress(models.Model):
 
     def __str__(self):
         return f'{self.user} stage in {self.quiz} ({self.stage})'
-
-
-@receiver(post_save, sender=Variant)
-@receiver(post_save, sender=Question)
-@receiver(post_delete, sender=Variant)
-@receiver(post_delete, sender=Question)
-def update_revision(sender, instance, **kwargs):
-    quiz = instance.quiz
-    if quiz.active and quiz.visibility:
-        Quiz.objects.filter(id=quiz.id).update(
-            revision=models.F('revision') + 1)
-
-
-@receiver(post_save, sender=Variant)
-@receiver(post_save, sender=Question)
-@receiver(post_delete, sender=Variant)
-@receiver(post_delete, sender=Question)
-def update_active_status(sender, instance, **kwargs):
-    pass

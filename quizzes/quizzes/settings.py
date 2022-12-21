@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'users',
-    'questions',
+    'questions.apps.QuestionsConfig',
     'debug_toolbar',
     'widget_tweaks'
 ]

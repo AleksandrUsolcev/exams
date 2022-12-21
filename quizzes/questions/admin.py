@@ -5,9 +5,8 @@ from .models import Progress, Question, Quiz, QuizTheme, Variant
 
 class QuizThemeAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'quizzes_count', 'priority')
-    readonly_fields = ('slug',)
     list_editable = ('priority',)
-    readonly_fields = ('quizzes_count',)
+    readonly_fields = ('slug', 'quizzes_count',)
 
     def quizzes_count(self, obj):
         return obj.quizzes.filter(visibility=False, active=False).count()
