@@ -35,8 +35,8 @@ class QuizAdmin(admin.ModelAdmin):
     list_display = ('title', 'theme', 'author',
                     'revision', 'questions_count', 'visibility', 'created')
     list_editable = ('visibility',)
-    readonly_fields = ('slug', 'active', 'revision', 'questions_count')
-    raw_id_fields = ('author',)
+    readonly_fields = ('author', 'slug', 'active',
+                       'revision', 'questions_count')
     inlines = (QuestionInline,)
     save_on_top = True
 

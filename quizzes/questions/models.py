@@ -51,8 +51,9 @@ class QuizTheme(models.Model):
 class Quiz(models.Model):
     revision = models.PositiveIntegerField(
         verbose_name='Редакция квиза',
-        help_text=('Меняется автоматически при изменении/удалении вопросов'
-                   ' и вариантов ответов, если квиз активен и не скрыт'),
+        help_text=('Меняется автоматически при изменении/удалении вопросов '
+                   'и вариантов ответов, если квиз готов к публикации и не '
+                   'скрыт'),
         default=1,
         editable=False
     )
@@ -97,27 +98,33 @@ class Quiz(models.Model):
     )
     empty_answers = models.BooleanField(
         verbose_name='Разрешить оставлять выбор пустым',
+        help_text='Только для типов вопросов с несколькими вариантами ответов',
         default=False
     )
     active = models.BooleanField(
-        verbose_name='Активен',
-        help_text=('Статус принимает положительное состояние, '
-                   'если есть хотя бы один не скрытый/активный вопрос'),
+        verbose_name='Готов к публикации',
+        help_text=('Статус принимает положительное состояние, если есть '
+                   'хотя бы один не скрытый/готовый к публикации вопрос'),
         default=False)
     visibility = models.BooleanField(
-        verbose_name='Виден всем',
+        verbose_name='Опубликован',
         default=False
     )
+    __prev_empty_answers = None
 
     class Meta:
         verbose_name = 'Квиз'
         verbose_name_plural = 'Квизы'
         ordering = ['-created']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__prev_empty_answers = self.empty_answers
+
     def __str__(self):
         return f'{self.title}'
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
         if self._state.adding:
             code = randrange(10000, 99999)
         else:
@@ -128,7 +135,26 @@ class Quiz(models.Model):
                 if progress.exists():
                     progress.delete()
         self.slug = slugify(self.title) + '-' + str(code)
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, *args, **kwargs)
+        if self.__prev_empty_answers != self.empty_answers:
+            current_active = True
+            updated_active = False
+            if self.empty_answers:
+                current_active = False
+                updated_active = True
+            questions = Question.objects.filter(
+                quiz=self.pk, active=current_active, variants__isnull=False
+            ).prefetch_related(
+                'variants').filter(type='many_correct').distinct()
+            questions.update(active=updated_active)
+        if not self._state.adding:
+            active = False
+            questions = Question.objects.filter(
+                quiz=self.pk, active=True, visibility=True)
+            if questions.exists():
+                active = True
+            Quiz.objects.filter(id=self.pk).update(active=active)
+        self.__prev_empty_answers = self.empty_answers
 
     def delete(self, *args, **kwargs):
         progress = Progress.objects.filter(quiz=self.pk)
@@ -174,13 +200,13 @@ class Question(models.Model):
         default='many_correct'
     )
     active = models.BooleanField(
-        verbose_name='Активен',
+        verbose_name='Готов к публикации',
         help_text=('Статус принимает положительное состояние, если '
                    'есть хотя бы один вариант ответа'),
         default=False
     )
     visibility = models.BooleanField(
-        verbose_name='Виден всем',
+        verbose_name='Опубликован',
         default=False
     )
 
@@ -195,7 +221,7 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
-        ordering = ['priority', 'id', 'text']
+        ordering = ['-visibility', '-active', 'priority', 'id', 'text']
 
     def __str__(self):
         if len(self.text) > 48:
