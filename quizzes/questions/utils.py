@@ -15,14 +15,24 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
             visibility=True,
             active=True
         ).prefetch_related('progress').annotate(
-            questions_count=Count('questions'),
+            questions_count=Count('questions', filter=(
+                Q(theme__slug=theme_slug) &
+                Q(progress__user=user) &
+                Q(questions__visibility=True) &
+                Q(questions__active=True))
+            ),
             current_stage=F('progress__stage'),
             passed=Case(
                 When(progress__passed__isnull=False, then=True),
                 output_field=BooleanField()
             ),
             percentage=ExpressionWrapper(
-                F('progress__answers') * 100 / Count('questions'),
+                F('progress__answers') * 100 / Count('questions', filter=(
+                    Q(theme__slug=theme_slug) &
+                    Q(progress__user=user) &
+                    Q(questions__visibility=True) &
+                    Q(questions__active=True))
+                ),
                 output_field=IntegerField()
             )
         )
@@ -32,7 +42,14 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
             ~Q(id__in=query_with_user_progress),
             visibility=True,
             active=True
-        ).annotate(questions_count=Count('questions'))
+        ).annotate(
+            questions_count=Count('questions', filter=(
+                Q(theme__slug=theme_slug) &
+                ~Q(id__in=query_with_user_progress) &
+                Q(questions__visibility=True) &
+                Q(questions__active=True))
+            )
+        )
 
         queryset = sorted(
             list(chain(query_without_user, query_with_user_progress)),
@@ -42,5 +59,9 @@ def get_quizzes_with_progress(user: object, theme_slug: str) -> object:
 
     queryset = Quiz.objects.filter(
         theme__slug=theme_slug, visibility=True, active=True).annotate(
-        questions_count=Count('questions')).order_by('-created')
+        questions_count=Count('questions', filter=(
+            Q(theme__slug=theme_slug) &
+            Q(questions__visibility=True) &
+            Q(questions__active=True)
+        ))).order_by('-created')
     return queryset

@@ -8,7 +8,7 @@
   <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
   <h1 class="fw-bold">{{ quiz.title }}</h1>
   <div class="pt-3">
-    {% for q in quiz.questions.all %}
+    {% for q in questions_list %}
       <a href="{% url 'questions:quiz_process' quiz.slug forloop.counter %}" class="text-decoration-none">
         <div class="d-inline-block pe-1 pb-1">
           <div class="p-2 rounded-1

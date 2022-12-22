@@ -61,7 +61,10 @@ class QuizProcessView(LoginRequiredMixin, FormView):
             quiz=self.quiz
         )
         self.question = Question.objects.filter(quiz=self.quiz)
-        if self.stage > self.quiz.questions.count():
+        self.questions_list = self.quiz.questions.filter(
+            active=True, visibility=True
+        )
+        if self.stage > self.questions_list.count():
             Progress.objects.filter(
                 user=self.request.user,
                 quiz=self.quiz
@@ -101,6 +104,7 @@ class QuizProcessView(LoginRequiredMixin, FormView):
             'quiz': self.quiz,
             'just_created': self.just_created,
             'question': question,
+            'questions_list': self.questions_list,
             'stage': self.stage,
             'already_answered': self.already_answered,
             'answers': self.answers,
@@ -158,7 +162,8 @@ class QuizFinallyView(LoginRequiredMixin, DetailView):
             selected_count=Count('variants', filter=Q(variants__selected=True))
         ).order_by('date')
         correct_count = latest_answers.filter(correct=True).count()
-        questions_count = self.object.questions.count()
+        questions = self.object.questions.filter(active=True, visibility=True)
+        questions_count = questions.count()
         try:
             correct_percentage = int((correct_count / questions_count) * 100)
         except ZeroDivisionError:
