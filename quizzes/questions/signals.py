@@ -1,8 +1,8 @@
 from django.db.models import F
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from .models import Question, Variant
+from .models import Question, Quiz, Variant
 
 
 @receiver(post_save, sender=Variant)
@@ -54,3 +54,28 @@ def quiz_active_change(sender, instance, raw, **kwargs):
     Question.objects.filter(id=instance.id).update(active=active)
     instance.quiz.active = quiz_active
     instance.quiz.save()
+
+
+@receiver(pre_save, sender=Quiz)
+def quiz_pre_save(sender, instance, **kwargs):
+    if instance.id is None:
+        return
+    previous_stage = Quiz.objects.get(id=instance.id)
+    if previous_stage.empty_answers != instance.empty_answers:
+        current_active = True
+        updated_active = False
+        if instance.empty_answers:
+            current_active = False
+            updated_active = True
+        questions = instance.questions.filter(
+            quiz=instance.id, active=current_active, variants__isnull=False
+        ).prefetch_related(
+            'variants').filter(type='many_correct').distinct()
+        questions.update(active=updated_active)
+
+    active = False
+    questions = Question.objects.filter(
+        quiz=instance.id, active=True, visibility=True)
+    if questions.exists():
+        active = True
+    Quiz.objects.filter(id=instance.id).update(active=active)

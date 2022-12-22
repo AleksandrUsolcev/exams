@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView
 
 from .forms import QuizProcessForm
-from .models import Progress, Question, Quiz, QuizTheme, UserAnswer
+from .models import (Progress, Question, Quiz, QuizTheme, UserAnswer,
+                     UserVariant)
 from .utils import get_quizzes_with_progress
 
 
@@ -149,18 +150,19 @@ class QuizFinallyView(LoginRequiredMixin, DetailView):
             quiz=self.object,
             user=self.request.user
         )
+
         latest_answers = UserAnswer.objects.prefetch_related(
-            'variants'
-        ).filter(
+            Prefetch('variants', queryset=UserVariant.objects.filter(
+                answer=F('answer')).order_by('-selected', '?'))).filter(
             user=self.request.user,
             quiz=self.object,
-            quiz_revision=self.object.revision
-        ).annotate(
+            quiz_revision=self.object.revision).annotate(
             corrected_count=Count('variants', filter=Q(
                 variants__correct=True, variants__selected=True
             )),
             selected_count=Count('variants', filter=Q(variants__selected=True))
         ).order_by('date')
+
         correct_count = latest_answers.filter(correct=True).count()
         questions = self.object.questions.filter(active=True, visibility=True)
         questions_count = questions.count()

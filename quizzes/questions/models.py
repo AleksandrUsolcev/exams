@@ -54,7 +54,7 @@ class Quiz(models.Model):
         help_text=('Меняется автоматически при изменении/удалении вопросов '
                    'и вариантов ответов, если квиз готов к публикации и не '
                    'скрыт'),
-        default=1,
+        default=0,
         editable=False
     )
     title = models.CharField(
@@ -110,21 +110,16 @@ class Quiz(models.Model):
         verbose_name='Опубликован',
         default=False
     )
-    __prev_empty_answers = None
 
     class Meta:
         verbose_name = 'Квиз'
         verbose_name_plural = 'Квизы'
         ordering = ['-created']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__prev_empty_answers = self.empty_answers
-
     def __str__(self):
         return f'{self.title}'
 
-    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+    def save(self, *args, **kwargs):
         if self._state.adding:
             code = randrange(10000, 99999)
         else:
@@ -135,26 +130,7 @@ class Quiz(models.Model):
                 if progress.exists():
                     progress.delete()
         self.slug = slugify(self.title) + '-' + str(code)
-        super().save(force_insert, force_update, *args, **kwargs)
-        if self.__prev_empty_answers != self.empty_answers:
-            current_active = True
-            updated_active = False
-            if self.empty_answers:
-                current_active = False
-                updated_active = True
-            questions = Question.objects.filter(
-                quiz=self.pk, active=current_active, variants__isnull=False
-            ).prefetch_related(
-                'variants').filter(type='many_correct').distinct()
-            questions.update(active=updated_active)
-        if not self._state.adding:
-            active = False
-            questions = Question.objects.filter(
-                quiz=self.pk, active=True, visibility=True)
-            if questions.exists():
-                active = True
-            Quiz.objects.filter(id=self.pk).update(active=active)
-        self.__prev_empty_answers = self.empty_answers
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         progress = Progress.objects.filter(quiz=self.pk)
