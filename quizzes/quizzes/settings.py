@@ -21,11 +21,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'django_filters',
     'core',
     'users',
     'questions.apps.QuestionsConfig',
     'debug_toolbar',
-    'widget_tweaks'
+    'widget_tweaks',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -70,6 +73,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+REST_FRAMEWORK = {
+    'SEARCH_PARAM': 'term'
 }
 
 AUTH_PASSWORD_VALIDATORS = [

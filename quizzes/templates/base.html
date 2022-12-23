@@ -1,38 +1,67 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/16x16.png' %}">
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <title>{% block title %}{% endblock %}</title>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/16x16.png' %}">
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+
+  <title>{% block title %}{% endblock %}</title>
 </head>
-  <body>
-    <div class="container-fluid bg-primary">
-      <div class="container">
-        <div class="row py-4">
-          <div class="col-4 col-lg-4">
-            <a href="{% url 'questions:index' %}" class="text-decoration-none"><h1 class="logo fw-bold text-white">Quizzes</h1></a>
-          </div>
-          <div class="col-8 col-lg-8 d-flex align-items-center flex-row-reverse text-white">
-            {% if request.user.is_authenticated %}
-              <a href="{% url 'users:logout' %}" class="fw-bold text-white text-decoration-none">Выход</a>
-              <a href="{% url 'users:profile' request.user.username %}" class="fw-bold text-white text-decoration-none pe-4">{{ request.user.username }}</a>
-              {% if request.user.is_superuser %}
-                <a href="{% url 'admin:index' %}" class="fw-bold text-white text-decoration-none pe-4">Админ-панель</a>
-              {% endif %}
-            {% else %}
-              <a href="{% url 'users:signup' %}" class="fw-bold text-white text-decoration-none">Регистрация</a>
-              <a href="{% url 'users:login' %}" class="fw-bold text-white text-decoration-none pe-4">Вход</a>
-            {% endif %}
-          </div>
+
+<body>
+  <div class="container-fluid">
+    <div class="container">
+      <div class="row py-4">
+        <div class="col-3 col-lg-2">
+          <a href="{% url 'questions:index' %}" class="text-decoration-none">
+            <h1 class="logo fw-bold">Quizzes</h1>
+          </a>
+        </div>
+        <div id="search" class="col-4 col-lg-6 d-flex align-items-center">
+          <input type="search" name="query" class="form-control" placeholder="Поиск">
+        </div>
+        <div class="col-5 col-lg-4 d-flex align-items-center flex-row-reverse">
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'users:logout' %}" class="fw-bold text-decoration-none">Выход</a>
+          <a href="{% url 'users:profile' request.user.username %}" class="fw-bold text-decoration-none pe-4">{{ request.user.username }}</a>
+          {% if request.user.is_superuser %}
+          <a href="{% url 'admin:index' %}" class="fw-bold text-decoration-none pe-4">Админ-панель</a>
+          {% endif %}
+          {% else %}
+          <a href="{% url 'users:signup' %}" class="fw-bold text-decoration-none">Регистрация</a>
+          <a href="{% url 'users:login' %}" class="fw-bold text-decoration-none pe-4">Вход</a>
+          {% endif %}
         </div>
       </div>
     </div>
-    <div class="container main-content py-4">
-      {% block content %}{% endblock %}
-    </div>
-  </body>
+  </div>
+  <div class="container main-content py-4">
+    {% block content %}{% endblock %}
+  </div>
+  <script>
+    jQuery.ui.autocomplete.prototype._resizeMenu = function () {
+      var ul = this.menu.element;
+      ul.outerWidth(this.element.outerWidth());
+    }
+
+    $('#search input[name="query"]').autocomplete({
+      minLength: 2,
+      source: "{% url 'api:quizzes-list' %}",
+      select: function (event, ui) {
+        var quiz_url = "{% url 'questions:quiz_detail' 1 %}".replace(/1/, ui.item.slug)
+        window.location = quiz_url;
+      }
+    })
+  </script>
+</body>
+
 </html>

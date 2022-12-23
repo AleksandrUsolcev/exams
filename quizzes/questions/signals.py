@@ -57,7 +57,7 @@ def quiz_active_change(sender, instance, raw, **kwargs):
 
 
 @receiver(pre_save, sender=Quiz)
-def quiz_stage_change(sender, instance, **kwargs):
+def quiz_empty_answers_change(sender, instance, **kwargs):
     if instance.id is None:
         return
     previous_stage = Quiz.objects.get(id=instance.id)
@@ -79,7 +79,7 @@ def quiz_stage_change(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Quiz)
-def quiz_action_self_change(sender, instance, **kwargs):
+def quiz_active_self_change(sender, instance, **kwargs):
     active = False
     questions = Question.objects.filter(
         quiz=instance.id, active=True, visibility=True)
