@@ -1,4 +1,4 @@
-from django.db.models import F
+from django.db.models import Count, F, Q
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
@@ -57,22 +57,29 @@ def quiz_active_change(sender, instance, raw, **kwargs):
 
 
 @receiver(pre_save, sender=Quiz)
-def quiz_pre_save(sender, instance, **kwargs):
+def quiz_stage_change(sender, instance, **kwargs):
     if instance.id is None:
         return
     previous_stage = Quiz.objects.get(id=instance.id)
     if previous_stage.empty_answers != instance.empty_answers:
-        current_active = True
-        updated_active = False
+        active = False
+        questions = instance.questions.prefetch_related('variants').annotate(
+            corrected_count=Count(
+                'variants__correct',
+                filter=Q(variants__correct=True)
+            )
+        ).filter(
+            type='many_correct',
+            variants__isnull=False,
+            corrected_count=0
+        ).distinct()
         if instance.empty_answers:
-            current_active = False
-            updated_active = True
-        questions = instance.questions.filter(
-            quiz=instance.id, active=current_active, variants__isnull=False
-        ).prefetch_related(
-            'variants').filter(type='many_correct').distinct()
-        questions.update(active=updated_active)
+            active = True
+        questions.update(active=active)
 
+
+@receiver(post_save, sender=Quiz)
+def quiz_action_self_change(sender, instance, **kwargs):
     active = False
     questions = Question.objects.filter(
         quiz=instance.id, active=True, visibility=True)

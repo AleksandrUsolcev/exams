@@ -8,6 +8,10 @@ class QuizThemeAdmin(admin.ModelAdmin):
     list_editable = ('priority',)
     readonly_fields = ('slug', 'quizzes_count',)
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('quizzes')
+
     def quizzes_count(self, obj):
         return obj.quizzes.filter(visibility=False, active=False).count()
 
@@ -19,6 +23,10 @@ class QuestionInline(admin.StackedInline):
     show_change_link = True
     extra = 0
     readonly_fields = ('active', 'variants_count')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('variants')
 
     def variants_count(self, obj):
         return obj.variants.all().count()
@@ -39,6 +47,11 @@ class QuizAdmin(admin.ModelAdmin):
                        'revision', 'questions_count')
     inlines = (QuestionInline,)
     save_on_top = True
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('questions').prefetch_related(
+            'theme', 'author')
 
     def questions_count(self, obj):
         return obj.questions.all().count()

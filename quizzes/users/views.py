@@ -1,6 +1,8 @@
+from django.contrib.auth import login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .forms import SignupForm
 from .models import User
 
@@ -9,6 +11,11 @@ class SignupView(CreateView):
     form_class = SignupForm
     success_url = reverse_lazy('questions:index')
     template_name = 'users/signup.html'
+
+    def form_valid(self, form):
+        valid = super().form_valid(form)
+        login(self.request, self.object)
+        return valid
 
 
 class UserProfileView(DetailView):
