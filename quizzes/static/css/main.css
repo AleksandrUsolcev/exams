@@ -23,7 +23,7 @@
   border: 0px;
   border-radius: 0 0 0.3em 0.3em;
   padding: 1em;
-  color: #777777;
+  color: #444;
   padding-left: 0.8rem;
   font-size: 0.95em;
   line-height: 1.8em;
@@ -31,12 +31,19 @@
   border-top: none;
 }
 
+.ui-widget.ui-widget-content .item-theme {
+  color: #999;
+  font-size: 0.8em;
+  line-height: 0.8em;
+  padding-bottom: 1em;
+}
+
 .ui-menu-item .ui-menu-item-wrapper {
   padding: 0;
   padding-bottom: 0.3em;
 }
 
-.ui-menu-item .ui-menu-item-wrapper.ui-state-active {
+.ui-menu-item .item-value.ui-menu-item-wrapper.ui-state-active {
   background: none !important;
   font-weight: none !important;
   color: #0d6efd !important;

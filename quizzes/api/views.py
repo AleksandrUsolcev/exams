@@ -9,7 +9,8 @@ from .serializers import QuizSerializer
 
 class QuizViewSet(ModelViewSet):
     serializer_class = QuizSerializer
-    queryset = Quiz.objects.filter(active=True, visibility=True)
+    queryset = Quiz.objects.filter(
+        active=True, visibility=True).prefetch_related('theme')
     http_method_names = ('get')
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('title',)
