@@ -1,16 +1,53 @@
+body {
+  background: rgb(255, 254, 251);
+}
+
+.logo {
+  font-size: 3.7em;
+  background: #0D6EFD;
+  background: linear-gradient(to bottom right, #0D6EFD 23%, #6943E6 78%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h1.logo.short-view {
+  display: none;
+}
+
+.main-tile {
+  background: #fff;
+  border-radius: 1em;
+  padding: 1em 2em;
+  margin: 1.5em 0;
+  -webkit-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  -moz-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+}
+
 .main-search .form-control {
   padding-bottom: 0.45rem;
-  border: 1px solid #0d6efd;
+  border: 1px solid #fff;
+  -webkit-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  -moz-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
 }
 
 .main-search .form-control::placeholder {
-  color: #86b7fe;
+  color: #76adff;
   font-weight: bold;
 }
 
+.main-search .form-control:focus::placeholder {
+  color: #0d6efd;
+}
+
 .main-search .form-control:focus {
-  border-color: none;
-  box-shadow: none;
+  -webkit-box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
+  -moz-box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
+  box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
+  border: 1px solid #0d6efd;
+  color: #0d6efd;
+  font-weight: bold;
 }
 
 .ui-autocomplete {
@@ -25,15 +62,20 @@
   padding: 1em;
   color: #444;
   padding-left: 0.8rem;
-  font-size: 0.95em;
+  font-size: 0.9em;
+  font-weight: bold;
   line-height: 1.8em;
   border: 1px solid #0d6efd;
   border-top: none;
+  -webkit-box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
+  -moz-box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
+  box-shadow: 0px 18px 13px 0px rgba(34, 60, 80, 0.25);
 }
 
 .ui-widget.ui-widget-content .item-theme {
   color: #999;
   font-size: 0.8em;
+  font-weight: normal;
   line-height: 0.8em;
   padding-bottom: 1em;
 }
@@ -48,4 +90,21 @@
   font-weight: none !important;
   color: #0d6efd !important;
   border-color: #fff !important;
+}
+
+@media (max-width: 1200px) {
+  h1.logo {
+    font-size: 3em;
+  }
+}
+
+
+@media (max-width: 992px) {
+  h1.logo.full-view {
+    display: none !important;
+  }
+
+  h1.logo.short-view {
+    display: inline-block;
+  }
 }

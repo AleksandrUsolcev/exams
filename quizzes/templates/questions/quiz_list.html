@@ -5,10 +5,10 @@
 {% endblock %}
 {% block content %}
   <h1 class="fw-bold">{{ theme.title }}</h1>
-  <p class="py-3 fs-5">{{ theme.description }}</p>
-  <div>
+  <div class="main-tile">
+    <p class="py-3 fs-5">{{ theme.description }}</p>
     {% for quiz in quizzes %}
-      <div class="bg-light shadow p-4 my-5 row">
+      <div class="row pb-3">
         <div class="col-9">
           <a href="{% url 'questions:quiz_detail' quiz.slug %}" class="text-decoration-none"><h4>{{ quiz.title }}</h4></a>
           <p>{{ quiz.description }}</p>
