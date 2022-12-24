@@ -1,6 +1,13 @@
 .main-search .form-control {
   padding-bottom: 0.45rem;
+  border: 1px solid #0d6efd;
 }
+
+.main-search .form-control::placeholder {
+  color: #86b7fe;
+  font-weight: bold;
+}
+
 .main-search .form-control:focus {
   border-color: none;
   box-shadow: none;
@@ -16,11 +23,11 @@
   border: 0px;
   border-radius: 0 0 0.3em 0.3em;
   padding: 1em;
-  color: #353535;
+  color: #777777;
   padding-left: 0.8rem;
   font-size: 0.95em;
   line-height: 1.8em;
-  border: 1px solid #86b7fe;
+  border: 1px solid #0d6efd;
   border-top: none;
 }
 
@@ -34,4 +41,4 @@
   font-weight: none !important;
   color: #0d6efd !important;
   border-color: #fff !important;
-} 
+}

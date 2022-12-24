@@ -46,6 +46,10 @@ class QuizDetailView(DetailView):
     model = Quiz
     template_name = 'questions/quiz_detail.html'
 
+    def get_object(self, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        return get_object_or_404(Quiz, slug=slug, active=True, visibility=True)
+
 
 class QuizProcessView(LoginRequiredMixin, FormView):
     template_name = 'questions/quiz_process.html'

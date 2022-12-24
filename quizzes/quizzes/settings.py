@@ -75,10 +75,6 @@ DATABASES = {
     }
 }
 
-REST_FRAMEWORK = {
-    'SEARCH_PARAM': 'term'
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME':

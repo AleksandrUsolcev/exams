@@ -21,12 +21,12 @@
   <div class="container-fluid">
     <div class="container">
       <div class="row py-4">
-        <div class="col-3 col-lg-2">
+        <div class="col-3 col-lg-4">
           <a href="{% url 'questions:index' %}" class="text-decoration-none">
             <h1 class="logo fw-bold">Quizzes</h1>
           </a>
         </div>
-        <div id="search" class="col-4 col-lg-6 d-flex align-items-center main-search">
+        <div id="search" class="col-4 col-lg-4 d-flex align-items-center main-search">
           <input type="search" name="query" class="form-control" placeholder="Поиск">
         </div>
         <div class="col-5 col-lg-4 d-flex align-items-center flex-row-reverse">
@@ -55,10 +55,23 @@
 
     $('#search input[name="query"]').autocomplete({
       minLength: 2,
-      source: "{% url 'api:quizzes-list' %}",
+      source: function (request, response) {
+        $.ajax({
+          url: "{% url 'api:quizzes-list' %}",
+          data: { search: request.term },
+          dataType: "json",
+          success: function(data) {
+            return response(data.results)
+          },
+          error: function () {
+            response([]);
+          }
+        });
+      },
       select: function (event, ui) {
         var quiz_url = "{% url 'questions:quiz_detail' 1 %}".replace(/1/, ui.item.slug)
         window.location = quiz_url;
+        return false;
       },
       position: {
         my: "left+0 top-4",
