@@ -78,7 +78,7 @@
       }
     }).autocomplete("instance")._renderItem = function (ul, item) {
       return $("<li>")
-        .append("<div class='item-value'>" + item.value + "</div><div class='item-theme'>" + item.theme + "</div>")
+        .append(`<div class='item-value'>${item.value}</div><div class='item-theme'>${item.theme}</div>`)
         .appendTo(ul);
     };
   </script>
