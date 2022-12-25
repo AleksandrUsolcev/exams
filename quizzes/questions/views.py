@@ -56,90 +56,90 @@ class QuizProcessView(LoginRequiredMixin, FormView):
     form_class = QuizProcessForm
 
     def dispatch(self, request, *args, **kwargs):
-        self.slug = self.kwargs.get('slug')
-        self.stage = self.kwargs.get('pk')
         if not self.request.user.is_authenticated:
             return redirect('users:signup')
-        self.quiz = get_object_or_404(Quiz, slug=self.slug)
-        self.progress, self.just_created = Progress.objects.get_or_create(
+
+        slug = self.kwargs.get('slug')
+        self.stage = self.kwargs.get('pk')
+        quiz = Quiz.objects.filter(
+            slug=slug, active=True, visibility=True
+        ).select_related('theme').prefetch_related(
+            Prefetch(
+                'questions', queryset=Question.objects.filter(
+                    active=True, visibility=True)
+            ))
+        self.quiz = get_object_or_404(quiz)
+
+        if self.quiz.questions.count() < self.stage:
+            return redirect('questions:quiz_detail', slug)
+
+        self.progress, _ = Progress.objects.get_or_create(
             user=self.request.user,
             quiz=self.quiz
         )
-        self.question = Question.objects.filter(quiz=self.quiz)
-        self.questions_list = self.quiz.questions.filter(
-            active=True, visibility=True
-        )
-        if self.stage > self.questions_list.count():
-            Progress.objects.filter(
-                user=self.request.user,
-                quiz=self.quiz
-            ).update(passed=timezone.now())
-            return redirect(
-                'questions:quiz_finally',
-                slug=self.slug
-            )
-        self.answers = UserAnswer.objects.filter(
-            user=self.request.user,
-            question=self.question[self.stage - 1],
-            quiz_revision=self.quiz.revision
-        ).prefetch_related('variants')
-        self.answered = UserAnswer.objects.filter(
-            user=self.request.user,
-            quiz_revision=self.quiz.revision
-        ).values_list('question__id', flat=True)
-        self.already_answered = False
-        if self.answers.exists():
-            self.already_answered = True
+        self.question = self.quiz.questions.all()[self.stage - 1]
+        self.last_stage = self.quiz.questions.count() == self.stage
         return super(QuizProcessView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if self.stage > self.progress.stage:
+        stage = self.kwargs.get('pk')
+        if stage > self.progress.stage:
             return redirect(
                 'questions:quiz_process',
-                slug=self.slug,
+                slug=self.kwargs.get('slug'),
                 pk=self.progress.stage
             )
         return super().get(request)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        question = self.question[self.stage - 1]
-        extra_context = {
-            'progress': self.progress,
-            'quiz': self.quiz,
-            'just_created': self.just_created,
-            'question': question,
-            'questions_list': self.questions_list,
-            'stage': self.stage,
-            'already_answered': self.already_answered,
-            'answers': self.answers,
-            'answered': self.answered
-        }
-        context.update(extra_context)
-        return context
-
     def get_initial(self):
         initial = super().get_initial()
-        initial_data = {
-            'question': self.question[self.stage - 1],
+        self.initial_data = {
             'quiz': self.quiz,
+            'question': self.question,
+            'progress': self.progress,
             'user': self.request.user,
-            'already_answered': self.already_answered
+            'stage': self.stage
         }
-        initial.update(initial_data)
+        initial.update(self.initial_data)
         return initial
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.progress.answers >= self.stage:
+            answer = UserVariant.objects.filter(
+                answer__user=self.request.user,
+                answer__question=self.question,
+                answer__quiz_revision=self.quiz.revision
+            ).order_by('-selected', '?')
+            self.initial_data['answer'] = answer
+        context.update(self.initial_data)
+        return context
+
     def form_valid(self, form):
-        if self.progress.stage < self.stage + 1:
+        stage = self.kwargs.get('pk')
+        data_update = {
+            'stage': stage + 1,
+            'answers': stage
+        }
+        if self.last_stage:
+            data_update['passed'] = timezone.now()
+
+        if self.progress.stage < stage + 1:
             Progress.objects.filter(
                 user=self.request.user,
                 quiz=self.quiz
-            ).update(stage=self.stage + 1, answers=self.stage)
-        form.answer()
+            ).update(**data_update)
+            form.answer()
+
+        if self.last_stage:
+            return redirect(
+                'questions:quiz_finally',
+                slug=self.kwargs.get('slug')
+            )
         return redirect(
             'questions:quiz_process',
-            slug=self.slug,
-            pk=self.stage + 1
+            slug=self.kwargs.get('slug'),
+            pk=stage + 1
         )
 
 
@@ -147,14 +147,18 @@ class QuizFinallyView(LoginRequiredMixin, DetailView):
     model = Quiz
     template_name = 'questions/quiz_finally.html'
 
+    def get(self, request, *args, **kwargs):
+        progress = Progress.objects.filter(
+            user=self.request.user,
+            quiz=self.get_object(),
+            passed__isnull=False
+        )
+        if not progress.exists():
+            return redirect('questions:quiz_detail', self.get_object().slug)
+        return super().get(request)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        get_object_or_404(
-            Progress,
-            quiz=self.object,
-            user=self.request.user
-        )
-
         latest_answers = UserAnswer.objects.prefetch_related(
             Prefetch('variants', queryset=UserVariant.objects.filter(
                 answer=F('answer')).order_by('-selected', '?'))).filter(

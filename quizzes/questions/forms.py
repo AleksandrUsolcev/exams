@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ValidationError
 
-from .models import UserAnswer, UserVariant, Variant
+from .models import UserAnswer, UserVariant
 
 
 class QuizProcessForm(forms.Form):
@@ -10,8 +10,11 @@ class QuizProcessForm(forms.Form):
         super(QuizProcessForm, self).__init__(*args, **kwargs)
         self.question = self.initial.get('question')
         self.quiz = self.initial.get('quiz')
+        self.progress = self.initial.get('progress')
         self.user = self.initial.get('user')
-        if not self.initial.get('already_answered'):
+        self.stage = self.initial.get('stage')
+
+        if self.progress.answers < self.stage:
             if self.quiz.shuffle_variants:
                 self.variants = self.question.variants.all().order_by('?')
             else:
@@ -82,20 +85,16 @@ class QuizProcessForm(forms.Form):
         UserVariant.objects.bulk_create(for_create)
 
     def answer(self):
-        answer = UserAnswer.objects.filter(
-            user=self.user,
-            quiz=self.quiz,
-            quiz_revision=self.quiz.revision,
-            question=self.question
-        )
         correct = True
+
         if self.question.one_correct:
             result = [int(self.cleaned_data.get('result'))]
-            variant = Variant.objects.filter(id=result[0], correct=True)
+            variant = self.variants.filter(id=result[0], correct=True)
             if not variant.exists():
                 correct = False
-            if result and not answer.exists():
+            if result and self.progress.answers < self.stage:
                 self.add_results(result, correct)
+
         if self.question.many_correct:
             results = []
             for variant_id in self.cleaned_data:
@@ -103,19 +102,19 @@ class QuizProcessForm(forms.Form):
                 if status is True:
                     results.append(int(variant_id))
             if self.quiz.empty_answers and not results:
-                variants = Variant.objects.filter(
+                variants = self.variants.filter(
                     question=self.question,
                     correct=True
                 )
                 if variants.exists():
                     correct = False
                 self.add_results(results, correct, no_answers=True)
-            uncorrects = Variant.objects.filter(id__in=results, correct=False)
-            corrects_count = Variant.objects.filter(
+            uncorrects = self.variants.filter(id__in=results, correct=False)
+            corrects_count = self.variants.filter(
                 question=self.question,
                 correct=True
             ).count()
             if uncorrects.exists() or len(results) < corrects_count:
                 correct = False
-            if results and not answer.exists():
+            if results and self.progress.answers < self.stage:
                 self.add_results(results, correct)

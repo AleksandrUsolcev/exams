@@ -8,13 +8,13 @@
   <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
   <h1 class="fw-bold">{{ quiz.title }}</h1>
   <div class="pt-3">
-    {% for q in questions_list %}
+    {% for q in quiz.questions.all %}
       <a href="{% url 'questions:quiz_process' quiz.slug forloop.counter %}" class="text-decoration-none">
         <div class="d-inline-block pe-1 pb-1">
           <div class="p-2 rounded-1
-            {% if question.id == q.id %}
+            {% if stage == forloop.counter %}
             bg-primary border border-primary
-            {% elif q.id in answered %}
+            {% elif stage > forloop.counter or progress.stage > forloop.counter %}
             bg-success border border-success
             {% else %}
             bg-light border
@@ -25,7 +25,7 @@
     {% endfor %}
   </div>
   <p class="py-3 fs-5">{{ question.text }}</p>
-  {% if not already_answered %}
+  {% if progress.answers < stage %}
   <form method="post">
     {% csrf_token %}
       <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
@@ -50,11 +50,8 @@
     </button>
   </form>
   {% else %}
-    <p class="fw-bold">Ваши ответы</p>
-  {% for answer in answers %}
-    {% for variant in answer.variants.all %}
-      <p>{{ variant.variant_text }}</p>
+    {% for variant in answer %}
+      {% include '../includes/user_variants.html' %}
     {% endfor %}
-  {% endfor %}
   {% endif %}
 {% endblock %}

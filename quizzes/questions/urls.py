@@ -16,7 +16,7 @@ urlpatterns = [
         name='quiz_list'
     ),
     path(
-        'quiz/<slug:slug>/',
+        'quiz/<slug:slug>/details/',
         views.QuizDetailView.as_view(),
         name='quiz_detail'
     ),
