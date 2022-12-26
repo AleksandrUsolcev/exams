@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
-<h1 class="fw-bold">{{ user.username }}</h1>
-{% if user.first_name %}
-  <h3 class="text-secondary">{{ user.first_name }} {{ user.last_name }}</h3>
-{% endif %}
-{% if request.user.is_authenticated and request.user == user %}
-  <a href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
-  <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
-{% endif %}
-{% if user.about %}
-  <p class="pt-3 col-lg-6 col-md-8 col-12">{{ user.about }}</p>
-{% endif %}
+<h2 class="fw-bold">{{ user.username }}</h2>
+<div class="main-tile col-12 col-md-6 col-lg-4">
+  {% if user.first_name %}
+    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+  {% endif %}
+  {% if request.user.is_authenticated and request.user == user %}
+    <a href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
+    <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
+  {% endif %}
+  {% if user.about %}
+    <p class="pt-3 col-lg-6 col-md-8 col-12">{{ user.about }}</p>
+  {% endif %}
+</div>
 {% endblock %}

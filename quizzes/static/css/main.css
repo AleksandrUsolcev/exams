@@ -1,11 +1,12 @@
 body {
-  background: rgb(255, 254, 251);
+  background: #e9ecf7;
 }
 
 .logo {
   font-size: 3.7em;
   background: #0D6EFD;
-  background: linear-gradient(to bottom right, #0D6EFD 23%, #6943E6 78%);
+  background: linear-gradient(to bottom right, #3586ff 23%, #6943E6 78%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -22,11 +23,19 @@ h1.logo.short-view {
   -webkit-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
   -moz-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
   box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  transition: 0.2s;
+}
+
+.hover-shadow:hover {
+  -webkit-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
+  -moz-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
+  box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
 }
 
 .main-search .form-control {
   padding-bottom: 0.45rem;
   border: 1px solid #fff;
+  border-radius: .5em;
   -webkit-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
   -moz-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
   box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
@@ -58,7 +67,7 @@ h1.logo.short-view {
 
 .ui-widget.ui-widget-content {
   border: 0px;
-  border-radius: 0 0 0.3em 0.3em;
+  border-radius: 0 0 0.5em 0.5em;
   padding: 1em;
   color: #444;
   padding-left: 0.8rem;
@@ -90,6 +99,10 @@ h1.logo.short-view {
   font-weight: none !important;
   color: #0d6efd !important;
   border-color: #fff !important;
+}
+
+.answer-icon {
+  margin-top: -.2em;
 }
 
 @media (max-width: 1200px) {

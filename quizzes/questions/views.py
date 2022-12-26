@@ -66,8 +66,22 @@ class QuizProcessView(LoginRequiredMixin, FormView):
         ).select_related('theme').prefetch_related(
             Prefetch(
                 'questions', queryset=Question.objects.filter(
-                    active=True, visibility=True)
-            ))
+                    active=True, visibility=True).annotate(
+                        corrected=Count('answers__correct', filter=Q(
+                            answers__user=self.request.user,
+                            answers__quiz_revision=F('quiz__revision'),
+                            quiz=F('quiz'),
+                            answers__correct=True
+                        )),
+                        passed=Count('answers__date', filter=Q(
+                            answers__user=self.request.user,
+                            answers__quiz_revision=F('quiz__revision'),
+                            quiz=F('quiz'),
+                            answers__date__isnull=False
+                        ))
+                )
+            )
+        )
         self.quiz = get_object_or_404(quiz)
 
         if self.quiz.questions.count() < self.stage:
@@ -83,7 +97,9 @@ class QuizProcessView(LoginRequiredMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         stage = self.kwargs.get('pk')
-        if stage > self.progress.stage:
+        if (stage > self.progress.stage
+            or not self.quiz.show_results
+                and stage != self.progress.stage):
             return redirect(
                 'questions:quiz_process',
                 slug=self.kwargs.get('slug'),
@@ -105,18 +121,33 @@ class QuizProcessView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.progress.answers >= self.stage:
-            answer = UserVariant.objects.filter(
-                answer__user=self.request.user,
-                answer__question=self.question,
-                answer__quiz_revision=self.quiz.revision
-            ).order_by('-selected', '?')
-            self.initial_data['answer'] = answer
+        if self.quiz.show_results and self.progress.answers >= self.stage:
+            answer = UserAnswer.objects.prefetch_related(
+                Prefetch('variants', queryset=UserVariant.objects.filter(
+                    answer=F('answer')).order_by('-selected', '?'))).filter(
+                user=self.request.user,
+                quiz=self.quiz,
+                question=self.question,
+                quiz_revision=self.quiz.revision).annotate(
+                corrected_count=Count('variants', filter=Q(
+                    variants__correct=True, variants__selected=True
+                )),
+                selected_count=Count('variants', filter=Q(
+                    variants__selected=True
+                ))
+            ).order_by('date').first()
+            extra_context = {
+                'answer': answer,
+                'last_stage': self.last_stage,
+                'next_stage': self.stage + 1
+            }
+            context.update(extra_context)
         context.update(self.initial_data)
         return context
 
     def form_valid(self, form):
         stage = self.kwargs.get('pk')
+        slug = self.kwargs.get('slug')
         data_update = {
             'stage': stage + 1,
             'answers': stage
@@ -131,16 +162,12 @@ class QuizProcessView(LoginRequiredMixin, FormView):
             ).update(**data_update)
             form.answer()
 
-        if self.last_stage:
-            return redirect(
-                'questions:quiz_finally',
-                slug=self.kwargs.get('slug')
-            )
-        return redirect(
-            'questions:quiz_process',
-            slug=self.kwargs.get('slug'),
-            pk=stage + 1
-        )
+        if self.last_stage and not self.quiz.show_results:
+            return redirect('questions:quiz_finally', slug=slug)
+        elif not self.quiz.show_results:
+            return redirect('questions:quiz_process', slug=slug, pk=stage + 1)
+        else:
+            return redirect('questions:quiz_process', slug=slug, pk=stage)
 
 
 class QuizFinallyView(LoginRequiredMixin, DetailView):

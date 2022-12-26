@@ -8,7 +8,7 @@
   <div class="main-tile">
     <p class="py-3 fs-5">{{ theme.description }}</p>
     {% for quiz in quizzes %}
-      <div class="row pb-3">
+      <div class="row pb-5">
         <div class="col-9">
           <a href="{% url 'questions:quiz_detail' quiz.slug %}" class="text-decoration-none"><h4>{{ quiz.title }}</h4></a>
           <p>{{ quiz.description }}</p>

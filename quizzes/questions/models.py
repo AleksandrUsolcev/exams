@@ -89,7 +89,7 @@ class Quiz(models.Model):
         auto_now_add=True
     )
     show_results = models.BooleanField(
-        verbose_name='Отображать пользователю подробные результаты',
+        verbose_name='Отображать результат после каждого ответа',
         default=True
     )
     shuffle_variants = models.BooleanField(
