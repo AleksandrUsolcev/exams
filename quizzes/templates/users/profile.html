@@ -11,7 +11,15 @@
     <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
   {% endif %}
   {% if user.about %}
-    <p class="pt-3 col-lg-6 col-md-8 col-12">{{ user.about }}</p>
+    <p class="pt-3 text-secondary fw-light">{{ user.about }}</p>
+  {% endif %}
+  {% if unique_passed > 0 %}
+    <div class="pt-3">
+      <p>Пройдено тестов: <span class="fw-bold">{{ unique_passed }}</span></p>
+      {% if correct_percentage > 0 %}
+        <p>Верных ответов: <span class="fw-bold">{{ correct_percentage }}%</span> </p>
+      {% endif %}
+    </div>
   {% endif %}
 </div>
 {% endblock %}

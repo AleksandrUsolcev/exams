@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
+from questions.models import Quiz, UserAnswer
 
 from .forms import SignupForm
 from .models import User
@@ -23,6 +24,24 @@ class UserProfileView(DetailView):
     template_name = 'users/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        unique_passed = Quiz.objects.prefetch_related('answers').filter(
+            answers__user=self.object,
+        ).distinct().count()
+        answers = UserAnswer.objects.filter(user=self.object)
+        try:
+            correct_percentage = int(
+                (answers.filter(correct=True).count() / answers.count()) * 100)
+        except ZeroDivisionError:
+            correct_percentage = 0
+        extra_context = {
+            'unique_passed': unique_passed,
+            'correct_percentage': correct_percentage
+        }
+        context.update(extra_context)
+        return context
 
 
 class UserEditView(LoginRequiredMixin, UpdateView):

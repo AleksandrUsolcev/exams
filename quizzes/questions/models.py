@@ -294,9 +294,6 @@ class UserAnswer(models.Model):
         verbose_name_plural = 'Ответы пользователей'
         ordering = ['-date']
 
-    def __str__(self):
-        return f'{self.user} answer {self.question}'
-
 
 class UserVariant(models.Model):
     answer = models.ForeignKey(
