@@ -6,7 +6,7 @@
 {% block content %}
   <a href="{% url 'questions:quiz_list' quiz.theme.slug %}" class="text-decoration-none fs-5 fw-bold">{{ quiz.theme.title }}</a>
   <h1 class="fw-bold">{{ quiz.title }}</h1>
-  <div class="main-tile">
+  <div>
     <p class="py-3 fs-5">Тест пройден</p>
     {% if latest_answers %}
       <h2 class="pb-2">Результаты</h2>
