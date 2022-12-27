@@ -1,3 +1,3 @@
-# quizzes
+# exams
 
 project in progress
