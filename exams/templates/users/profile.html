@@ -11,7 +11,7 @@
     <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
   {% endif %}
   {% if user.about %}
-    <p class="pt-3 text-secondary fw-light">{{ user.about }}</p>
+    <p class="pt-3 text-secondary">{{ user.about }}</p>
   {% endif %}
   {% if unique_passed > 0 %}
     <div class="pt-3">

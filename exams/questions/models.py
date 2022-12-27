@@ -61,6 +61,12 @@ class Exam(models.Model):
         verbose_name='Название',
         max_length=200
     )
+    success_message = models.TextField(
+        verbose_name='Сообщение после прохождения теста',
+        help_text='Не обязательно к заполнению',
+        blank=True,
+        null=True
+    )
     slug = models.SlugField(
         unique=True,
         max_length=340,
@@ -89,7 +95,8 @@ class Exam(models.Model):
         auto_now_add=True
     )
     show_results = models.BooleanField(
-        verbose_name='Отображать результат после каждого ответа',
+        verbose_name=('Отображать пользователю результат после каждого ответа '
+                      'и по окончанию тестирования'),
         default=True
     )
     shuffle_variants = models.BooleanField(
@@ -155,6 +162,13 @@ class Question(models.Model):
     text = models.TextField(
         verbose_name='Вопрос'
     )
+    success_message = models.TextField(
+        verbose_name='Сообщение после ответа',
+        help_text=('Не обязательно к заполнению, выводится в том случае, '
+                   'если опция отображения результата активна'),
+        blank=True,
+        null=True
+    )
     priority = models.PositiveIntegerField(
         verbose_name='Приоритет',
         default=99,
@@ -178,7 +192,8 @@ class Question(models.Model):
     active = models.BooleanField(
         verbose_name='Готов к публикации',
         help_text=('Статус принимает положительное состояние, если '
-                   'есть хотя бы один вариант ответа'),
+                   'есть хотя бы один вариант ответа, соответствующий '
+                   'настройками вопроса и теста'),
         default=False
     )
     visibility = models.BooleanField(

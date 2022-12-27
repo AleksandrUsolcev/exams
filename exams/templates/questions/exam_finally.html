@@ -7,9 +7,13 @@
   <a href="{% url 'questions:exam_list' exam.category.slug %}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
   <h1 class="fw-bold">{{ exam.title }}</h1>
   <div>
-    <p class="py-3 fs-5">Тест пройден</p>
     {% if latest_answers %}
-      <h2 class="pb-2">Результаты</h2>
+      <h2 class="py-3">Результаты</h2>
+      {% if exam.success_message %}
+        <p class="py-3">
+          {{ exam.success_message }}
+        </p>
+      {% endif %}
       {% if questions_count %}
         <p>Верных ответов: <span class="fw-bold">{{ correct_count }}</span> из <span class="fw-bold">{{ questions_count }}</span>
         {% if correct_percentage > 0 %}
@@ -17,6 +21,8 @@
         {% endif %}
         </p>
       {% endif %}
+    {% endif %}
+    {% if latest_answers and exam.show_results %}
       {% for answer in latest_answers %}
         <p class="py-2 pt-3 fs-5 {% if answer.correct %}text-success{% else %}text-danger{% endif %}">
           {% if answer.correct %}

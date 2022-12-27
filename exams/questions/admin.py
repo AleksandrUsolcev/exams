@@ -1,4 +1,8 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import Textarea
+from nested_admin.nested import (NestedModelAdmin, NestedStackedInline,
+                                 NestedTabularInline)
 
 from .models import Category, Exam, Progress, Question, Variant
 
@@ -18,11 +22,23 @@ class CategoryAdmin(admin.ModelAdmin):
     exams_count.short_description = 'Тестирований'
 
 
-class QuestionInline(admin.StackedInline):
+class VariantInline(NestedTabularInline):
+    model = Variant
+    extra = 1
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 2, 'cols': 60})},
+    }
+
+
+class QuestionInline(NestedStackedInline):
     model = Question
     show_change_link = True
     extra = 1
     readonly_fields = ('active', 'variants_count')
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 4, 'cols': 40})},
+    }
+    inlines = (VariantInline,)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -34,24 +50,23 @@ class QuestionInline(admin.StackedInline):
     variants_count.short_description = 'Вариантов ответа'
 
 
-class VariantInline(admin.TabularInline):
-    model = Variant
-    extra = 1
-
-
-class ExamAdmin(admin.ModelAdmin):
+class ExamAdmin(NestedModelAdmin):
     list_display = ('title', 'category', 'author', 'revision',
                     'questions_count', 'active', 'visibility', 'created')
     list_editable = ('visibility',)
     readonly_fields = ('author', 'slug', 'active',
-                       'revision', 'questions_count')
+                       'revision', 'questions_count', 'created')
+
     inlines = (QuestionInline,)
     save_on_top = True
+    formfield_overrides = {
+        models.TextField: {'widget': Textarea(attrs={'rows': 4, 'cols': 80})},
+    }
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.prefetch_related('questions').prefetch_related(
-            'category', 'author')
+            'category', 'author',)
 
     def questions_count(self, obj):
         return obj.questions.all().count()
@@ -64,15 +79,6 @@ class ExamAdmin(admin.ModelAdmin):
         obj.save()
 
 
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'exam', 'priority')
-    list_editable = ('priority',)
-    raw_id_fields = ('exam',)
-    inlines = (VariantInline,)
-    save_on_top = True
-    readonly_fields = ('active',)
-
-
 class ProgressAdmin(admin.ModelAdmin):
     list_display = ('user', 'exam', 'stage', 'answers', 'passed')
 
@@ -82,5 +88,4 @@ class ProgressAdmin(admin.ModelAdmin):
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exam, ExamAdmin)
-admin.site.register(Question, QuestionAdmin)
 admin.site.register(Progress, ProgressAdmin)
