@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  {{ category.title }}
+{% endblock %}
+{% block content %}
+  <h1 class="fw-bold">{{ category.title }}</h1>
+  <div>
+    <p class="py-3 fs-5">{{ category.description }}</p>
+    {% for exam in exams %}
+      <div class="row pb-5">
+        <div class="col-9">
+          <a href="{% url 'questions:exam_detail' exam.slug %}" class="text-decoration-none"><h4>{{ exam.title }}</h4></a>
+          <p>{{ exam.description }}</p>
+          {% if exam.questions_count %}
+            <p><span>Вопросов: </span>{{ exam.questions_count }}</p>
+          {% endif %}
+        </div>
+        <div class="col-3 d-flex align-items-center flex-row-reverse">
+          {% if request.user.is_authenticated and exam.current_stage and not exam.passed %}
+            <a href="{% url 'questions:exam_process' exam.slug exam.current_stage %}" class="btn btn-primary">Продолжить</a>
+          {% elif request.user.is_authenticated and exam.passed %}
+            <a href="{% url 'questions:exam_finally' exam.slug %}" class="btn btn-success">Результаты</a>
+          {% else %}
+            <a href="{% url 'questions:exam_process' exam.slug 1 %}" class="btn btn-primary">Пройти</a>
+          {% endif %}
+        </div>
+        {% if request.user.is_authenticated and exam.questions_count and exam.percentage > 0 and not exam.passed %}
+          <div class="col-12 py-3">
+            <div class="progress">
+              <div class="progress-bar"role="progressbar" style="width: {{ exam.percentage }}%"></div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% include '../includes/paginator.html' %}
+{% endblock %}

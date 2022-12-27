@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{ title }}
+{% endblock %}
+{% block content %}
+  <div class="row">
+    <h3 class="fw-bold m-0">Популярные темы</h3>
+    {% for category in categories %}
+      <div class="exam-categories-list col-12 col-md-6 col-lg-4 p-4">
+        <a href="{% url 'questions:exam_list' category.slug %}" class="text-decoration-none">
+            <h3>{{ category.title }}</h3>
+            <p>{{ category.description }}</p>
+            <p class="fw-bold">
+              <span class="pe-4">
+                {% if category.exams.count > 0 %}
+                  Тестов: {{ category.exams.count }}
+                {% endif %}
+              </span>
+            </p>
+        </a>
+      </div>
+    {% endfor %}
+    {% include '../includes/paginator.html' %}
+  </div>
+{% endblock %}

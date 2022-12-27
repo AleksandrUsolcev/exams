@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{ exam.title }} - {{ exam.category.title}}
+{% endblock %}
+{% block content %}
+  <a href="{% url 'questions:exam_list' exam.category.slug %}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
+  <h1 class="fw-bold">{{ exam.title }}</h1>
+  <p class="py-3 fs-5">{{ exam.description }}</p>
+{% endblock %}
