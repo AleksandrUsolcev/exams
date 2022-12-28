@@ -14,7 +14,7 @@
           <div class="p-2 rounded-1
             {% if stage == forloop.counter %}
             bg-primary border border-primary
-            {% elif exam.show_results and q.corrected == 0 and q.passed != 0 %}
+            {% elif exam.show_results and q.corrected == 0 and q.finished != 0 %}
             bg-danger border border-danger
             {% elif stage > forloop.counter or progress.stage > forloop.counter %}
             bg-success border border-success
@@ -50,7 +50,7 @@
     </p>
   {% endif %}
 
-  {% if progress.answers < stage %}
+  {% if progress.answers_count < stage %}
   <form method="post">
     {% csrf_token %}
       <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">

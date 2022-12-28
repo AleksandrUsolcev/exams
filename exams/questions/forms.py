@@ -14,7 +14,7 @@ class ExamProcessForm(forms.Form):
         self.user = self.initial.get('user')
         self.stage = self.initial.get('stage')
 
-        if self.progress.answers < self.stage:
+        if self.progress.answers_count < self.stage:
             if self.exam.shuffle_variants:
                 self.variants = self.question.variants.all().order_by('?')
             else:
@@ -56,10 +56,7 @@ class ExamProcessForm(forms.Form):
     ) -> None:
         variants = self.question.variants.all()
         answer = UserAnswer.objects.create(
-            user=self.user,
-            exam=self.exam,
-            exam_revision=self.exam.revision,
-            exam_title=self.exam.title,
+            progress=self.progress,
             question=self.question,
             question_text=self.question.text,
             correct=correct,
@@ -92,7 +89,7 @@ class ExamProcessForm(forms.Form):
             variant = self.variants.filter(id=result[0], correct=True)
             if not variant.exists():
                 correct = False
-            if result and self.progress.answers < self.stage:
+            if result and self.progress.answers_count < self.stage:
                 self.add_results(result, correct)
 
         if self.question.many_correct:
@@ -116,5 +113,5 @@ class ExamProcessForm(forms.Form):
             ).count()
             if uncorrects.exists() or len(results) < corrects_count:
                 correct = False
-            if results and self.progress.answers < self.stage:
+            if results and self.progress.answers_count < self.stage:
                 self.add_results(results, correct)

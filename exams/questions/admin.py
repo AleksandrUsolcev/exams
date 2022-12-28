@@ -80,10 +80,19 @@ class ExamAdmin(NestedModelAdmin):
 
 
 class ProgressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'exam', 'stage', 'answers', 'passed')
+    list_display = ('user', 'exam', 'exam_revision', 'answers_count',
+                    'current_stage', 'passed', 'started', 'finished')
 
     def has_change_permission(self, request, obj=None):
         return False
+
+    def current_stage(self, obj):
+        stage = obj.stage
+        if obj.finished:
+            stage = 'Тест пройден'
+        return stage
+
+    current_stage.short_description = 'Этап'
 
 
 admin.site.register(Category, CategoryAdmin)

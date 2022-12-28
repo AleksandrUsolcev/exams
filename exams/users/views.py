@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
-from questions.models import Exam, UserAnswer
+from questions.utils import get_exams_with_progress
 
 from .forms import SignupForm
 from .models import User
@@ -27,18 +27,10 @@ class UserProfileView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        unique_passed = Exam.objects.prefetch_related('answers').filter(
-            answers__user=self.object,
-        ).distinct().count()
-        answers = UserAnswer.objects.filter(user=self.object)
-        try:
-            correct_percentage = int(
-                (answers.filter(correct=True).count() / answers.count()) * 100)
-        except ZeroDivisionError:
-            correct_percentage = 0
+        latest_exams = get_exams_with_progress(
+            user=self.object, category_slug=None)
         extra_context = {
-            'unique_passed': unique_passed,
-            'correct_percentage': correct_percentage
+            'latest_exams': latest_exams[:6],
         }
         context.update(extra_context)
         return context

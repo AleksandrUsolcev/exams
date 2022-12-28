@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from slugify import slugify
 
 User = get_user_model()
@@ -133,17 +134,8 @@ class Exam(models.Model):
             code = self.slug[-5:]
             if self.active and self.visibility:
                 self.revision += 1
-                progress = Progress.objects.filter(exam=self.pk)
-                if progress.exists():
-                    progress.delete()
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        progress = Progress.objects.filter(exam=self.pk)
-        if progress.exists():
-            progress.delete()
-        super().delete(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('questions:exam_detail', kwargs={'slug': self.slug})
@@ -258,17 +250,17 @@ class Variant(models.Model):
         return f'{self.text}'
 
 
-class UserAnswer(models.Model):
+class Progress(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='Пользователь',
-        related_name='answers',
+        related_name='progression',
         on_delete=models.CASCADE
     )
     exam = models.ForeignKey(
         Exam,
         verbose_name='Тестирование',
-        related_name='answers',
+        related_name='progress',
         on_delete=models.CASCADE
     )
     exam_revision = models.PositiveIntegerField(
@@ -279,6 +271,47 @@ class UserAnswer(models.Model):
         verbose_name='Заголовок тестирования',
         max_length=200,
         null=True
+    )
+    stage = models.PositiveIntegerField(
+        verbose_name='Этап',
+        default=1
+    )
+    answers_count = models.PositiveIntegerField(
+        verbose_name='Ответов',
+        default=0
+    )
+    started = models.DateTimeField(
+        verbose_name='Дата начала',
+        null=True
+    )
+    finished = models.DateTimeField(
+        verbose_name='Дата завершения',
+        null=True
+    )
+    passed = models.BooleanField(
+        verbose_name='Зачтено',
+        null=True
+    )
+
+    class Meta:
+        verbose_name = 'Прогресс пользователя'
+        verbose_name_plural = 'Прогресс пользователей'
+
+    def __str__(self):
+        return f'{self.user} stage in {self.exam_title} ({self.stage})'
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.started = timezone.now()
+        super().save(*args, **kwargs)
+
+
+class UserAnswer(models.Model):
+    progress = models.ForeignKey(
+        Progress,
+        verbose_name='Прогресс',
+        related_name='answers',
+        on_delete=models.CASCADE
     )
     question = models.ForeignKey(
         Question,
@@ -344,41 +377,3 @@ class UserVariant(models.Model):
 
     def __str__(self):
         return f'{self.variant_text}'
-
-
-class Progress(models.Model):
-    user = models.ForeignKey(
-        User,
-        verbose_name='Пользователь',
-        related_name='progression',
-        on_delete=models.CASCADE
-    )
-    exam = models.ForeignKey(
-        Exam,
-        verbose_name='Тестирование',
-        related_name='progress',
-        on_delete=models.CASCADE
-    )
-    stage = models.PositiveIntegerField(
-        verbose_name='Этап',
-        default=1
-    )
-    answers = models.PositiveIntegerField(
-        verbose_name='Ответов',
-        default=0
-    )
-    started = models.DateTimeField(
-        verbose_name='Дата начала',
-        null=True
-    )
-    passed = models.DateTimeField(
-        verbose_name='Дата завершения',
-        null=True
-    )
-
-    class Meta:
-        verbose_name = 'Прогресс пользователя'
-        verbose_name_plural = 'Прогресс пользователей'
-
-    def __str__(self):
-        return f'{self.user} stage in {self.exam} ({self.stage})'
