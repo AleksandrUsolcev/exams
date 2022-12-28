@@ -38,8 +38,7 @@ class ExamListView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        queryset = get_exams_with_progress(
-            self.request.user, slug, without_user=True)
+        queryset = get_exams_with_progress(self.request.user, slug)
         return queryset
 
 

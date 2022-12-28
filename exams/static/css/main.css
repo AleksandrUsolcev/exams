@@ -16,21 +16,33 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.main-tile {
-  background: #fff;
+.exam-card {
+  background: #f3f5fb;
   border-radius: 1em;
-  padding: 1em 2em;
-  margin: 1.5em 0;
-  -webkit-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
-  -moz-box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
-  box-shadow: 0px 6px 13px 0px rgba(34, 60, 80, 0.15);
+  border: none;
   transition: 0.2s;
+  padding: .5em;
 }
 
 .hover-shadow:hover {
   -webkit-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   -moz-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
+  cursor: pointer;
+}
+
+.exam-card .progress {
+  height: .4rem;
+}
+
+.exam-card .text-mini {
+  font-size: .8em;
+}
+
+.exam-card .card-header,
+.exam-card .card-footer {
+  background: none;
+  border: none;
 }
 
 .main-search .form-control {

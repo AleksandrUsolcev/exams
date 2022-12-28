@@ -1,8 +1,9 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count, ExpressionWrapper, F, IntegerField, Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
-from questions.utils import get_exams_with_progress
+from questions.models import Progress
 
 from .forms import SignupForm
 from .models import User
@@ -27,10 +28,31 @@ class UserProfileView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        latest_exams = get_exams_with_progress(
-            user=self.object, category_slug=None)
+        latest_progress = Progress.objects.filter(
+            user=self.object, exam_revision=F('exam__revision')
+        ).select_related('exam').annotate(
+            questions_count=Count(
+                'exam__questions', filter=(
+                    Q(exam__questions__visibility=True) &
+                    Q(exam__questions__active=True)
+                )
+            ),
+            percentage=ExpressionWrapper(
+                F('answers_count') * 100 / Count(
+                    'exam__questions', filter=(
+                        Q(exam__questions__visibility=True) &
+                        Q(exam__questions__active=True)
+                    )
+                ),
+                output_field=IntegerField()
+            ),
+            percentage_passed=ExpressionWrapper(
+                F('passed') * 100 / F('answers_count'),
+                output_field=IntegerField()
+            )
+        ).order_by('-started')
         extra_context = {
-            'latest_exams': latest_exams[:6],
+            'latest_progress': latest_progress[:6],
         }
         context.update(extra_context)
         return context

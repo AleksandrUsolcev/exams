@@ -2,13 +2,13 @@
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
 <h1 class="fw-bold">{{ user.username }}</h1>
-<div class="col-12 col-md-6 col-lg-4">
+<div class="col-md-12 col-lg-6 col-xl-4">
   {% if user.first_name %}
     <h4>{{ user.first_name }} {{ user.last_name }}</h4>
   {% endif %}
   {% if request.user.is_authenticated and request.user == user %}
-    <a href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
-    <a href="{% url 'users:password_change_form' %}">Смена пароля</a>
+    <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
+    <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
   {% endif %}
   {% if user.about %}
     <p class="pt-3 text-secondary">{{ user.about }}</p>
@@ -22,4 +22,46 @@
     </div>
   {% endif %}
 </div>
+{% if latest_progress %}
+  <a href="#" class="text-decoration-none"><h3 class="py-3">Прогресс</h3></a>
+  <div class="row row-cols-2 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
+    {% for progress in latest_progress %}
+      <div class="col">
+        <a href="#" class="text-decoration-none text-dark">
+          <div class="card h-100 exam-card hover-shadow">
+            <div class="card-body pb-0">
+              <h5 class="card-title fw-bold">{{ progress.exam.title }}</h5>
+            </div>
+            <div class="card-footer mb-2 pt-0">
+              <div class="progress mt-2">
+                {% if progress.finished %}
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress.percentage }}%"></div>
+                {% else %}
+                  <div class="progress-bar" role="progressbar" style="width: {{ progress.percentage }}%"></div>
+                {% endif %}
+              </div>
+              <div class="pb-3 pt-1">
+                <span class="text-secondary text-mini">
+                  {% if progress.finished %}
+                    Пройден {{ progress.finished|date:"d.m.Y в H:i" }} <br>
+                    <span class="fw-bold">{{ progress.percentage_passed }}%</span> верных ответов
+                  {% else %}
+                    В процессе <br>
+                    {{ progress.answers_count }} / {{ progress.questions_count }}
+                  {% endif %}
+                </span>
+              </div>
+              {% if progress.passed %}
+                <span class="text-success fw-bold">Зачет</span>
+              {% else %}
+                <span class="text-danger fw-bold">Не зачет</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 {% endblock %}

@@ -7,12 +7,9 @@ from django.db.models import (BooleanField, Case, Count, ExpressionWrapper, F,
 from .models import Exam
 
 
-def get_exams_with_progress(user: object,
-                            category_slug: str,
-                            without_user: bool = False
-                            ) -> object:
+def get_exams_with_progress(user: object, category_slug: str) -> object:
 
-    if user.is_authenticated and without_user:
+    if user.is_authenticated:
         queryset = Exam.objects.filter(
             category__slug=category_slug,
             progress__user=user,
@@ -62,37 +59,6 @@ def get_exams_with_progress(user: object,
         queryset = sorted(
             list(chain(query_without_user, queryset)),
             key=attrgetter('created'), reverse=True
-        )
-        return queryset
-
-    elif not category_slug:
-        queryset = Exam.objects.filter(
-            progress__user=user,
-            progress__exam_revision=F('revision'),
-            visibility=True,
-            active=True
-        ).prefetch_related('progress').annotate(
-            questions_count=Count('questions', filter=(
-                Q(progress__user=user) &
-                Q(questions__visibility=True) &
-                Q(questions__active=True)) &
-                Q(progress__exam_revision=F('revision'))
-            ),
-            current_stage=F('progress__stage'),
-            is_finished=Case(
-                When(progress__finished__isnull=False, then=True),
-                output_field=BooleanField()
-            ),
-            percentage=ExpressionWrapper(
-                F('progress__answers_count') * 100 / Count(
-                    'questions', filter=(
-                        Q(progress__user=user) &
-                        Q(questions__visibility=True) &
-                        Q(questions__active=True)) &
-                    Q(progress__exam_revision=F('revision'))
-                ),
-                output_field=IntegerField()
-            )
         )
         return queryset
 
