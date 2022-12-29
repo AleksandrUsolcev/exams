@@ -29,25 +29,29 @@ class UserProfileView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         latest_progress = Progress.objects.filter(
-            user=self.object, exam_revision=F('exam__revision')
-        ).select_related('exam').annotate(
+            user=self.object,
+            exam_revision=F('exam__revision')
+        ).select_related('exam', 'exam__category').annotate(
             questions_count=Count(
-                'exam__questions', filter=(
+                'exam__questions', distinct=True, filter=(
                     Q(exam__questions__visibility=True) &
                     Q(exam__questions__active=True)
                 )
             ),
             percentage=ExpressionWrapper(
-                F('answers_count') * 100 / Count(
-                    'exam__questions', filter=(
+                F('answers_quantity') * 100 / Count(
+                    'exam__questions', distinct=True, filter=(
                         Q(exam__questions__visibility=True) &
-                        Q(exam__questions__active=True)
+                        Q(exam__questions__active=True) &
+                        Q(finished__isnull=True)
                     )
                 ),
                 output_field=IntegerField()
             ),
-            percentage_passed=ExpressionWrapper(
-                F('passed') * 100 / F('answers_count'),
+            percentage_correct=ExpressionWrapper(
+                Count('answers', distinct=True, filter=(
+                    Q(answers__correct=True)
+                )) * 100 / F('answers_quantity'),
                 output_field=IntegerField()
             )
         ).order_by('-started')

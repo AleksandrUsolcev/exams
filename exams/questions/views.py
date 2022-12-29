@@ -126,7 +126,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if (self.exam.show_results
-                and self.progress.answers_count >= self.stage):
+                and self.progress.answers_quantity >= self.stage):
             answer = UserAnswer.objects.prefetch_related(
                 Prefetch('variants', queryset=UserVariant.objects.filter(
                     answer=F('answer')).order_by('-selected', '?'))).filter(
@@ -155,7 +155,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         slug = self.kwargs.get('slug')
         data_update = {
             'stage': stage + 1,
-            'answers_count': stage
+            'answers_quantity': stage
         }
         if self.last_stage:
             data_update['finished'] = timezone.now()

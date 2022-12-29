@@ -23,7 +23,7 @@
   {% endif %}
 </div>
 {% if latest_progress %}
-  <a href="#" class="text-decoration-none"><h3 class="py-3">Прогресс</h3></a>
+  <a href="#" class="text-decoration-none"><h3 class="py-3 fw-bold">Прогресс</h3></a>
   <div class="row row-cols-2 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
     {% for progress in latest_progress %}
       <div class="col">
@@ -31,11 +31,12 @@
           <div class="card h-100 exam-card hover-shadow">
             <div class="card-body pb-0">
               <h5 class="card-title fw-bold">{{ progress.exam.title }}</h5>
+              <span>{{ progress.exam.category.title }}</span>
             </div>
-            <div class="card-footer mb-2 pt-0">
+            <div class="card-footer mb-2 pt-2">
               <div class="progress mt-2">
                 {% if progress.finished %}
-                  <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress.percentage }}%"></div>
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
                 {% else %}
                   <div class="progress-bar" role="progressbar" style="width: {{ progress.percentage }}%"></div>
                 {% endif %}
@@ -43,18 +44,18 @@
               <div class="pb-3 pt-1">
                 <span class="text-secondary text-mini">
                   {% if progress.finished %}
-                    Пройден {{ progress.finished|date:"d.m.Y в H:i" }} <br>
-                    <span class="fw-bold">{{ progress.percentage_passed }}%</span> верных ответов
+                    {{ progress.finished|date:"d.m.Y  H:i" }} <br>
+                    <span class="fw-bold">{{ progress.percentage_correct }}%</span> верных ответов
                   {% else %}
-                    В процессе <br>
-                    {{ progress.answers_count }} / {{ progress.questions_count }}
+                    Начат {{ progress.started|date:"d.m.Y  H:i" }} <br>
+                    {{ progress.answers_quantity }} / {{ progress.questions_count }} 
                   {% endif %}
                 </span>
               </div>
               {% if progress.passed %}
-                <span class="text-success fw-bold">Зачет</span>
+                <span class="text-success fw-bold">Завершен</span>
               {% else %}
-                <span class="text-danger fw-bold">Не зачет</span>
+                <span class="text-primary fw-bold">В процессе</span>
               {% endif %}
             </div>
           </div>

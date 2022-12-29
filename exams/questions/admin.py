@@ -80,7 +80,7 @@ class ExamAdmin(NestedModelAdmin):
 
 
 class ProgressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'exam', 'exam_revision', 'answers_count',
+    list_display = ('user', 'exam', 'exam_revision', 'answers_quantity',
                     'current_stage', 'passed', 'started', 'finished')
 
     def has_change_permission(self, request, obj=None):

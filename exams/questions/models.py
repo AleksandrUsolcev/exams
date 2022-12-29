@@ -276,7 +276,7 @@ class Progress(models.Model):
         verbose_name='Этап',
         default=1
     )
-    answers_count = models.PositiveIntegerField(
+    answers_quantity = models.PositiveIntegerField(
         verbose_name='Ответов',
         default=0
     )

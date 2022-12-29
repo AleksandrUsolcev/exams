@@ -7,6 +7,10 @@ body {
   border-bottom: 5px solid #c9deff;
 }
 
+.header .auth {
+  font-size: .9em;
+}
+
 .logo {
   font-size: 3.7em;
   background: #0D6EFD;
@@ -20,7 +24,7 @@ body {
   background: #f3f5fb;
   border-radius: 1em;
   border: none;
-  transition: 0.2s;
+  transition: .3s;
   padding: .5em;
 }
 

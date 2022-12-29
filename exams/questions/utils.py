@@ -16,7 +16,7 @@ def get_exams_with_progress(user: object, category_slug: str) -> object:
             progress__exam_revision=F('revision'),
             visibility=True,
             active=True
-        ).prefetch_related('progress').annotate(
+        ).annotate(
             questions_count=Count('questions', filter=(
                 Q(category__slug=category_slug) &
                 Q(progress__user=user) &
@@ -30,7 +30,7 @@ def get_exams_with_progress(user: object, category_slug: str) -> object:
                 output_field=BooleanField()
             ),
             percentage=ExpressionWrapper(
-                F('progress__answers_count') * 100 / Count(
+                F('progress__answers_quantity') * 100 / Count(
                     'questions', filter=(
                         Q(category__slug=category_slug) &
                         Q(progress__user=user) &

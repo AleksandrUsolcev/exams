@@ -50,7 +50,7 @@
     </p>
   {% endif %}
 
-  {% if progress.answers_count < stage %}
+  {% if progress.answers_quantity < stage %}
   <form method="post">
     {% csrf_token %}
       <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
