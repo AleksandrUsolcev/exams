@@ -16,7 +16,7 @@ def get_exams_with_progress(user: object, category_slug: str) -> object:
             progress__exam_revision=F('revision'),
             visibility=True,
             active=True
-        ).annotate(
+        ).prefetch_related('progress').annotate(
             questions_count=Count('questions', filter=(
                 Q(category__slug=category_slug) &
                 Q(progress__user=user) &
@@ -25,6 +25,7 @@ def get_exams_with_progress(user: object, category_slug: str) -> object:
                 Q(progress__exam_revision=F('revision'))
             ),
             current_stage=F('progress__stage'),
+            progress_id=F('progress__id'),
             is_finished=Case(
                 When(progress__finished__isnull=False, then=True),
                 output_field=BooleanField()
@@ -64,9 +65,9 @@ def get_exams_with_progress(user: object, category_slug: str) -> object:
 
     queryset = Exam.objects.filter(
         category__slug=category_slug, visibility=True, active=True).annotate(
-        questions_count=Count('questions', filter=(
-            Q(category__slug=category_slug) &
-            Q(questions__visibility=True) &
-            Q(questions__active=True)
+        questions_count=Count('questions', filter=Q(
+            category__slug=category_slug,
+            questions__visibility=True,
+            questions__active=True
         ))).order_by('-created')
     return queryset

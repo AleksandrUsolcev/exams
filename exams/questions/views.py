@@ -13,7 +13,6 @@ class IndexView(ListView):
     model = Category
     template_name = 'questions/index.html'
     context_object_name = 'categories'
-    paginate_by = 15
     queryset = Category.objects.prefetch_related(
         Prefetch('exams', queryset=Exam.objects.filter(
             active=True, visibility=True)))
@@ -95,7 +94,8 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             exam_revision=self.exam.revision,
             exam_title=self.exam.title
         )
-        self.question = self.exam.questions.all()[self.stage - 1]
+        self.question = self.exam.questions.all().order_by(
+            '-visibility', '-active', 'priority', 'id', 'text')[self.stage - 1]
         self.last_stage = self.exam.questions.count() == self.stage
         return super(ExamProcessView, self).dispatch(request, *args, **kwargs)
 
@@ -169,53 +169,11 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             form.answer()
 
         if self.last_stage and not self.exam.show_results:
-            return redirect('questions:exam_finally', slug=slug)
+            return redirect(
+                'users:progress_detail',
+                username=self.request.user.username, pk=self.progress.id
+            )
         elif not self.exam.show_results:
             return redirect('questions:exam_process', slug=slug, pk=stage + 1)
         else:
             return redirect('questions:exam_process', slug=slug, pk=stage)
-
-
-class ExamFinallyView(LoginRequiredMixin, DetailView):
-    model = Exam
-    template_name = 'questions/exam_finally.html'
-
-    def get(self, request, *args, **kwargs):
-        progress = Progress.objects.filter(
-            user=self.request.user,
-            exam=self.get_object(),
-            finished__isnull=False
-        )
-        if not progress.exists():
-            return redirect('questions:exam_detail', self.get_object().slug)
-        return super().get(request)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        latest_answers = UserAnswer.objects.prefetch_related(
-            Prefetch('variants', queryset=UserVariant.objects.filter(
-                answer=F('answer')).order_by('-selected', '?'))).filter(
-            progress__user=self.request.user,
-            progress__exam=self.object,
-            progress__exam_revision=self.object.revision).annotate(
-            corrected_count=Count('variants', filter=Q(
-                variants__correct=True, variants__selected=True
-            )),
-            selected_count=Count('variants', filter=Q(variants__selected=True))
-        ).order_by('date')
-
-        correct_count = latest_answers.filter(correct=True).count()
-        questions = self.object.questions.filter(active=True, visibility=True)
-        questions_count = questions.count()
-        try:
-            correct_percentage = int((correct_count / questions_count) * 100)
-        except ZeroDivisionError:
-            correct_percentage = 0
-        extra_context = {
-            'latest_answers': latest_answers,
-            'questions_count': questions_count,
-            'correct_count': correct_count,
-            'correct_percentage': correct_percentage
-        }
-        context.update(extra_context)
-        return context

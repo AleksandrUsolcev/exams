@@ -340,7 +340,7 @@ class UserAnswer(models.Model):
     class Meta:
         verbose_name = 'Ответ пользователя'
         verbose_name_plural = 'Ответы пользователей'
-        ordering = ['-date']
+        ordering = ['date']
 
 
 class UserVariant(models.Model):

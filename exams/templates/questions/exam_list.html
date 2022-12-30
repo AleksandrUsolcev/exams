@@ -20,7 +20,7 @@
           {% if request.user.is_authenticated and exam.current_stage and not exam.is_finished %}
             <a href="{% url 'questions:exam_process' exam.slug exam.current_stage %}" class="btn btn-primary">Продолжить</a>
           {% elif request.user.is_authenticated and exam.is_finished %}
-            <a href="{% url 'questions:exam_finally' exam.slug %}" class="btn btn-success">Результаты</a>
+            <a href="{% url 'users:progress_detail' request.user.username exam.progress_id %}" class="btn btn-success">Результаты</a>
           {% else %}
             <a href="{% url 'questions:exam_process' exam.slug 1 %}" class="btn btn-primary">Пройти</a>
           {% endif %}

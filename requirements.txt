@@ -4,5 +4,6 @@ django-filter==22.1
 django-nested-admin==4.0.2
 django-widget-tweaks==1.4.12
 djangorestframework==3.14.0
+psycopg2-binary==2.9.1
 python-dotenv==0.21.0
 python-slugify==7.0.0

@@ -27,7 +27,7 @@
   <div class="row row-cols-2 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
     {% for progress in latest_progress %}
       <div class="col">
-        <a href="#" class="text-decoration-none text-dark">
+        <a href="{% url 'users:progress_detail' user.username progress.id %}" class="text-decoration-none text-dark">
           <div class="card h-100 exam-card hover-shadow">
             <div class="card-body pb-0">
               <h5 class="card-title fw-bold">{{ progress.exam.title }}</h5>

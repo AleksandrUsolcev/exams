@@ -69,4 +69,9 @@ urlpatterns = [
         views.UserEditView.as_view(),
         name='profile_edit'
     ),
+    path(
+        '@<slug:username>/progress/<int:pk>/',
+        views.UserProgressDetailView.as_view(),
+        name='progress_detail'
+    ),
 ]

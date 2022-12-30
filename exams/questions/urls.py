@@ -25,9 +25,4 @@ urlpatterns = [
         views.ExamProcessView.as_view(),
         name='exam_process'
     ),
-    path(
-        'exam/<slug:slug>/finally/',
-        views.ExamFinallyView.as_view(),
-        name='exam_finally'
-    ),
 ]
