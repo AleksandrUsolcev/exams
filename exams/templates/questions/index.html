@@ -3,26 +3,26 @@
   {{ title }}
 {% endblock %}
 {% block content %}
-  {% if categories %}
     <div class="row">
-      <div class="col-3">
-        <h3 class="fw-bold mb-4">Категории</h3>
+      <div class="col-9 col-xl-10">
+        <h3 class="fw-bold mb-4">Последние тесты</h3>
+      </div>
+      {% if categories %}
+      <div class="col-3 col-xl-2">
+        <h5 class="fw-bold py-1">Категории</h5>
         <ul class="list-group">
           {% for category in categories %}
-            <a href="{% url 'questions:exam_list' category.slug %}" class="fw-bold text-decoration-none mb-2">
-              <li class="list-group-item d-flex justify-content-between align-items-center border-0 ps-0">
-                <span class="text-primary">{{ category.title }}</span>
-                {% if category.exams.count > 0 %}
-                  <span class="badge bg-primary">{{ category.exams.count }}</span>
-                {% endif %}
-              </li>
-            </a>
+            <li class="list-group-item d-flex align-items-center border-0 ps-0">
+              <a href="{% url 'questions:exam_list' category.slug %}" class="fw-bold text-decoration-none">
+                {{ category.title }}
+              </a>
+              {% if category.exams.count > 0 %}
+                <span class="badge bg-primary ms-2">{{ category.exams.count }}</span>
+              {% endif %}
+            </li>
           {% endfor %}
         </ul>
       </div>
-      <div class="col-9">
-        <h3 class="fw-bold mb-4">Последние тесты</h3>
-      </div>
+      {% endif %}
     </div>
-  {% endif %}
 {% endblock %}

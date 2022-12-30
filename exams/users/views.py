@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
                               Prefetch, Q)
 from django.db.models.functions.comparison import NullIf
-from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
 from questions.models import Progress, UserAnswer, UserVariant
@@ -135,12 +134,15 @@ class UserProgressDetailView(DetailView):
                         exam__questions__visibility=True,
                         exam__questions__active=True
                     )),
+
                 correct_count=Count(
                     'answers', distinct=True, filter=Q(
                         answers__correct=True
                     )),
+
                 correct_percentage=ExpressionWrapper(
-                    Count(Q(answers__correct=True), distinct=True) * 100 /
+                    Count('answers', filter=Q(
+                        answers__correct=True), distinct=True) * 100 /
                     NullIf(Count('exam__questions', distinct=True, filter=Q(
                         exam__questions__visibility=True,
                         exam__questions__active=True
