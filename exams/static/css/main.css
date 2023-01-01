@@ -18,6 +18,7 @@ body {
 
 .header-links a {
   background: #0D6EFD;
+  color: #f3f5fb;
   padding: .5em 1em;
   margin: 0 .5em;
   border-radius: .5em;
@@ -52,6 +53,14 @@ body {
   -moz-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   cursor: pointer;
+}
+
+.category-list a {
+  color: #000;
+}
+
+.category-list a:hover {
+  color: #777;
 }
 
 .exam-card .progress {

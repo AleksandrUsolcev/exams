@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.utils import timezone
 from slugify import slugify
 
+from . import managers
+
 User = get_user_model()
 
 
@@ -23,14 +25,21 @@ class Category(models.Model):
     description = models.TextField(
         verbose_name='Краткое описание'
     )
+    show_empty = models.BooleanField(
+        verbose_name='Отображать если нет тестов',
+        default=True
+    )
     priority = models.PositiveIntegerField(
         verbose_name='Приоритет',
-        default=99,
+        null=True,
+        blank=True,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(99)
         ]
     )
+
+    objects = managers.CategoryManager()
 
     class Meta:
         verbose_name = 'Категория'
@@ -119,6 +128,8 @@ class Exam(models.Model):
         default=False
     )
 
+    objects = managers.ExamManager()
+
     class Meta:
         verbose_name = 'Тестирование'
         verbose_name_plural = 'Тестирования'
@@ -163,7 +174,8 @@ class Question(models.Model):
     )
     priority = models.PositiveIntegerField(
         verbose_name='Приоритет',
-        default=99,
+        null=True,
+        blank=True,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(99)
@@ -218,7 +230,8 @@ class Variant(models.Model):
     )
     priority = models.PositiveIntegerField(
         verbose_name='Приоритет',
-        default=99,
+        null=True,
+        blank=True,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(99)
@@ -292,6 +305,8 @@ class Progress(models.Model):
         verbose_name='Зачтено',
         null=True
     )
+
+    objects = managers.ProgressManager()
 
     class Meta:
         verbose_name = 'Прогресс пользователя'

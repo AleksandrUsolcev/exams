@@ -6,20 +6,26 @@ from django.views.generic import DetailView, FormView, ListView
 
 from .forms import ExamProcessForm
 from .models import Category, Exam, Progress, Question, UserAnswer, UserVariant
-from .utils import get_exams_with_progress
 
 
 class IndexView(ListView):
     model = Category
     template_name = 'questions/index.html'
     context_object_name = 'categories'
-    queryset = Category.objects.prefetch_related(
-        Prefetch('exams', queryset=Exam.objects.filter(
-            active=True, visibility=True)))
+    queryset = Category.objects.exams_count()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Exams - проверь свои знания'
+        exams = (
+            Exam.objects
+            .select_related('category')
+            .list_(user=self.request.user)
+        )
+        extra_context = {
+            'title': 'Exams - проверь свои знания',
+            'exams': exams[:12]
+        }
+        context.update(extra_context)
         return context
 
 
@@ -27,17 +33,23 @@ class ExamListView(ListView):
     model = Exam
     template_name = 'questions/exam_list.html'
     context_object_name = 'exams'
-    paginate_by = 15
+    paginate_by = 18
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         category = get_object_or_404(Category, slug=self.kwargs.get('slug'))
-        context.update({'category': category})
+        categories = Category.objects.exams_count()
+        context.update({'categories': categories, 'category': category})
         return context
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        queryset = get_exams_with_progress(self.request.user, slug)
+        queryset = (
+            Exam.objects
+            .filter(category__slug=slug)
+            .select_related('category')
+            .list_(user=self.request.user)
+        )
         return queryset
 
 
@@ -169,10 +181,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             form.answer()
 
         if self.last_stage and not self.exam.show_results:
-            return redirect(
-                'users:progress_detail',
-                username=self.request.user.username, pk=self.progress.id
-            )
+            return redirect('users:progress_detail', pk=self.progress.id)
         elif not self.exam.show_results:
             return redirect('questions:exam_process', slug=slug, pk=stage + 1)
         else:

@@ -4,25 +4,14 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-      <div class="col-9 col-xl-10">
-        <h3 class="fw-bold mb-4">Последние тесты</h3>
+      <div class="col-8 col-xl-10">
+        {% if exams %}
+          <h3 class="fw-bold mb-4">Последние тесты</h3>
+          {% include '../includes/exams.html' %}
+        {% endif %}
       </div>
       {% if categories %}
-      <div class="col-3 col-xl-2">
-        <h5 class="fw-bold py-1">Категории</h5>
-        <ul class="list-group">
-          {% for category in categories %}
-            <li class="list-group-item d-flex align-items-center border-0 ps-0">
-              <a href="{% url 'questions:exam_list' category.slug %}" class="fw-bold text-decoration-none">
-                {{ category.title }}
-              </a>
-              {% if category.exams.count > 0 %}
-                <span class="badge bg-primary ms-2">{{ category.exams.count }}</span>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
+        {% include '../includes/categories_list.html' %}
       {% endif %}
     </div>
 {% endblock %}

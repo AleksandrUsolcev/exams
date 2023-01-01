@@ -70,7 +70,7 @@ urlpatterns = [
         name='profile_edit'
     ),
     path(
-        '@<slug:username>/progress/<int:pk>/',
+        'progress/<int:pk>/',
         views.UserProgressDetailView.as_view(),
         name='progress_detail'
     ),

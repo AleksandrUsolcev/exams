@@ -22,47 +22,9 @@
     </div>
   {% endif %}
 </div>
-{% if latest_progress %}
+{% if exams %}
   <a href="#" class="text-decoration-none"><h3 class="py-3 fw-bold">Прогресс</h3></a>
-  <div class="row row-cols-2 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
-    {% for progress in latest_progress %}
-      <div class="col">
-        <a href="{% url 'users:progress_detail' user.username progress.id %}" class="text-decoration-none text-dark">
-          <div class="card h-100 exam-card hover-shadow">
-            <div class="card-body pb-0">
-              <h5 class="card-title fw-bold">{{ progress.exam.title }}</h5>
-              <span>{{ progress.exam.category.title }}</span>
-            </div>
-            <div class="card-footer mb-2 pt-2">
-              <div class="progress mt-2">
-                {% if progress.finished %}
-                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
-                {% else %}
-                  <div class="progress-bar" role="progressbar" style="width: {{ progress.percentage }}%"></div>
-                {% endif %}
-              </div>
-              <div class="pb-3 pt-1">
-                <span class="text-secondary text-mini">
-                  {% if progress.finished %}
-                    {{ progress.finished|date:"d.m.Y  H:i" }} <br>
-                    <span class="fw-bold">{{ progress.percentage_correct }}%</span> верных ответов
-                  {% else %}
-                    Начат {{ progress.started|date:"d.m.Y  H:i" }} <br>
-                    {{ progress.answers_quantity }} / {{ progress.questions_count }} 
-                  {% endif %}
-                </span>
-              </div>
-              {% if progress.passed %}
-                <span class="text-success fw-bold">Завершен</span>
-              {% else %}
-                <span class="text-primary fw-bold">В процессе</span>
-              {% endif %}
-            </div>
-          </div>
-        </a>
-      </div>
-    {% endfor %}
-  </div>
+  {% include '../includes/exams.html' %}
 {% endif %}
 
 {% endblock %}

@@ -89,7 +89,7 @@
   {% if answer %}
   <div>
     {% if last_stage %}
-      <a href="{% url 'users:progress_detail' request.user.username progress.id %}" class="btn btn-success my-3 me-3">
+      <a href="{% url 'users:progress_detail' progress.id %}" class="btn btn-success my-3 me-3">
         Перейти к результатам
       </a>
     {% else %}
@@ -97,7 +97,7 @@
         Следующий вопрос
       </a>
       {% if answered.count == exam.questions.count %}
-        <a href="{% url 'users:progress_detail' request.user.username progress.id %}">
+        <a href="{% url 'users:progress_detail' progress.id %}">
           Перейти к результатам
         </a>
       {% endif %}
