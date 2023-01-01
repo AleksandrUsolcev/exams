@@ -40,6 +40,29 @@ class ExamQuerySet(QuerySet):
 
         return count
 
+    def users_stats(self):
+
+        stats = (
+            self
+            .annotate(
+                users_count=Count('progress__user', distinct=True, filter=Q(
+                    progress__finished__isnull=False
+                )),
+                average_progress=ExpressionWrapper(NullIf(Count(
+                    'progress__answers', distinct=True, filter=Q(
+                        progress__finished__isnull=False,
+                        progress__answers__correct=True
+                    )), 0) * 100 / NullIf(Count(
+                        'progress__answers', distinct=True, filter=Q(
+                            progress__finished__isnull=False
+                        )), 0),
+                    output_field=IntegerField()
+                )
+            )
+        )
+
+        return stats
+
     def with_request_user_progress(self):
 
         progress = (
@@ -91,6 +114,7 @@ class ExamQuerySet(QuerySet):
                 exams = exams.only(*fields_only).questions_count()
                 query_without_user = (
                     self
+                    .users_stats()
                     .filter(~Q(id__in=exams))
                     .only(*fields_only)
                     .questions_count()
@@ -108,6 +132,7 @@ class ExamQuerySet(QuerySet):
 
         exams = (
             self
+            .users_stats()
             .filter(**filter_data)
             .only(*fields_only)
             .questions_count()
@@ -124,6 +149,9 @@ class ExamManager(Manager):
 
     def questions_count(self):
         return self.get_queryset().questions_count()
+
+    def users_stats(self):
+        return self.get_queryset().users_stats()
 
     def with_request_user_progress(self):
         return self.get_queryset().with_request_user_progress()
