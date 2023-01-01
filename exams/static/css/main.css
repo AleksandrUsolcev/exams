@@ -3,8 +3,11 @@ body {
 }
 
 .header {
-  background: #e9ecf7;
-  border-bottom: 5px solid #c9deff;
+  background: rgb(2,0,36);
+  background: -moz-linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
+  background: -webkit-linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
+  background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#020024",endColorstr="#0a3c86",GradientType=1);
 }
 
 .logo {
@@ -61,6 +64,10 @@ body {
 
 .category-list a:hover {
   color: #777;
+}
+
+.category-list .badge {
+  font-size: .5em;
 }
 
 .exam-card .progress {

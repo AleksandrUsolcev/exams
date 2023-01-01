@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
-<div class="col-xl-6 col-lg-6 col-md-8 col-xs-12 pt-3">
+<div class="col-xl-6 col-lg-6 col-md-8 col-xs-12">
+  <h3 class="fw-bold mb-4">Регистрация</h3>
   <form method="post">
     {% include '../includes/auth_form_body.html' %}
     <button class="btn btn-primary mb-3 mt-2 me-4" type="submit">

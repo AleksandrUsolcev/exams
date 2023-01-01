@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
-<h1 class="fw-bold">{{ user.username }}</h1>
+<h3 class="fw-bold">{{ user.username }}</h3>
 <div class="col-md-12 col-lg-6 col-xl-4">
   {% if user.first_name %}
-    <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+    <h5>{{ user.first_name }} {{ user.last_name }}</h5>
   {% endif %}
   {% if request.user.is_authenticated and request.user == user %}
     <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>

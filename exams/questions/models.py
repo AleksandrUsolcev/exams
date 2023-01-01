@@ -20,7 +20,8 @@ class Category(models.Model):
     slug = models.SlugField(
         unique=True,
         max_length=340,
-        verbose_name='ЧПУ'
+        verbose_name='ЧПУ',
+        db_index=True
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -80,7 +81,8 @@ class Exam(models.Model):
     slug = models.SlugField(
         unique=True,
         max_length=340,
-        verbose_name='ЧПУ'
+        verbose_name='ЧПУ',
+        db_index=True
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -98,7 +100,8 @@ class Exam(models.Model):
         verbose_name='Категория',
         related_name='exams',
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        db_index=True
     )
     created = models.DateTimeField(
         verbose_name='Дата добавления',
@@ -185,7 +188,8 @@ class Question(models.Model):
         Exam,
         verbose_name='Тестирование',
         related_name='questions',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     type = models.CharField(
         verbose_name='Тип',
@@ -245,7 +249,8 @@ class Variant(models.Model):
         Question,
         verbose_name='Вопрос',
         related_name='variants',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
 
     @property
@@ -268,13 +273,15 @@ class Progress(models.Model):
         User,
         verbose_name='Пользователь',
         related_name='progression',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     exam = models.ForeignKey(
         Exam,
         verbose_name='Тестирование',
         related_name='progress',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     exam_revision = models.PositiveIntegerField(
         verbose_name='Редакция тестирования',
@@ -326,7 +333,8 @@ class UserAnswer(models.Model):
         Progress,
         verbose_name='Прогресс',
         related_name='answers',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     question = models.ForeignKey(
         Question,

@@ -2,7 +2,7 @@
 {% block title %}Редактирование {{ user.username }}{% endblock %}
 {% block content %}
 <a href="{% url 'users:profile' user.username %}" class="text-decoration-none fs-5 fw-bold">{{ user.username }}</a>
-<h1 class="fw-bold">Редактирование профиля</h1>
+<h3 class="fw-bold mb-4">Редактирование профиля</h3>
 <div class="pt-3 col-lg-6 col-md-8 col-12">
   <form method="post">
     {% include '../includes/auth_form_body.html' %}
