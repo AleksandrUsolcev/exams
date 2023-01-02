@@ -9,7 +9,6 @@ from django.db.models.functions.comparison import NullIf
 class CategoryManager(Manager):
 
     def exams_count(self) -> object:
-
         count = (
             self
             .only('title', 'slug', 'show_empty')
@@ -20,14 +19,12 @@ class CategoryManager(Manager):
             )
             .order_by('priority', '-exams_count', 'title')
         )
-
         return count
 
 
 class ExamQuerySet(QuerySet):
 
     def questions_count(self):
-
         count = (
             self
             .annotate(
@@ -37,11 +34,9 @@ class ExamQuerySet(QuerySet):
                 ))
             )
         )
-
         return count
 
     def users_stats(self):
-
         stats = (
             self
             .annotate(
@@ -60,11 +55,9 @@ class ExamQuerySet(QuerySet):
                 )
             )
         )
-
         return stats
 
     def with_request_user_progress(self):
-
         progress = (
             self
             .annotate(
@@ -88,11 +81,9 @@ class ExamQuerySet(QuerySet):
                 )
             )
         )
-
         return progress
 
     def list_(self, user: object = None, only_user: bool = False) -> object:
-
         filter_data = {
             'visibility': True,
             'active': True
@@ -138,7 +129,6 @@ class ExamQuerySet(QuerySet):
             .questions_count()
             .order_by('-created')
         )
-
         return exams
 
 
@@ -164,7 +154,6 @@ class ProgressManager(Manager):
 
     def get_details(self, progress_id: int, answers: object,
                     variants: object) -> object:
-
         details = (
             self
             .filter(id=progress_id)
@@ -215,5 +204,4 @@ class ProgressManager(Manager):
                 )
             )
         )
-
         return details

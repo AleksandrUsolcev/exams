@@ -137,6 +137,9 @@ class Exam(models.Model):
         verbose_name = 'Тестирование'
         verbose_name_plural = 'Тестирования'
         ordering = ['-created']
+        index_together = [
+            ('slug', 'category'),
+        ]
 
     def __str__(self):
         return f'{self.title}'
@@ -318,6 +321,9 @@ class Progress(models.Model):
     class Meta:
         verbose_name = 'Прогресс пользователя'
         verbose_name_plural = 'Прогресс пользователей'
+        index_together = [
+            ('user', 'exam'),
+        ]
 
     def __str__(self):
         return f'{self.user} stage in {self.exam_title} ({self.stage})'

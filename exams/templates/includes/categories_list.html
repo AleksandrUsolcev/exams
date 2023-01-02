@@ -1,5 +1,4 @@
 <div class="col-4 col-xl-2">
-  <h3 class="fw-bold pb-2 ps-2">Категории</h3>
   <ul class="list-group ps-2">
     {% for category in categories %}
       {% if category.exams_count > 0 or category.show_empty %}
@@ -8,7 +7,7 @@
             {{ category.title }}
           </a>
           {% if category.exams_count > 0 %}
-            <span class="badge bg-primary ms-2">{{ category.exams_count }}</span>
+            <span class="badge rounded-pill bg-primary ms-2">{{ category.exams_count }}</span>
           {% endif %}
         </li>
       {% endif %}

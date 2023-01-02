@@ -1,17 +1,23 @@
+@font-face {
+  font-family: 'JosefinSans-SemiBold';
+  src: url('../fonts/JosefinSans-SemiBold.ttf');
+}
+
 body {
   background: #ffffff;
 }
 
 .header {
-  background: rgb(2,0,36);
-  background: -moz-linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
-  background: -webkit-linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
-  background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(255,255,255,1) 0%, rgba(135,159,196,0.15449929971988796) 93%, rgba(10,60,134,0.1516981792717087) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#020024",endColorstr="#0a3c86",GradientType=1);
+  background: rgb(2, 0, 36);
+  background: -moz-linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(135, 159, 196, 0.15449929971988796) 93%, rgba(10, 60, 134, 0.1516981792717087) 100%);
+  background: -webkit-linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(135, 159, 196, 0.15449929971988796) 93%, rgba(10, 60, 134, 0.1516981792717087) 100%);
+  background: linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(135, 159, 196, 0.15449929971988796) 93%, rgba(10, 60, 134, 0.1516981792717087) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#020024", endColorstr="#0a3c86", GradientType=1);
 }
 
 .logo {
-  font-size: 3.7em;
+  font-size: 4.5em;
+  font-family: 'JosefinSans-SemiBold';
   background: #0D6EFD;
   background: linear-gradient(to bottom right, #3586ff 23%, #6943E6 78%);
   background-clip: text;
@@ -159,13 +165,13 @@ body {
 
 @media (max-width: 1200px) {
   h1.logo {
-    font-size: 3em;
+    font-size: 3.8em;
   }
 }
 
 
 @media (max-width: 992px) {
   h1.logo {
-    font-size: 2em;
+    font-size: 3em;
   }
 }
