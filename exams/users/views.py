@@ -33,7 +33,8 @@ class UserProfileView(DetailView):
             .list_(user=self.object, only_user=True)
         )
         extra_context = {
-            'exams': exams[:6]
+            'exams': exams[:6],
+            'progress_url': True
         }
         context.update(extra_context)
         return context
@@ -58,7 +59,6 @@ class UserProgressDetailView(DetailView):
 
     def get_queryset(self):
         progress_id = self.kwargs.get('pk')
-        queryset = Progress.objects.get_details(
-            progress_id=progress_id, variants=UserVariant, answers=UserAnswer
-        )
+        queryset = Progress.objects.filter(id=progress_id).get_details(
+            variants=UserVariant, answers=UserAnswer)
         return queryset

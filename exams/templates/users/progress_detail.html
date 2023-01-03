@@ -3,10 +3,10 @@
 {% block content %}
 
 <a href="{% url 'questions:exam_list' progress.exam.category.slug %}" class="text-decoration-none fs-5 fw-bold">{{ progress.exam.category.title }}</a>
-<h1 class="fw-bold">{{ progress.exam.title }}</h1>
+<h3 class="fw-bold">{{ progress.exam.title }}</h3>
 <div>
   {% if progress %}
-    <h2 class="py-3">Результаты</h2>
+    <h4 class="py-3">Результаты</h4>
     {% if progress.exam.success_message %}
       <p class="py-3">
         {{ progress.exam.success_message }}

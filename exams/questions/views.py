@@ -59,7 +59,30 @@ class ExamDetailView(DetailView):
 
     def get_object(self, *args, **kwargs):
         slug = self.kwargs.get('slug')
-        return get_object_or_404(Exam, slug=slug, active=True, visibility=True)
+        exam = (
+            Exam.objects
+            .select_related('category')
+            .users_stats()
+            .questions_count()
+        )
+        return get_object_or_404(exam, slug=slug, active=True, visibility=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs.get('slug')
+        if self.request.user.is_authenticated:
+            progress = (
+                Exam.objects
+                .filter(
+                    slug=slug, progress__user=self.request.user,
+                    active=True, visibility=True
+                )
+                .with_request_user_progress()
+                .order_by('-started')
+                .first()
+            )
+            context.update({'progress': progress})
+        return context
 
 
 class ExamProcessView(LoginRequiredMixin, FormView):

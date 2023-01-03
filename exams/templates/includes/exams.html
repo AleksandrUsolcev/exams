@@ -2,7 +2,11 @@
 <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
   {% for exam in exams %}
     <div class="col">
-      <a href="{% url 'questions:exam_detail' exam.slug %}" class="text-decoration-none text-dark">
+      {% if progress_url %}
+        <a href="{% url 'users:progress_detail' exam.progress_id %}" class="text-decoration-none text-dark">
+      {% else %}
+        <a href="{% url 'questions:exam_detail' exam.slug %}" class="text-decoration-none text-dark">
+      {% endif %}
         <div class="card h-100 exam-card hover-shadow">
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ exam.title }}</h5>

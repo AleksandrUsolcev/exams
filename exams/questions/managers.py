@@ -62,6 +62,7 @@ class ExamQuerySet(QuerySet):
             self
             .annotate(
                 current_answers=F('progress__answers_quantity'),
+                current_stage=F('progress__stage'),
                 progress_id=F('progress__id'),
                 started=F('progress__started'),
                 finished=F('progress__finished'),
@@ -150,13 +151,11 @@ class ExamManager(Manager):
         return self.get_queryset().list_(user, only_user)
 
 
-class ProgressManager(Manager):
+class ProgressQuerySet(QuerySet):
 
-    def get_details(self, progress_id: int, answers: object,
-                    variants: object) -> object:
+    def get_details(self, answers: object, variants: object) -> object:
         details = (
             self
-            .filter(id=progress_id)
             .select_related('user', 'exam', 'exam__category')
             .prefetch_related(
                 Prefetch(
@@ -205,3 +204,12 @@ class ProgressManager(Manager):
             )
         )
         return details
+
+
+class ProgressManager(Manager):
+
+    def get_queryset(self):
+        return ProgressQuerySet(self.model, using=self._db)
+
+    def get_details(self, answers: object, variants: object) -> object:
+        return self.get_queryset().get_details()
