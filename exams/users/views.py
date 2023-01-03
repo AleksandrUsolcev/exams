@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
 from questions.models import Exam, Progress, UserAnswer, UserVariant
@@ -24,6 +25,14 @@ class UserProfileView(DetailView):
     template_name = 'users/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
+
+    def get_object(self, *args, **kwargs):
+        user = (
+            User.objects
+            .filter(username=self.kwargs.get('username'))
+            .with_progress()
+        )
+        return get_object_or_404(user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

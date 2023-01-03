@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 
+from .managers import UserManager
+
 
 class User(AbstractUser):
     email = models.EmailField(
@@ -15,6 +17,8 @@ class User(AbstractUser):
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+    objects = UserManager()
 
     class Meta:
         verbose_name = 'Пользователь'

@@ -1,30 +1,47 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
 <h3 class="fw-bold">{{ user.username }}</h3>
-<div class="col-md-12 col-lg-6 col-xl-4">
-  {% if user.first_name %}
-    <h5>{{ user.first_name }} {{ user.last_name }}</h5>
-  {% endif %}
-  {% if request.user.is_authenticated and request.user == user %}
-    <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
-    <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
-  {% endif %}
-  {% if user.about %}
-    <p class="pt-3 text-secondary">{{ user.about }}</p>
-  {% endif %}
-  {% if unique_finished > 0 %}
-    <div class="pt-3">
-      <p>Пройдено тестов: <span class="fw-bold">{{ unique_finished }}</span></p>
-      {% if correct_percentage > 0 %}
-        <p>Верных ответов: <span class="fw-bold">{{ correct_percentage }}%</span> </p>
-      {% endif %}
-    </div>
-  {% endif %}
+<div class="row">
+  <div class="col-md-12 col-xl-4">
+    {% if user.first_name %}
+      <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+    {% endif %}
+    <p class="text-secondary mini-info">Зарегистрирован {{ user.date_joined|date:"d.m.Y" }}</p>
+    {% if user.about %}
+      <p class="text-secondary">{{ user.about }}</p>
+    {% endif %}
+    {% if request.user.is_authenticated and request.user == user %}
+      <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
+      <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
+    {% endif %}
+  </div>
+  <div class="row col-md-12 col-xl-8">
+    {% if user.exams_count %}
+      <div class="col-4 text-center">
+        <div class="text-secondary">Пройдено тестов</div>
+        <h4 class="fw-bold py-3">{{ user.exams_count }}</h4>
+      </div>
+    {% endif %}
+    {% if user.correct_percentage %}
+      <div class="col-4 text-center">
+        <div class="text-secondary">Верных ответов</div>
+        <h4 class="fw-bold py-3
+        {% if user.correct_percentage > 70 %}
+        text-success
+        {% elif user.correct_percentage > 30 %}
+        text-warning
+        {% else %}
+        text-danger
+        {% endif %}
+        ">{{ user.correct_percentage }}%</h4>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% if exams %}
   <h3 class="py-3 fw-bold">Прогресс</h3>
   {% include '../includes/exams.html' %}
 {% endif %}
-
 {% endblock %}

@@ -11,7 +11,7 @@ urlpatterns = [
         name='index'
     ),
     path(
-        'category/<slug:slug>/',
+        'exams/',
         views.ExamListView.as_view(),
         name='exam_list'
     ),

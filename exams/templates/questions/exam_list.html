@@ -5,10 +5,18 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-  <h3 class="fw-bold mb-4">{{ category.title }}</h3>
+  <h3 class="fw-bold mb-4">
+    {% if category %}
+      {{ category.title }}
+    {% else %}
+      Все тесты
+    {% endif %}
+  </h3>
   <div class="col-9 col-xl-10">
     <div>
-      <p class="py-3 fs-5">{{ category.description }}</p>
+      {% if category %}
+        <p class="py-3 fs-5">{{ category.description }}</p>
+      {% endif %}
       {% if exams %}
         {% include '../includes/exams.html' %}
       {% endif %}

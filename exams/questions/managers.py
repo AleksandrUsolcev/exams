@@ -194,8 +194,8 @@ class ProgressQuerySet(QuerySet):
                     )),
 
                 correct_percentage=ExpressionWrapper(
-                    Count('answers', filter=Q(
-                        answers__correct=True), distinct=True) * 100 /
+                    NullIf(Count('answers', filter=Q(
+                        answers__correct=True), distinct=True), 0) * 100 /
                     NullIf(Count('exam__questions', distinct=True, filter=Q(
                         exam__questions__visibility=True,
                         exam__questions__active=True

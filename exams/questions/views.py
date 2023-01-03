@@ -37,16 +37,22 @@ class ExamListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category = get_object_or_404(Category, slug=self.kwargs.get('slug'))
+        slug = self.request.GET.get('category')
+        if slug:
+            category = get_object_or_404(Category, slug=slug)
+            context.update({'category': category})
         categories = Category.objects.exams_count()
-        context.update({'categories': categories, 'category': category})
+        context.update({'categories': categories})
         return context
 
     def get_queryset(self):
-        slug = self.kwargs.get('slug')
+        slug = self.request.GET.get('category')
+        filter_data = {}
+        if slug:
+            filter_data['category__slug'] = slug
         queryset = (
             Exam.objects
-            .filter(category__slug=slug)
+            .filter(**filter_data)
             .select_related('category')
             .list_(user=self.request.user)
         )
