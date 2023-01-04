@@ -20,8 +20,7 @@ class Category(models.Model):
     slug = models.SlugField(
         unique=True,
         max_length=340,
-        verbose_name='ЧПУ',
-        db_index=True
+        verbose_name='ЧПУ'
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -81,8 +80,7 @@ class Exam(models.Model):
     slug = models.SlugField(
         unique=True,
         max_length=340,
-        verbose_name='ЧПУ',
-        db_index=True
+        verbose_name='ЧПУ'
     )
     description = models.TextField(
         verbose_name='Краткое описание'
@@ -137,9 +135,6 @@ class Exam(models.Model):
         verbose_name = 'Тестирование'
         verbose_name_plural = 'Тестирования'
         ordering = ['-created']
-        index_together = [
-            ('slug', 'category'),
-        ]
 
     def __str__(self):
         return f'{self.title}'
@@ -276,15 +271,13 @@ class Progress(models.Model):
         User,
         verbose_name='Пользователь',
         related_name='progression',
-        on_delete=models.CASCADE,
-        db_index=True
+        on_delete=models.CASCADE
     )
     exam = models.ForeignKey(
         Exam,
         verbose_name='Тестирование',
         related_name='progress',
-        on_delete=models.CASCADE,
-        db_index=True
+        on_delete=models.CASCADE
     )
     exam_revision = models.PositiveIntegerField(
         verbose_name='Редакция тестирования',
@@ -321,9 +314,6 @@ class Progress(models.Model):
     class Meta:
         verbose_name = 'Прогресс пользователя'
         verbose_name_plural = 'Прогресс пользователей'
-        index_together = [
-            ('user', 'exam'),
-        ]
 
     def __str__(self):
         return f'{self.user} stage in {self.exam_title} ({self.stage})'
@@ -339,8 +329,7 @@ class UserAnswer(models.Model):
         Progress,
         verbose_name='Прогресс',
         related_name='answers',
-        on_delete=models.CASCADE,
-        db_index=True
+        on_delete=models.CASCADE
     )
     question = models.ForeignKey(
         Question,

@@ -8,22 +8,22 @@
 {% cache 3600 rankings %}
 <table class="table table-hover">
   <thead>
-    <tr>
+    <tr class="text-secondary">
       <th scope="col"></th>
       <th scope="col">Пользователь</th>
-      <th scope="col">Пройдено тестов</th>
-      <th scope="col">Баллов</th>
-      <th scope="col">Верных ответов</th>
+      <th scope="col" class="text-center">Пройдено тестов</th>
+      <th scope="col" class="text-center">Верных ответов</th>
+      <th scope="col" class="text-center">Баллов</th>
     </tr>
   </thead>
   <tbody>
     {% for user in users %}
       <tr>
         <th scope="row">{{ user.rank }}</th>
-        <td><a href="{% url 'users:profile' user.username %}">{{ user.username }}</a></td>
-        <td>{{ user.exams_count }}</td>
-        <td>{{ user.points }}</td>
-        <td>{{ user.correct_percentage }}%</td>
+        <td class="fw-bold"><a href="{% url 'users:profile' user.username %}" class="text-decoration-none">{{ user.username }}</a></td>
+        <td class="text-center">{{ user.exams_count }}</td>
+        <td class="text-center">{{ user.correct_percentage }}%</td>
+        <td class="text-center fw-bold">{{ user.points }}</td>
       </tr>
     {% endfor %}
   </tbody>
