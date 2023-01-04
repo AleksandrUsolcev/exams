@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load cache %}
 {% load humanize %}
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
@@ -17,7 +18,7 @@
       <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
     {% endif %}
   </div>
-  <div class="row col-md-12 col-xl-8">
+  <div class="row col-md-12 col-xl-8 py-3">
     {% if user.exams_count %}
       <div class="col-4 text-center">
         <div class="text-secondary">Пройдено тестов</div>
@@ -38,10 +39,21 @@
         ">{{ user.correct_percentage }}%</h4>
       </div>
     {% endif %}
+    {% if user.points %}
+    <div class="col-4 text-center">
+      <div class="text-secondary">Баллов</div>
+      <h4 class="fw-bold py-3">{{ user.points }}</h4>
+      {% cache 3600 standing %}
+        {% if standing %}
+          <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: {{ standing }}</div>
+        {% endif %}
+      {% endcache %}
+    </div>
+  {% endif %}
   </div>
 </div>
 {% if exams %}
-  <h3 class="py-3 fw-bold">Прогресс</h3>
+  <h3 class="py-3 pt-4 fw-bold">Прогресс</h3>
   {% include '../includes/exams.html' %}
 {% endif %}
 {% endblock %}

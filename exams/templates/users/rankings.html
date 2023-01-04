@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load cache %}
+{% block title %}Рейтинг пользователей{% endblock %}
+{% block content %}
+<h3 class="fw-bold mb-4">Рейтинг пользователей</h3>
+<div class="mini-info text-secondary pb-3">Актуальные данные за последний час</div>
+{% cache 3600 rankings %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Пользователь</th>
+      <th scope="col">Выполнено тестов</th>
+      <th scope="col">Баллов</th>
+      <th scope="col">Верных ответов</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <th scope="row">{{ user.rank }}</th>
+        <td><a href="{% url 'users:profile' user.username %}">{{ user.username }}</a></td>
+        <td>{{ user.exams_count }}</td>
+        <td>{{ user.points }}</td>
+        <td>{{ user.correct_percentage }}%</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endcache %}
+{% include '../includes/paginator.html' %}
+{% endblock %}

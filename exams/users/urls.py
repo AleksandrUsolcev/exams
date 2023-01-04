@@ -77,4 +77,7 @@ urlpatterns = [
         views.UserProgressDetailView.as_view(),
         name='progress_detail'
     ),
+    path(
+        'rankings/', views.RankingListView.as_view(), name='users_rankings'
+    )
 ]

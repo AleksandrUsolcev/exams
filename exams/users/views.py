@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, UpdateView
+from django.views.generic import CreateView, DetailView, UpdateView, ListView
 from questions.models import Exam, Progress, UserAnswer, UserVariant
 
 from .forms import SignupForm
@@ -30,6 +30,9 @@ class UserProfileView(DetailView):
         user = (
             User.objects
             .filter(username=self.kwargs.get('username'))
+            .only(
+                'username', 'date_joined', 'about', 'first_name', 'last_name'
+            )
             .with_progress()
         )
         return get_object_or_404(user)
@@ -41,9 +44,19 @@ class UserProfileView(DetailView):
             .select_related('category')
             .list_(user=self.object, only_user=True)
         )
+        ranks = (
+            User.objects
+            .filter(is_active=True)
+            .with_progress()
+            .get_rank()
+            .order_by('-points', '-correct_percentage', '-exams_count',
+                      '-date_joined')
+            .values_list('id', flat=True)
+        )
         extra_context = {
             'exams': exams[:6],
-            'progress_url': True
+            'progress_url': True,
+            'standing': list(ranks).index(self.object.id) + 1
         }
         context.update(extra_context)
         return context
@@ -70,4 +83,25 @@ class UserProgressDetailView(DetailView):
         progress_id = self.kwargs.get('pk')
         queryset = Progress.objects.filter(id=progress_id).get_details(
             variants=UserVariant, answers=UserAnswer)
+        return queryset
+
+
+class RankingListView(ListView):
+    model = User
+    template_name = 'users/rankings.html'
+    context_object_name = 'users'
+    paginate_by = 50
+
+    def get_queryset(self):
+        queryset = (
+            User.objects
+            .filter(is_active=True)
+            .with_progress()
+            .get_rank()
+            .only(
+                'username', 'date_joined', 'about', 'first_name', 'last_name'
+            )
+            .order_by('-points', '-correct_percentage', '-exams_count',
+                      '-date_joined')
+        )
         return queryset
