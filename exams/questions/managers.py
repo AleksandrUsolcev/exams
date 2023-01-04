@@ -111,6 +111,10 @@ class ExamQuerySet(QuerySet):
                     .only(*fields_only)
                     .questions_count()
                 )
+
+                if user.hide_finished_exams:
+                    return query_without_user.order_by('-created')
+
                 exams = sorted(
                     list(chain(query_without_user, exams)),
                     key=attrgetter('created'), reverse=True

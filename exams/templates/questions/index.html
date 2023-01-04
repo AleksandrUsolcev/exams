@@ -5,6 +5,11 @@
 {% block content %}
     <div class="row">
       <h3 class="fw-bold mb-4">Последние тесты</h3>
+      {% if request.user.is_authenticated and request.user.hide_finished_exams %}
+        <div class="col-12 pt-0 mt-0 pb-4">
+          <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
+        </div>
+      {% endif %}
       <div class="col-8 col-xl-10">
         {% if exams %}
           {% include '../includes/exams.html' %}

@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, UpdateView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from questions.models import Exam, Progress, UserAnswer, UserVariant
 
 from .forms import SignupForm
@@ -43,20 +43,11 @@ class UserProfileView(DetailView):
             Exam.objects
             .select_related('category')
             .list_(user=self.object, only_user=True)
-        )
-        ranks = (
-            User.objects
-            .filter(is_active=True)
-            .with_progress()
-            .get_rank()
-            .order_by('-points', '-correct_percentage', '-exams_count',
-                      '-date_joined')
-            .values_list('id', flat=True)
+            .order_by('-started')
         )
         extra_context = {
             'exams': exams[:6],
-            'progress_url': True,
-            'standing': list(ranks).index(self.object.id) + 1
+            'progress_url': True
         }
         context.update(extra_context)
         return context
@@ -64,7 +55,7 @@ class UserProfileView(DetailView):
 
 class UserEditView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name', 'last_name', 'about']
+    fields = ['first_name', 'last_name', 'hide_finished_exams', 'about']
     template_name = 'users/profile_edit.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
@@ -101,7 +92,6 @@ class RankingListView(ListView):
             .only(
                 'username', 'date_joined', 'about', 'first_name', 'last_name'
             )
-            .order_by('-points', '-correct_percentage', '-exams_count',
-                      '-date_joined')
+            .order_by('rank')
         )
         return queryset

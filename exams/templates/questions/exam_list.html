@@ -12,6 +12,11 @@
       Все тесты
     {% endif %}
   </h3>
+  {% if request.user.is_authenticated and request.user.hide_finished_exams %}
+    <div class="col-12 pt-0 mt-0 pb-4">
+      <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
+    </div>
+  {% endif %}
   <div class="col-9 col-xl-10">
     <div>
       {% if category %}

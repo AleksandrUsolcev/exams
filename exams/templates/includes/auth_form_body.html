@@ -7,8 +7,17 @@
   {% endfor %}
 </div>
 {% for field in form %}
+  {% if field.field.widget.input_type == 'checkbox' %}
+  <p class="mt-2 mb-2 py-2 fw-bold">
+    {{ field|addclass:'form-check-input' }}
+    <span class="ms-2">{{ field.label}}</span>
+  </p>
+  {% else %}
   <p class="mt-2 mb-2 fw-bold">{{ field.label}}</p>
-  <p>{{ field|addclass:'form-control' }}</p>
+  <p>
+    {{ field|addclass:'form-control' }}
+  </p>
+  {% endif %}
   {% for error in field.errors %}
     <p class="help-block mt-2 text-danger fw-bold">{{ error }}</p>
   {% endfor %}

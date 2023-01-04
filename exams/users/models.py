@@ -15,10 +15,27 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
+    hide_finished_exams = models.BooleanField(
+        verbose_name='Скрывать пройденные тесты',
+        default=False
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     objects = UserManager()
+
+    @property
+    def position_of_rankings(self):
+        ranks = (
+            User.objects
+            .filter(is_active=True)
+            .with_progress()
+            .get_rank()
+            .order_by('-points', '-correct_percentage', '-exams_count',
+                      '-date_joined')
+            .values_list('username', flat=True)
+        )
+        return list(ranks).index(self.username) + 1
 
     class Meta:
         verbose_name = 'Пользователь'

@@ -4,14 +4,14 @@
 {% block title %}Рейтинг пользователей{% endblock %}
 {% block content %}
 <h3 class="fw-bold mb-4">Рейтинг пользователей</h3>
-<div class="mini-info text-secondary pb-3">Актуальные данные за последний час</div>
+<div class="mini-info text-secondary pb-3">Рейтинг обновляется каждый час</div>
 {% cache 3600 rankings %}
 <table class="table table-hover">
   <thead>
     <tr>
       <th scope="col"></th>
       <th scope="col">Пользователь</th>
-      <th scope="col">Выполнено тестов</th>
+      <th scope="col">Пройдено тестов</th>
       <th scope="col">Баллов</th>
       <th scope="col">Верных ответов</th>
     </tr>

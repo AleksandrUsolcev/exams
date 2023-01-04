@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load cache %}
 {% load humanize %}
 {% block title %}Профиль пользователя {{ user.username }}{% endblock %}
 {% block content %}
@@ -22,13 +21,13 @@
     {% if user.exams_count %}
       <div class="col-4 text-center">
         <div class="text-secondary">Пройдено тестов</div>
-        <h4 class="fw-bold py-3">{{ user.exams_count }}</h4>
+        <h3 class="fw-bold py-3">{{ user.exams_count }}</h3>
       </div>
     {% endif %}
     {% if user.correct_percentage %}
       <div class="col-4 text-center">
         <div class="text-secondary">Верных ответов</div>
-        <h4 class="fw-bold py-3
+        <h3 class="fw-bold py-3
         {% if user.correct_percentage > 70 %}
         text-success
         {% elif user.correct_percentage > 30 %}
@@ -36,18 +35,16 @@
         {% else %}
         text-danger
         {% endif %}
-        ">{{ user.correct_percentage }}%</h4>
+        ">{{ user.correct_percentage }}%</h3>
       </div>
     {% endif %}
     {% if user.points %}
     <div class="col-4 text-center">
       <div class="text-secondary">Баллов</div>
-      <h4 class="fw-bold py-3">{{ user.points }}</h4>
-      {% cache 3600 standing %}
-        {% if standing %}
-          <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: {{ standing }}</div>
-        {% endif %}
-      {% endcache %}
+      <h3 class="fw-bold py-3">{{ user.points }}</h3>
+    </div>
+    <div class="col-12 text-center">
+      <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: {{ user.position_of_rankings }}</div>
     </div>
   {% endif %}
   </div>
