@@ -12,7 +12,7 @@ from .models import Exam, Question, Variant
 def exam_update_revision(sender, instance, **kwargs):
     if (instance.exam.active
         and instance.exam.visibility
-            and instance.change_revision):
+            and instance.exam.change_revision):
         instance.exam.revision = F('revision') + 1
         instance.exam.save()
 
