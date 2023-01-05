@@ -10,7 +10,9 @@ from .models import Exam, Question, Variant
 @receiver(post_delete, sender=Variant)
 @receiver(post_delete, sender=Question)
 def exam_update_revision(sender, instance, **kwargs):
-    if instance.exam.active and instance.exam.visibility:
+    if (instance.exam.active
+        and instance.exam.visibility
+            and instance.change_revision):
         instance.exam.revision = F('revision') + 1
         instance.exam.save()
 

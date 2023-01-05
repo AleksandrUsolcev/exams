@@ -1,5 +1,6 @@
 from random import randrange
 
+from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -82,8 +83,8 @@ class Exam(models.Model):
         max_length=340,
         verbose_name='ЧПУ'
     )
-    description = models.TextField(
-        verbose_name='Краткое описание'
+    description = RichTextField(
+        verbose_name='Описание'
     )
     author = models.ForeignKey(
         User,
@@ -104,6 +105,21 @@ class Exam(models.Model):
     created = models.DateTimeField(
         verbose_name='Дата добавления',
         auto_now_add=True
+    )
+    change_revision = models.BooleanField(
+        verbose_name=('Менять версию редакции при сохранении теста, вопросов '
+                      'или вариантов ответов'),
+        default=False
+    )
+    timer = models.PositiveIntegerField(
+        verbose_name='Время на выполнение (мин.)',
+        help_text='Необязательное поле',
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(720)
+        ]
     )
     show_results = models.BooleanField(
         verbose_name=('Отображать пользователю результат после каждого ответа '
@@ -144,7 +160,7 @@ class Exam(models.Model):
             code = randrange(10000, 99999)
         else:
             code = self.slug[-5:]
-            if self.active and self.visibility:
+            if self.active and self.visibility and self.change_revision:
                 self.revision += 1
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
@@ -163,7 +179,7 @@ class Question(models.Model):
         (MANY_CORRECT, 'Допустимы несколько вариантов ответов')
     )
 
-    text = models.TextField(
+    text = RichTextField(
         verbose_name='Вопрос'
     )
     success_message = models.TextField(

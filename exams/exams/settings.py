@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'questions.apps.QuestionsConfig',
     'debug_toolbar',
     'widget_tweaks',
+    'ckeditor',
     'api'
 ]
 
@@ -115,6 +116,12 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 

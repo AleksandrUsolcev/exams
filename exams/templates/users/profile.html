@@ -28,9 +28,9 @@
       <div class="col-4 text-center">
         <div class="text-secondary">Верных ответов</div>
         <h3 class="fw-bold py-3
-        {% if user.correct_percentage > 70 %}
+        {% if user.correct_percentage > 65 %}
         text-success
-        {% elif user.correct_percentage > 30 %}
+        {% elif user.correct_percentage > 32 %}
         text-warning
         {% else %}
         text-danger

@@ -1,3 +1,5 @@
+from ckeditor.widgets import CKEditorWidget
+from django import forms
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
@@ -59,9 +61,7 @@ class ExamAdmin(NestedModelAdmin):
 
     inlines = (QuestionInline,)
     save_on_top = True
-    formfield_overrides = {
-        models.TextField: {'widget': Textarea(attrs={'rows': 4, 'cols': 80})},
-    }
+    description = forms.CharField(widget=CKEditorWidget())
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

@@ -33,9 +33,9 @@ class User(AbstractUser):
             .get_rank()
             .order_by('-points', '-correct_percentage', '-exams_count',
                       '-date_joined')
-            .values_list('username', flat=True)
+            .values_list('id', flat=True)
         )
-        return list(ranks).index(self.username) + 1
+        return list(ranks).index(self.id) + 1
 
     class Meta:
         verbose_name = 'Пользователь'

@@ -45,9 +45,9 @@
       </p>
     {% endif %}
   {% else %}
-    <p class="py-2 pt-3 fs-5">
-      {{ question.text }}
-    </p>
+    <div class="description py-2 pt-3 fs-5">
+      {{ question.text|safe }}
+    </div>
   {% endif %}
 
   {% if progress.answers_quantity < stage %}

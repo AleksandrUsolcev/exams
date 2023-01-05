@@ -9,7 +9,7 @@
   <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
   <div class="row">
     <div class="col-8 pe-5">
-      <p class="py-3">{{ exam.description }}</p>
+      <div class="description py-3">{{ exam.description|safe }}</div>
     </div>
     <div class="col-4">
       <div class="exam-info p-4 py-3">
