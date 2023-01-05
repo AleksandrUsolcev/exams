@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from questions.models import Exam
+from exams.models import Exam
 
 
 class ExamSerializer(serializers.ModelSerializer):

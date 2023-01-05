@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}
+  {{ exam.title }} - {{ exam.category.title}}
+{% endblock %}
+{% block content %}
+  <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
+  <h3 class="fw-bold">{{ exam.title }}</h3>
+  <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
+  <div class="row">
+    <div class="col-8 pe-5">
+      <div class="description py-3">{{ exam.description|safe }}</div>
+    </div>
+    <div class="col-4">
+      <div class="exam-info p-4 py-3">
+        <div class="questions-count py-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-card-checklist pb-1" viewBox="0 0 16 16">
+            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+            <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+          </svg>
+          <span class="py-1 ps-1 pe-3">Количество вопросов: {{ exam.questions_count|intcomma }}</span>
+        </div>
+        {% if exam.users_count %}
+          <div class="users-count py-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-people-fill pb-1" viewBox="0 0 16 16">
+              <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+            </svg>
+            <span class="py-1 ps-1 pe-3">Пользователей завершивших тест: {{ exam.users_count }}</span>
+          </div>
+          {% if exam.average_progress %}
+            <div class="average-progress py-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-fire pb-1" viewBox="0 0 16 16">
+                <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
+              </svg>
+              <span class="py-1 ps-1">Пользователями было дано {{ exam.average_progress }}% верных ответов</span>
+            </div>
+          {% endif %}
+        {% endif %}
+          <div class="exam-rules mt-3">
+            <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
+            <div class="mini-info text-secondary">
+              {% if exam.show_results %}
+                <p>Пользователю отображается результат, после каждого ответа и по окончанию тестирования</p>
+              {% endif %}
+              {% if exam.empty_answers %}
+                <p>Допускается оставлять выбор пустым, там где предполагается несколько вариантов ответа</p>
+              {% endif %}
+              {% if exam.shuffle_variants %}
+                <p>Варианты ответа выводятся в случайном порядке</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="progress-info mt-3">
+          {% if progress %}
+            {% if progress.finished %}
+              <div class="mini-info text-secondary fw-bold">
+                Тест пройден {{ progress.finished|date:"d.m.Y в H:i" }}
+              </div>
+              <a class="btn btn-success my-3" href="{% url 'progress:progress_detail' progress.progress_id %}">Результаты</a>
+            {% elif progress.started %}
+              <div class="mini-info text-secondary fw-bold">
+                Тест начат {{ progress.started|date:"d.m.Y в H:i" }}
+              </div>
+              <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' progress.slug progress.current_stage %}">Продолжить</a>
+            {% endif %}
+          {% else %}
+            <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' exam.slug 1 %}">Начать</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

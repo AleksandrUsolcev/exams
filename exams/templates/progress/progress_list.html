@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  Прогресс пользователя {{ username }}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <a href="{% url 'users:profile' username %}" class="text-decoration-none fs-5 fw-bold">{{ username }}</a>
+  <h3 class="fw-bold mb-4">
+    Прогресс пользователя
+  </h3>
+  <div class="col-9 col-xl-10">
+    <div>
+      {% if exams %}
+        {% include '../includes/exams.html' %}
+      {% endif %}
+    </div>
+    {% include '../includes/paginator.html' %}
+  </div>
+</div>
+{% endblock %}

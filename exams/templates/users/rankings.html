@@ -21,8 +21,20 @@
       <tr>
         <th scope="row">{{ user.rank }}</th>
         <td class="fw-bold"><a href="{% url 'users:profile' user.username %}" class="text-decoration-none">{{ user.username }}</a></td>
-        <td class="text-center">{{ user.exams_count }}</td>
-        <td class="text-center">{{ user.correct_percentage }}%</td>
+        <td class="text-center">
+          {% if user.exams_count %}
+            {{ user.exams_count }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if user.correct_percentage %}
+            {{ user.correct_percentage }}%
+          {% else %}
+            -
+          {% endif %}
+        </td>
         <td class="text-center fw-bold">{{ user.points }}</td>
       </tr>
     {% endfor %}

@@ -4,7 +4,7 @@ from django.contrib.auth.views import (LoginView, LogoutView,
                                        PasswordResetCompleteView,
                                        PasswordResetConfirmView,
                                        PasswordResetDoneView,
-                                       PasswordResetView, )
+                                       PasswordResetView)
 from django.urls import path, reverse_lazy
 
 from . import views
@@ -16,7 +16,7 @@ urlpatterns = [
         'logout/',
         LogoutView.as_view(
             template_name='users/logout.html',
-            next_page='questions:index'
+            next_page='exams:index'
         ),
         name='logout'
     ),
@@ -66,16 +66,11 @@ urlpatterns = [
             template_name='users/password_change_done.html'),
         name='password_change_done'
     ),
-    path('@<slug:username>', views.UserProfileView.as_view(), name='profile'),
+    path('@<slug:username>/', views.UserProfileView.as_view(), name='profile'),
     path(
         '@<slug:username>/edit/',
         views.UserEditView.as_view(),
         name='profile_edit'
-    ),
-    path(
-        'progress/<int:pk>/',
-        views.UserProgressDetailView.as_view(),
-        name='progress_detail'
     ),
     path(
         'rankings/', views.RankingListView.as_view(), name='users_rankings'

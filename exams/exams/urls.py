@@ -1,20 +1,28 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
+
+from . import views
+
+app_name = 'exams'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('api/1.0/', include('api.urls', namespace='api')),
-    path('', include('questions.urls', namespace='questions')),
-    path('', include('users.urls', namespace='users')),
+    path(
+        '',
+        views.IndexView.as_view(),
+        name='index'
+    ),
+    path(
+        'exams/',
+        views.ExamListView.as_view(),
+        name='exam_list'
+    ),
+    path(
+        'exam/<slug:slug>/details/',
+        views.ExamDetailView.as_view(),
+        name='exam_detail'
+    ),
+    path(
+        'exam/<slug:slug>/progress/<int:pk>/',
+        views.ExamProcessView.as_view(),
+        name='exam_process'
+    ),
 ]
-
-if settings.DEBUG:
-    import debug_toolbar
-
-    urlpatterns += (path('__debug__/', include(debug_toolbar.urls)),)
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )

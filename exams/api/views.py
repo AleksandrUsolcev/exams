@@ -1,7 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from questions.models import Exam
 from rest_framework.filters import SearchFilter
 from rest_framework.viewsets import ModelViewSet
+
+from exams.models import Exam
 
 from .pagination import ExamPagination
 from .serializers import ExamSerializer

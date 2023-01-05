@@ -17,40 +17,52 @@
       <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
     {% endif %}
   </div>
-  <div class="row col-md-12 col-xl-8 py-3">
-    {% if user.exams_count %}
-      <div class="col-4 text-center">
-        <div class="text-secondary">Пройдено тестов</div>
-        <h3 class="fw-bold py-3">{{ user.exams_count }}</h3>
-      </div>
-    {% endif %}
-    {% if user.correct_percentage %}
+  <div class="row col-md-12 col-xl-8 py-3 border-bottom">
+    <div class="col-4 text-center">
+      <div class="text-secondary">Пройдено тестов</div>
+      <h3 class="fw-bold py-3">
+        {% if user.exams_count %}
+          {{ user.exams_count }}
+        {% else %}
+        -
+        {% endif %}
+      </h3>
+    </div>
       <div class="col-4 text-center">
         <div class="text-secondary">Верных ответов</div>
-        <h3 class="fw-bold py-3
-        {% if user.correct_percentage > 65 %}
-        text-success
-        {% elif user.correct_percentage > 32 %}
-        text-warning
+        {% if user.correct_percentage %}
+          <h3 class="fw-bold py-3
+          {% if user.correct_percentage > 65 %}
+          text-success
+          {% elif user.correct_percentage > 32 %}
+          text-warning
+          {% else %}
+          text-danger
+          {% endif %}
+          ">{{ user.correct_percentage }}%</h3>
         {% else %}
-        text-danger
+          <h3 class="fw-bold py-3">-</h3>
         {% endif %}
-        ">{{ user.correct_percentage }}%</h3>
       </div>
-    {% endif %}
-    {% if user.points %}
     <div class="col-4 text-center">
       <div class="text-secondary">Баллов</div>
-      <h3 class="fw-bold py-3">{{ user.points }}</h3>
+      <h3 class="fw-bold py-3">
+        {% if user.points %}
+          {{ user.points }}
+        {% else %}
+        -
+        {% endif %}
+      </h3>
     </div>
     <div class="col-12 text-center">
       <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: {{ user.position_of_rankings }}</div>
     </div>
-  {% endif %}
   </div>
 </div>
 {% if exams %}
-  <h3 class="py-3 pt-4 fw-bold">Прогресс</h3>
+  <div class="py-4">
+    <h3 class="fw-bold d-inline"><a href="{% url 'progress:progress_list' user.username %}" class="text-decoration-none">Прогресс</a></h3>
+  </div>
   {% include '../includes/exams.html' %}
 {% endif %}
 {% endblock %}

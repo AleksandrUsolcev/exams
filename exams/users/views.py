@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-from questions.models import Exam, Progress, UserAnswer, UserVariant
+from exams.models import Exam
 
 from .forms import SignupForm
 from .models import User
@@ -11,7 +11,7 @@ from .models import User
 
 class SignupView(CreateView):
     form_class = SignupForm
-    success_url = reverse_lazy('questions:index')
+    success_url = reverse_lazy('exams:index')
     template_name = 'users/signup.html'
 
     def form_valid(self, form):
@@ -62,19 +62,6 @@ class UserEditView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, *args, **kwargs):
         return self.request.user
-
-
-class UserProgressDetailView(DetailView):
-    model = Progress
-    template_name = 'users/progress_detail.html'
-    slug_field = 'username'
-    slug_url_kwarg = 'username'
-
-    def get_queryset(self):
-        progress_id = self.kwargs.get('pk')
-        queryset = Progress.objects.filter(id=progress_id).get_details(
-            variants=UserVariant, answers=UserAnswer)
-        return queryset
 
 
 class RankingListView(ListView):
