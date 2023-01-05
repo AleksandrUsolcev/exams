@@ -17,7 +17,7 @@
       <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
     </div>
   {% endif %}
-  <div class="col-9 col-xl-10">
+  <div class="col-8 col-xl-10">
     <div>
       {% if category %}
         <p class="py-3 fs-5">{{ category.description }}</p>

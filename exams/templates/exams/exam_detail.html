@@ -12,7 +12,7 @@
       <div class="description py-3">{{ exam.description|safe }}</div>
     </div>
     <div class="col-4">
-      <div class="exam-info p-4 py-3">
+      <div class="exam-stats pb-3">
         <div class="questions-count py-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-card-checklist pb-1" viewBox="0 0 16 16">
             <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
@@ -36,21 +36,37 @@
             </div>
           {% endif %}
         {% endif %}
-          <div class="exam-rules mt-3">
-            <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
-            <div class="mini-info text-secondary">
-              {% if exam.show_results %}
-                <p>Пользователю отображается результат, после каждого ответа и по окончанию тестирования</p>
-              {% endif %}
-              {% if exam.empty_answers %}
-                <p>Допускается оставлять выбор пустым, там где предполагается несколько вариантов ответа</p>
-              {% endif %}
-              {% if exam.shuffle_variants %}
-                <p>Варианты ответа выводятся в случайном порядке</p>
-              {% endif %}
-            </div>
+      </div>
+      <div class="exam-info p-4 py-3">
+        <div class="exam-rules mt-1">
+          <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
+          <div class="mini-info text-secondary pt-3">
+            {% if exam.timer %}
+              <p>Время на прохождение в минутах: <span class="fw-bold">{{ exam.timer }}</span></p>
+            {% else %}
+              <p>Время прохождения неограниченно</p>
+            {% endif %}
+            {% if exam.allow_retesting %}
+              <p>Допускается повторное прохождение</p>
+            {% else %}
+              <p>Тест можно пройти только один раз</p>
+            {% endif %}
+            {% if exam.show_results %}
+              <p>Пользователю отображается результат, после каждого ответа и по окончанию тестирования</p>
+            {% else %}
+              <p>Результаты теста выводится только по его окончанию</p>
+            {% endif %}
+            {% if exam.empty_answers %}
+              <p>Допускается оставлять выбор пустым, там где предполагается несколько вариантов ответа</p>
+            {% else %}
+              <p>Не допускается оставлять выбор пустым</p>
+            {% endif %}
+            {% if exam.shuffle_variants %}
+              <p>Варианты ответа выводятся в случайном порядке</p>
+            {% endif %}
           </div>
-          <div class="progress-info mt-3">
+        </div>
+        <div class="progress-info mt-4">
           {% if progress %}
             {% if progress.finished %}
               <div class="mini-info text-secondary fw-bold">

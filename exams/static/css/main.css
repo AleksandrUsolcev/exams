@@ -5,6 +5,10 @@
 
 body {
   background: #ffffff;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -43,6 +47,11 @@ body {
   -moz-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.25);
   cursor: pointer;
+}
+
+.main-content {
+  position: relative;
+  flex: 1;
 }
 
 .main-content .description img {

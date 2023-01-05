@@ -118,6 +118,10 @@ class Exam(models.Model):
             MaxValueValidator(720)
         ]
     )
+    allow_retesting = models.BooleanField(
+        verbose_name='Разрешить повторное прохождение',
+        default=True
+    )
     show_results = models.BooleanField(
         verbose_name=('Отображать пользователю результат после каждого ответа '
                       'и по окончанию тестирования'),
