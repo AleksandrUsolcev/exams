@@ -39,9 +39,11 @@ class ExamListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = self.request.GET.get('category')
+
         if slug:
             category = get_object_or_404(Category, slug=slug)
             context.update({'category': category})
+
         categories = Category.objects.exams_count()
         context.update({'categories': categories})
         return context
@@ -49,8 +51,10 @@ class ExamListView(ListView):
     def get_queryset(self):
         slug = self.request.GET.get('category')
         filter_data = {}
+
         if slug:
             filter_data['category__slug'] = slug
+
         queryset = (
             Exam.objects
             .filter(**filter_data)
@@ -77,6 +81,7 @@ class ExamDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs.get('slug')
+
         if self.request.user.is_authenticated:
             progress = (
                 Exam.objects
@@ -89,6 +94,7 @@ class ExamDetailView(DetailView):
                 .first()
             )
             context.update({'progress': progress})
+
         return context
 
 
@@ -122,7 +128,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                             answers__progress__exam=F('exam'),
                             answers__date__isnull=False
                         ))
-                )
+                ).order_by('-visibility', '-active', 'priority', 'id', 'text')
             )
         )
         self.exam = get_object_or_404(exam)
@@ -167,8 +173,10 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if (self.exam.show_results
-                and self.progress.answers_quantity >= self.stage):
+        if (
+            self.exam.show_results
+            and self.progress.answers_quantity >= self.stage
+        ):
             answer = UserAnswer.objects.prefetch_related(
                 Prefetch('variants', queryset=UserVariant.objects.filter(
                     answer=F('answer')).order_by('-selected', '?'))).filter(
@@ -208,7 +216,10 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 user=self.request.user,
                 exam=self.exam
             ).update(**data_update)
-            form.answer()
+            if self.question.many_correct:
+                form.answer_with_many_correct()
+            elif self.question.one_correct:
+                form.answer_with_one_correct()
 
         if self.last_stage and not self.exam.show_results:
             return redirect('progress:progress_detail', pk=self.progress.id)

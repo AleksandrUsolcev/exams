@@ -21,7 +21,8 @@ class Category(models.Model):
         verbose_name='ЧПУ'
     )
     description = models.TextField(
-        verbose_name='Краткое описание'
+        verbose_name='Краткое описание',
+        max_length=300
     )
     show_empty = models.BooleanField(
         verbose_name='Отображать если нет тестов',

@@ -55,7 +55,7 @@ class UserQuerySet(QuerySet):
                     F('points').desc(),
                     F('correct_percentage').desc(),
                     F('exams_count').desc(),
-                    F('date_joined').desc()
+                    F('date_joined').asc()
                 ])
             )
         )

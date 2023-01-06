@@ -13,7 +13,8 @@ class User(AbstractUser):
     about = models.TextField(
         verbose_name='Обо мне',
         null=True,
-        blank=True
+        blank=True,
+        max_length=200
     )
     hide_finished_exams = models.BooleanField(
         verbose_name='Скрывать пройденные тесты',
@@ -31,8 +32,7 @@ class User(AbstractUser):
             .filter(is_active=True)
             .with_progress()
             .get_rank()
-            .order_by('-points', '-correct_percentage', '-exams_count',
-                      '-date_joined')
+            .order_by('rank')
             .values_list('id', flat=True)
         )
         return list(ranks).index(self.id) + 1

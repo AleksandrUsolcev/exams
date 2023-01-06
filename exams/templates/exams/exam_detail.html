@@ -72,7 +72,10 @@
               <div class="mini-info text-secondary fw-bold">
                 Тест пройден {{ progress.finished|date:"d.m.Y в H:i" }}
               </div>
-              <a class="btn btn-success my-3" href="{% url 'progress:progress_detail' progress.progress_id %}">Результаты</a>
+              <a class="btn btn-success my-3 me-2" href="{% url 'progress:progress_detail' progress.progress_id %}">Результаты</a>
+              {% if progress.allow_retesting %}
+                <a class="btn btn-primary my-3 me-2" href="{% url 'exams:exam_process' exam.slug 1 %}">Пройти заново</a>
+              {% endif %}
             {% elif progress.started %}
               <div class="mini-info text-secondary fw-bold">
                 Тест начат {{ progress.started|date:"d.m.Y в H:i" }}

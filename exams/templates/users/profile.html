@@ -4,13 +4,13 @@
 {% block content %}
 <h3 class="fw-bold">{{ user.username }}</h3>
 <div class="row">
-  <div class="col-md-12 col-xl-4">
+  <div class="col-md-6 col-xl-4">
     {% if user.first_name %}
       <h5>{{ user.first_name }} {{ user.last_name }}</h5>
     {% endif %}
     <p class="text-secondary mini-info">Зарегистрирован {{ user.date_joined|date:"d.m.Y" }}</p>
     {% if user.about %}
-      <p class="text-secondary">{{ user.about }}</p>
+      <p class="text-secondary pe-3 pb-2">{{ user.about }}</p>
     {% endif %}
     {% if request.user.is_authenticated and request.user == user %}
       <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
@@ -55,13 +55,13 @@
       </h3>
     </div>
     <div class="col-12 text-center">
-      <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: {{ user.position_of_rankings }}</div>
+      <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: <span class="fw-bold">{{ user.position_of_rankings }}</span></div>
     </div>
   </div>
 </div>
 {% if exams %}
   <div class="py-4">
-    <h3 class="fw-bold d-inline"><a href="{% url 'progress:progress_list' user.username %}" class="text-decoration-none">Прогресс</a></h3>
+    <h4 class="fw-bold d-inline"><a href="{% url 'progress:progress_list' user.username %}" class="text-decoration-none">Прогресс</a></h4>
   </div>
   {% include '../includes/exams.html' %}
 {% endif %}
