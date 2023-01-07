@@ -41,6 +41,11 @@
         <div class="exam-rules mt-1">
           <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
           <div class="mini-info text-secondary pt-3">
+            {% if exam.required_percent %}
+              <p>Минимальный процент для успешного прохождения: <span class="fw-bold">{{ exam.required_percent }}%</span></p>
+            {% else %}
+              <p>Для успешного прохождение достаточно набрать любой процент верных ответов</p>
+            {% endif %}
             {% if exam.timer %}
               <p>Время на прохождение в минутах: <span class="fw-bold">{{ exam.timer }}</span></p>
             {% else %}

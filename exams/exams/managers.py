@@ -66,6 +66,7 @@ class ExamQuerySet(QuerySet):
                 progress_id=F('progress__id'),
                 started=F('progress__started'),
                 finished=F('progress__finished'),
+                passed=F('progress__passed'),
                 percentage_answers=ExpressionWrapper(
                     F('progress__answers_quantity') * 100 / NullIf(Count(
                         'questions', distinct=True, filter=Q(

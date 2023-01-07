@@ -44,7 +44,11 @@
                 </span>
               </div>
               {% if exam.finished %}
-                <span class="text-success fw-bold">Завершен</span>
+                {% if exam.passed %}
+                  <span class="text-success fw-bold">Завершен</span>
+                {% else %}
+                  <span class="text-danger fw-bold">Не зачтено</span>
+                {% endif %}
               {% else %}
                 <span class="text-primary fw-bold">В процессе</span>
               {% endif %}

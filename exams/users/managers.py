@@ -16,6 +16,11 @@ class UserQuerySet(QuerySet):
                     progression__user_id=F('id'),
                     progression__finished__isnull=False
                 )),
+                passed_count=Count('progression__exam', distinct=True,
+                                   filter=Q(
+                                       progression__user_id=F('id'),
+                                       progression__passed=True
+                                   )),
                 correct_percentage=ExpressionWrapper(NullIf(
                     Count('progression__answers', distinct=True, filter=Q(
                         progression__user_id=F('id'),
@@ -40,7 +45,7 @@ class UserQuerySet(QuerySet):
                             .values('progression__id')
                         ),
                         progression__answers__correct=True,
-                        progression__finished__isnull=False
+                        progression__passed=True
                     )) * 10, output_field=IntegerField()
                 )
             )
@@ -53,6 +58,7 @@ class UserQuerySet(QuerySet):
             .annotate(
                 rank=Window(expression=DenseRank(), order_by=[
                     F('points').desc(),
+                    F('passed_count').desc(),
                     F('correct_percentage').desc(),
                     F('exams_count').desc(),
                     F('date_joined').asc()

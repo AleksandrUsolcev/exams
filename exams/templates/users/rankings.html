@@ -11,7 +11,8 @@
     <tr>
       <th scope="col"></th>
       <th scope="col">Пользователь</th>
-      <th scope="col" class="text-center">Пройдено тестов</th>
+      <th scope="col" class="text-center">Завершено тестов</th>
+      <th scope="col" class="text-center">Зачтено</th>
       <th scope="col" class="text-center">Верных ответов</th>
       <th scope="col" class="text-center">Баллов</th>
     </tr>
@@ -24,6 +25,13 @@
         <td class="text-center">
           {% if user.exams_count %}
             {{ user.exams_count }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if user.passed_count %}
+            {{ user.passed_count }}
           {% else %}
             -
           {% endif %}
