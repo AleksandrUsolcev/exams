@@ -3,6 +3,33 @@ from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
 from django.db.models.functions.comparison import NullIf
 
 
+class UserAnswerQuerySet(QuerySet):
+
+    def get_counters(self):
+        counters = (
+            self
+            .annotate(
+                corrected_count=Count('variants', filter=Q(
+                    variants__correct=True,
+                    variants__selected=True
+                )),
+                selected_count=Count('variants', filter=Q(
+                    variants__selected=True
+                ))
+            )
+        )
+        return counters
+
+
+class UserAnswerManager(Manager):
+
+    def get_queryset(self):
+        return UserAnswerQuerySet(self.model, using=self._db)
+
+    def get_counters(self) -> object:
+        return self.get_queryset().get_counters()
+
+
 class ProgressQuerySet(QuerySet):
 
     def get_details(self, answers: object, variants: object) -> object:
@@ -14,15 +41,7 @@ class ProgressQuerySet(QuerySet):
                     'answers', queryset=answers.objects
                     .filter(progress=F('progress'))
                     .defer('question', 'date')
-                    .annotate(
-                        corrected_count=Count('variants', filter=Q(
-                            variants__correct=True,
-                            variants__selected=True
-                        )),
-                        selected_count=Count('variants', filter=Q(
-                            variants__selected=True
-                        ))
-                    )
+                    .get_counters()
                 ),
                 Prefetch(
                     'answers__variants', queryset=variants.objects

@@ -7,18 +7,20 @@ class ExamProcessForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(ExamProcessForm, self).__init__(*args, **kwargs)
+        self.answered = self.initial.get('answered')
+
+        if self.answered:
+            return
         self.question = self.initial.get('question')
-        self.exam = self.initial.get('exam')
         self.progress = self.initial.get('progress')
         self.user = self.initial.get('user')
         self.stage = self.initial.get('stage')
+        self.variants = self.initial.get('variants')
 
         if self.progress.answers_quantity < self.stage:
 
-            if self.exam.shuffle_variants:
-                self.variants = self.question.variants.all().order_by('?')
-            else:
-                self.variants = self.question.variants.all()
+            if self.question.exam.shuffle_variants:
+                self.variants = self.variants.order_by('?')
 
             self.corrected = self.variants.filter(
                 correct=True).values_list('id', flat=True)
@@ -47,7 +49,7 @@ class ExamProcessForm(forms.Form):
         if (
             self.question.many_correct
             and len(v_count) == len(self.cleaned_data.keys())
-                and self.exam.empty_answers is False
+                and self.question.exam.empty_answers is False
         ):
             raise ValidationError('Выберите хотя бы один вариант ответа')
         return self.cleaned_data
@@ -58,7 +60,6 @@ class ExamProcessForm(forms.Form):
             correct: bool,
             no_answers: bool = False
     ) -> None:
-        variants = self.question.variants.all()
         answer = UserAnswer.objects.create(
             progress=self.progress,
             question=self.question,
@@ -68,7 +69,7 @@ class ExamProcessForm(forms.Form):
         )
         for_create = []
 
-        for variant in variants:
+        for variant in self.variants:
             selected = False
             corrected = False
 
@@ -109,7 +110,7 @@ class ExamProcessForm(forms.Form):
             if status is True:
                 results.append(int(variant_id))
 
-        if self.exam.empty_answers and not results:
+        if self.question.exam.empty_answers and not results:
             variants = self.variants.filter(
                 question=self.question,
                 correct=True

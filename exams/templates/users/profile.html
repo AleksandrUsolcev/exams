@@ -13,7 +13,7 @@
       <p class="text-secondary pe-3 pb-2">{{ user.about }}</p>
     {% endif %}
     {% if request.user.is_authenticated and request.user == user %}
-      <a class="btn btn-primary me-3 my-2" href="{% url 'users:profile_edit' user.username %}" class="pe-4">Редактировать профиль</a>
+      <a class="btn btn-primary my-2 me-2" href="{% url 'users:profile_edit' user.username %}">Редактировать профиль</a>
       <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
     {% endif %}
   </div>

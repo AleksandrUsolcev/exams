@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
-from exams.models import Exam, Question, Variant
 from users.models import User
+
+from exams.models import Exam, Question, Variant
 
 from . import managers
 
@@ -22,11 +23,6 @@ class Progress(models.Model):
     exam_revision = models.PositiveIntegerField(
         verbose_name='Редакция тестирования',
         null=True,
-    )
-    exam_title = models.CharField(
-        verbose_name='Заголовок тестирования',
-        max_length=200,
-        null=True
     )
     stage = models.PositiveIntegerField(
         verbose_name='Этап',
@@ -56,7 +52,7 @@ class Progress(models.Model):
         verbose_name_plural = 'Прогресс пользователей'
 
     def __str__(self):
-        return f'{self.user} stage in {self.exam_title} ({self.stage})'
+        return f'{self.user} in exam: {self.exam_id} (stage: {self.stage})'
 
     def save(self, *args, **kwargs):
         if self._state.adding:
@@ -94,6 +90,8 @@ class UserAnswer(models.Model):
         verbose_name='Дата ответа',
         auto_now_add=True
     )
+
+    objects = managers.UserAnswerManager()
 
     class Meta:
         verbose_name = 'Ответ пользователя'

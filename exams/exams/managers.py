@@ -11,7 +11,7 @@ class CategoryManager(Manager):
     def exams_count(self) -> object:
         count = (
             self
-            .only('title', 'slug', 'show_empty')
+            .only('title', 'slug', 'show_empty', 'description')
             .annotate(
                 exams_count=Count('exams', distinct=True, filter=Q(
                     exams__active=True, exams__visibility=True

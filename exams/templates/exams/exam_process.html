@@ -2,19 +2,19 @@
 {% load user_filters %}
 {% load widget_tweaks %}
 {% block title %}
-  {{ exam.title }} - {{ exam.category.title}}
+  {{ question.exam.title }} - {{ question.category.title}}
 {% endblock %}
 {% block content %}
-  <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
-  <h3 class="fw-bold">{{ exam.title }}</h3>
+  <a href="{% url 'exams:exam_list' %}?category={{ question.exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ question.exam.category.title }}</a>
+  <h3 class="fw-bold">{{ question.exam.title }}</h3>
   <div class="pt-3">
-    {% for q in exam.questions.all %}
-      <a href="{% url 'exams:exam_process' exam.slug forloop.counter %}" class="text-decoration-none">
+    {% for q in questions %}
+      <a href="{% url 'exams:exam_process' q.exam.slug forloop.counter %}" class="text-decoration-none">
         <div class="d-inline-block pe-1 pb-1">
           <div class="p-2 rounded-1
             {% if stage == forloop.counter %}
             bg-primary border border-primary
-            {% elif exam.show_results and q.corrected == 0 and q.finished != 0 %}
+            {% elif q.exam.show_results and q.corrected == 0 and q.finished != 0 %}
             bg-danger border border-danger
             {% elif stage > forloop.counter or progress.stage > forloop.counter %}
             bg-success border border-success
@@ -39,14 +39,14 @@
       {% endif %}
       {{ answer.question_text }}
     </p>
-    {% if exam.show_results and question.success_message %}
+    {% if question.exam.show_results and question.success_message %}
       <p class="py-3">
         {{ question.success_message }}
       </p>
     {% endif %}
   {% else %}
     <div class="description py-2 pt-3 fs-5">
-      {{ question.text|safe }}
+      {{ question.text }}
     </div>
   {% endif %}
 
@@ -75,7 +75,7 @@
     </button>
   </form>
   {% else %}
-  {% if exam.show_results %}
+  {% if question.exam.show_results %}
     {% for variant in answer.variants.all %}
       {% include '../includes/user_variants.html' %}
     {% endfor %}
@@ -93,10 +93,10 @@
         Перейти к результатам
       </a>
     {% else %}
-      <a href="{% url 'exams:exam_process' exam.slug next_stage %}" class="btn btn-success my-3 me-3">
+      <a href="{% url 'exams:exam_process' question.exam.slug next_stage %}" class="btn btn-success my-3 me-3">
         Следующий вопрос
       </a>
-      {% if answered.count == exam.questions.count %}
+      {% if progress.finished %}
         <a href="{% url 'progress:progress_detail' progress.id %}">
           Перейти к результатам
         </a>

@@ -181,7 +181,7 @@ class Question(models.Model):
         (MANY_CORRECT, 'Допустимы несколько вариантов ответов')
     )
 
-    text = RichTextField(
+    text = models.TextField(
         verbose_name='Вопрос'
     )
     success_message = models.TextField(
@@ -236,7 +236,7 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
-        ordering = ['-visibility', '-active', 'priority', 'id', 'text']
+        ordering = ['-visibility', '-active', 'priority', 'id']
 
     def __str__(self):
         if len(self.text) > 48:
