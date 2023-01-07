@@ -143,8 +143,8 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 global_correct_percentage=ExpressionWrapper(
                     NullIf(Count('answers', distinct=True, filter=Q(
                         answers__correct=True
-                    )), 0) * 100 /
-                    NullIf(Count('answers', distinct=True), 0),
+                    )), 0) * 100
+                    / NullIf(Count('answers', distinct=True), 0),
                     output_field=IntegerField()
                 )
             )
@@ -266,6 +266,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                     update['passed'] = False
             except TypeError:
                 update['passed'] = False
+
             actual_progress.update(**update)
 
         if self.last_stage and not self.question.exam.show_results:

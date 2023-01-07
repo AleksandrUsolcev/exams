@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
+
 from exams.models import Exam
 from users.models import User
 

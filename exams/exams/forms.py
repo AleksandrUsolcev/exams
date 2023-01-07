@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ValidationError
+
 from progress.models import UserAnswer, UserVariant
 
 

@@ -8,10 +8,10 @@
   <h3 class="fw-bold">{{ exam.title }}</h3>
   <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
   <div class="row">
-    <div class="col-8 pe-5">
+    <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
       <div class="description py-3">{{ exam.description|safe }}</div>
     </div>
-    <div class="col-4">
+    <div class="col-md-12 col-lg-6 col-xl-4">
       <div class="exam-stats pb-3">
         <div class="questions-count py-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-card-checklist pb-1" viewBox="0 0 16 16">
@@ -42,7 +42,7 @@
           <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
           <div class="mini-info text-secondary pt-3">
             {% if exam.required_percent %}
-              <p>Минимальный процент для успешного прохождения: <span class="fw-bold">{{ exam.required_percent }}%</span></p>
+              <p>Минимальный процент верных ответов для успешного прохождения: <span class="fw-bold">{{ exam.required_percent }}%</span></p>
             {% else %}
               <p>Для успешного прохождение достаточно набрать любой процент верных ответов</p>
             {% endif %}

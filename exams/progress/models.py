@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils import timezone
-from users.models import User
 
 from exams.models import Exam, Question, Variant
+from users.models import User
 
 from . import managers
 

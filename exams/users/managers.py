@@ -35,8 +35,8 @@ class UserQuerySet(QuerySet):
                     Count('progression__answers', distinct=True, filter=Q(
                         progression__user_id=F('id'),
                         progression__answers__correct=True
-                    )), 0) * 100 /
-                    NullIf(Count(
+                    )), 0) * 100
+                    / NullIf(Count(
                         'progression__answers', distinct=True,
                         filter=Q(
                             progression__user_id=F('id'),

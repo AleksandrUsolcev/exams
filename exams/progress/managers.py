@@ -38,8 +38,8 @@ class ProgressQuerySet(QuerySet):
             .annotate(
                 correct_percentage=ExpressionWrapper(
                     NullIf(Count('answers', filter=Q(
-                        answers__correct=True), distinct=True), 0) * 100 /
-                    NullIf(Count('exam__questions', distinct=True, filter=Q(
+                        answers__correct=True), distinct=True), 0) * 100
+                    / NullIf(Count('exam__questions', distinct=True, filter=Q(
                         exam__questions__visibility=True,
                         exam__questions__active=True
                     )), 0), output_field=IntegerField()

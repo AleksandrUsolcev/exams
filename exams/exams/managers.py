@@ -77,8 +77,8 @@ class ExamQuerySet(QuerySet):
                 ),
                 percentage_correct=ExpressionWrapper(
                     NullIf(Count('progress__answers', distinct=True, filter=Q(
-                        progress__answers__correct=True)), 0) * 100 /
-                    F('progress__answers_quantity'),
+                        progress__answers__correct=True)), 0) * 100
+                    / F('progress__answers_quantity'),
                     output_field=IntegerField()
                 )
             )
