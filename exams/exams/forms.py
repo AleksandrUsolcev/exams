@@ -11,20 +11,18 @@ class ExamProcessForm(forms.Form):
 
         if self.answered:
             return
+
         self.question = self.initial.get('question')
         self.progress = self.initial.get('progress')
         self.user = self.initial.get('user')
-        self.stage = self.initial.get('stage')
         self.variants = self.initial.get('variants')
 
-        if self.progress.answers_quantity < self.stage:
+        if self.question.exam.shuffle_variants:
+            self.variants = self.variants.order_by('?')
 
-            if self.question.exam.shuffle_variants:
-                self.variants = self.variants.order_by('?')
-
-            self.corrected = self.variants.filter(
-                correct=True).values_list('id', flat=True)
-            self.add_variants_fields(self.variants)
+        self.corrected = self.variants.filter(
+            correct=True).values_list('id', flat=True)
+        self.add_variants_fields(self.variants)
 
     def add_variants_fields(self, variants_list: list) -> None:
         if self.question.many_correct:
@@ -98,7 +96,7 @@ class ExamProcessForm(forms.Form):
         if not variant.exists():
             correct = False
 
-        if result and self.progress.answers_quantity < self.stage:
+        if result:
             self.add_results(result, correct)
 
     def answer_with_many_correct(self):
@@ -128,5 +126,5 @@ class ExamProcessForm(forms.Form):
         if uncorrects.exists() or len(results) < corrects_count:
             correct = False
 
-        if results and self.progress.answers_quantity < self.stage:
+        if results:
             self.add_results(results, correct)

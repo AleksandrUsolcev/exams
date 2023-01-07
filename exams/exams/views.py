@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, F, Prefetch, Q
+from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
+                              Prefetch, Q)
+from django.db.models.functions.comparison import NullIf
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView
@@ -134,9 +136,20 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         self.progress = self.get_or_create_progress()
 
         self.questions_queue = (
-            Question.objects.filter(
-                active=True, visibility=True, exam__slug=self.slug,
+            Question.objects
+            .filter(
+                active=True, visibility=True,
             )
+            .annotate(
+                global_correct_percentage=ExpressionWrapper(
+                    NullIf(Count('answers', distinct=True, filter=Q(
+                        answers__correct=True
+                    )), 0) * 100 /
+                    NullIf(Count('answers', distinct=True), 0),
+                    output_field=IntegerField()
+                )
+            )
+            .filter(exam__slug=self.slug)
             .annotate(
                 corrected=Count('answers__correct', filter=Q(
                     answers__progress=self.progress,
@@ -154,7 +167,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 'exam__shuffle_variants', 'exam__slug', 'exam__title',
                 'exam__category__title', 'exam__category__slug'
             )
-            .order_by('-visibility', '-active', 'priority', 'id')
+            .order_by('priority', 'id')
         )
 
         if len(self.questions_queue) < self.stage:
