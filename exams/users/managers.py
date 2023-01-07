@@ -16,11 +16,21 @@ class UserQuerySet(QuerySet):
                     progression__user_id=F('id'),
                     progression__finished__isnull=False
                 )),
-                passed_count=Count('progression__exam', distinct=True,
-                                   filter=Q(
-                                       progression__user_id=F('id'),
-                                       progression__passed=True
-                                   )),
+                passed_count=Count(
+                    'progression__exam', distinct=True, filter=Q(
+                        progression__id__in=Subquery(
+                            self
+                            .filter(progression__user_id=OuterRef('id'))
+                            .order_by(
+                                'progression__exam__id',
+                                '-progression__started'
+                            )
+                            .distinct('progression__exam__id')
+                            .values('progression__id')
+                        ),
+                        progression__user_id=F('id'),
+                        progression__passed=True
+                    )),
                 correct_percentage=ExpressionWrapper(NullIf(
                     Count('progression__answers', distinct=True, filter=Q(
                         progression__user_id=F('id'),

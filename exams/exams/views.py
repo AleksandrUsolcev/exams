@@ -251,14 +251,22 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 'finished': timezone.now(),
                 'passed': True
             }
+            actual_progress = (
+                Progress.objects
+                .filter(id=self.progress.id)
+                .get_percentage()
+            )
+
             try:
-                if (self.question.exam.required_percent
+                if (
+                    self.question.exam.required_percent
                     and self.question.exam.required_percent
-                        > self.progress.correct_percentage):
+                    > actual_progress.first().correct_percentage
+                ):
                     update['passed'] = False
             except TypeError:
                 update['passed'] = False
-            Progress.objects.filter(id=self.progress.id).update(**update)
+            actual_progress.update(**update)
 
         if self.last_stage and not self.question.exam.show_results:
             return redirect('progress:progress_detail', pk=self.progress.id)

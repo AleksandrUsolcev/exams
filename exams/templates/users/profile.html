@@ -18,7 +18,7 @@
     {% endif %}
   </div>
   <div class="row col-md-12 col-xl-8 py-3 border-bottom">
-    <div class="col-4 text-center">
+    <div class="col-3 text-center">
       <div class="text-secondary">Пройдено тестов</div>
       <h3 class="fw-bold py-3">
         {% if user.exams_count %}
@@ -28,23 +28,33 @@
         {% endif %}
       </h3>
     </div>
-      <div class="col-4 text-center">
-        <div class="text-secondary">Верных ответов</div>
-        {% if user.correct_percentage %}
-          <h3 class="fw-bold py-3
-          {% if user.correct_percentage > 65 %}
-          text-success
-          {% elif user.correct_percentage > 32 %}
-          text-warning
-          {% else %}
-          text-danger
-          {% endif %}
-          ">{{ user.correct_percentage }}%</h3>
+    <div class="col-3 text-center">
+      <div class="text-secondary">Зачтено</div>
+      <h3 class="fw-bold py-3">
+        {% if user.passed_count %}
+          {{ user.passed_count }}
         {% else %}
-          <h3 class="fw-bold py-3">-</h3>
+        -
         {% endif %}
-      </div>
-    <div class="col-4 text-center">
+      </h3>
+    </div>
+    <div class="col-3 text-center">
+      <div class="text-secondary">Верных ответов</div>
+      {% if user.correct_percentage %}
+        <h3 class="fw-bold py-3
+        {% if user.correct_percentage > 65 %}
+        text-success
+        {% elif user.correct_percentage > 32 %}
+        text-warning
+        {% else %}
+        text-danger
+        {% endif %}
+        ">{{ user.correct_percentage }}%</h3>
+      {% else %}
+        <h3 class="fw-bold py-3">-</h3>
+      {% endif %}
+    </div>
+    <div class="col-3 text-center">
       <div class="text-secondary">Баллов</div>
       <h3 class="fw-bold py-3">
         {% if user.points %}
