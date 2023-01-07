@@ -34,12 +34,12 @@ class ExamProcessForm(forms.Form):
                 )
 
         if self.question.one_correct:
-            RADIOS = []
+            radios = []
             for variant in variants_list:
-                RADIOS.append((str(variant.id), variant.text))
+                radios.append((str(variant.id), variant.text))
             self.fields['result'] = forms.ChoiceField(
                 widget=forms.RadioSelect,
-                choices=RADIOS,
+                choices=radios,
             )
 
     def clean(self):
