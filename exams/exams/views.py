@@ -118,14 +118,12 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             exam = get_object_or_404(
                 Exam, slug=self.slug, active=True, visibility=True
             )
-            if exam.allow_retesting:
+            if not progress or exam.allow_retesting:
                 progress = Progress.objects.create(
                     user=self.request.user,
                     exam=exam,
                     exam_revision=exam.revision
                 )
-            else:
-                return redirect('exams:exam_detail', self.slug)
         return progress
 
     def dispatch(self, request, *args, **kwargs):
@@ -253,9 +251,12 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 'finished': timezone.now(),
                 'passed': True
             }
-            if (self.question.exam.required_percent
-                and self.question.exam.required_percent
-                    > self.progress.correct_percentage):
+            try:
+                if (self.question.exam.required_percent
+                    and self.question.exam.required_percent
+                        > self.progress.correct_percentage):
+                    update['passed'] = False
+            except TypeError:
                 update['passed'] = False
             Progress.objects.filter(id=self.progress.id).update(**update)
 
