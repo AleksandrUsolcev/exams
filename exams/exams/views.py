@@ -109,6 +109,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             Progress.objects
             .filter(user=self.request.user, exam__slug=self.slug)
             .order_by('-started')
+            .get_percentage()
             .first()
         )
         restart = self.request.GET.get('restart')
@@ -163,7 +164,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             .select_related('exam', 'exam__category')
             .only(
                 'text', 'success_message', 'type', 'exam__show_results',
-                'exam__empty_answers', 'exam__timer',
+                'exam__empty_answers', 'exam__timer', 'exam__required_percent',
                 'exam__shuffle_variants', 'exam__slug', 'exam__title',
                 'exam__category__title', 'exam__category__slug'
             )
@@ -235,22 +236,28 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         return context
 
     def form_valid(self, form):
-        data_update = {
+        data = {
             'stage': self.stage + 1,
             'answers_quantity': self.stage
         }
-        if self.last_stage:
-            data_update['finished'] = timezone.now()
-            data_update['passed'] = True
 
         if self.progress.stage < self.stage + 1:
-            Progress.objects.filter(
-                id=self.progress.id
-            ).update(**data_update)
+            Progress.objects.filter(id=self.progress.id).update(**data)
             if self.question.many_correct:
                 form.answer_with_many_correct()
             elif self.question.one_correct:
                 form.answer_with_one_correct()
+
+        if self.last_stage:
+            update = {
+                'finished': timezone.now(),
+                'passed': True
+            }
+            if (self.question.exam.required_percent
+                and self.question.exam.required_percent
+                    > self.progress.correct_percentage):
+                update['passed'] = False
+            Progress.objects.filter(id=self.progress.id).update(**update)
 
         if self.last_stage and not self.question.exam.show_results:
             return redirect('progress:progress_detail', pk=self.progress.id)

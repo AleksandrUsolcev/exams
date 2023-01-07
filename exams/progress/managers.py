@@ -32,6 +32,22 @@ class UserAnswerManager(Manager):
 
 class ProgressQuerySet(QuerySet):
 
+    def get_percentage(self):
+        percentage = (
+            self
+            .annotate(
+                correct_percentage=ExpressionWrapper(
+                    NullIf(Count('answers', filter=Q(
+                        answers__correct=True), distinct=True), 0) * 100 /
+                    NullIf(Count('exam__questions', distinct=True, filter=Q(
+                        exam__questions__visibility=True,
+                        exam__questions__active=True
+                    )), 0), output_field=IntegerField()
+                )
+            )
+        )
+        return percentage
+
     def get_details(self, answers: object, variants: object) -> object:
         details = (
             self
@@ -62,16 +78,7 @@ class ProgressQuerySet(QuerySet):
                 correct_count=Count(
                     'answers', distinct=True, filter=Q(
                         answers__correct=True
-                    )),
-
-                correct_percentage=ExpressionWrapper(
-                    NullIf(Count('answers', filter=Q(
-                        answers__correct=True), distinct=True), 0) * 100 /
-                    NullIf(Count('exam__questions', distinct=True, filter=Q(
-                        exam__questions__visibility=True,
-                        exam__questions__active=True
-                    )), 0), output_field=IntegerField()
-                )
+                    ))
             )
         )
         return details
@@ -81,6 +88,9 @@ class ProgressManager(Manager):
 
     def get_queryset(self):
         return ProgressQuerySet(self.model, using=self._db)
+
+    def get_percentage(self):
+        return self.get_queryset().get_percentage()
 
     def get_details(self, answers: object, variants: object) -> object:
         return self.get_queryset().get_details()

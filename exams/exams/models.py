@@ -119,6 +119,17 @@ class Exam(models.Model):
             MaxValueValidator(720)
         ]
     )
+    required_percent = models.PositiveIntegerField(
+        verbose_name='Процент верных ответов для успешного прохождения',
+        help_text=('Необязательное поле. По умолчанию прохождение будет '
+                   'успешным при любом проценте'),
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(100)
+        ]
+    )
     allow_retesting = models.BooleanField(
         verbose_name='Разрешить повторное прохождение',
         default=True

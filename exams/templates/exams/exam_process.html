@@ -90,7 +90,13 @@
   {% endif %}
   {% if answer %}
   <div>
-    <p class="mini-info text-secondary">{{ question.global_correct_percentage }}% пользователей ответили верно</p>
+    <p class="mini-info text-secondary">
+      {% if question.global_correct_percentage %}
+        В <span class="fw-bold">{{ question.global_correct_percentage }}%</span> случаев на этот вопрос был дан верный ответ
+      {% else %}
+        На этот вопрос еще никто не давал верного ответа
+      {% endif %}
+    </p>
     {% if last_stage %}
       <a href="{% url 'progress:progress_detail' progress.id %}" class="btn btn-success my-3 me-3">
         Перейти к результатам

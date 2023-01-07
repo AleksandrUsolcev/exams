@@ -14,8 +14,12 @@ class ProgressDetailView(DetailView):
 
     def get_queryset(self):
         progress_id = self.kwargs.get('pk')
-        queryset = Progress.objects.filter(id=progress_id).get_details(
-            variants=UserVariant, answers=UserAnswer)
+        queryset = (
+            Progress.objects
+            .filter(id=progress_id)
+            .get_details(variants=UserVariant, answers=UserAnswer)
+            .get_percentage()
+        )
         return queryset
 
 
