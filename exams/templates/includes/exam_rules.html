@@ -1,6 +1,6 @@
 <div class="mini-info text-secondary pt-3">
   {% if exam.timer %}
-    <p>Время на прохождение в минутах: <span class="fw-bold">{{ exam.timer }}</span></p>
+    <p>Время на прохождение <span class="fw-bold">{{ humanize_time }}</span></p>
   {% else %}
     <p>Время прохождения неограниченно</p>
   {% endif %}

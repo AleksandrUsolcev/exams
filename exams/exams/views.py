@@ -9,6 +9,7 @@ from progress.models import Progress, UserAnswer, UserVariant
 
 from .forms import ExamProcessForm
 from .models import Category, Exam, Question, Variant
+from .utils import get_humanize_time
 
 
 class IndexView(ListView):
@@ -97,6 +98,8 @@ class ExamDetailView(DetailView):
             )
             context.update({'progress': progress})
 
+        if self.object.timer:
+            context['humanize_time'] = get_humanize_time(self.object.timer)
         return context
 
 
@@ -233,6 +236,8 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
         if self.question.exam.timer:
             context['remaining_time'] = self.get_remaining_time()
+            context['humanize_time'] = get_humanize_time(
+                self.question.exam.timer)
 
         context['questions'] = self.questions_queue
         context.update(self.initial_data)
@@ -278,6 +283,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             actual_progress.update(**update)
 
             return redirect('progress:progress_detail', pk=self.progress.id)
+
         elif self.question.exam.show_results:
             return redirect(
                 'exams:exam_process', slug=self.slug, pk=self.stage)
