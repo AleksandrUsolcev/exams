@@ -277,13 +277,10 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
             actual_progress.update(**update)
 
-            if self.question.exam.show_results:
-                return redirect(
-                    'exams:exam_process', slug=self.slug, pk=self.stage)
-            else:
-                return redirect(
-                    'progress:progress_detail', pk=self.progress.id)
-
+            return redirect('progress:progress_detail', pk=self.progress.id)
+        elif self.question.exam.show_results:
+            return redirect(
+                'exams:exam_process', slug=self.slug, pk=self.stage)
         else:
             return redirect(
                 'exams:exam_process', slug=self.slug, pk=self.stage + 1)

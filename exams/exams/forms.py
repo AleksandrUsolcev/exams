@@ -38,7 +38,7 @@ class ExamProcessForm(forms.Form):
             for variant in variants_list:
                 radios.append((str(variant.id), variant.text))
             self.fields['result'] = forms.ChoiceField(
-                widget=forms.RadioSelect,
+                widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
                 choices=radios,
             )
 

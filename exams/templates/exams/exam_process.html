@@ -62,18 +62,25 @@
               {{ error }}
             {% endfor %}
           </div>
-        {% for field in form %}
-          {% if question.many_correct %}
+        {% if question.many_correct %}
+          {% for field in form %}
             <div class="form-check">
               {{ field|addclass:'form-check-input' }}
               <label class="form-check-label" for="flexCheckDefault">
                 {{ field.label }}
               </label>
             </div>
-          {% elif question.one_correct %}
-              {{ field|addclass:'list-unstyled p-0 m-0 mb-2' }}
-          {% endif %}
-        {% endfor %}
+          {% endfor %}
+        {% elif question.one_correct %}
+          {% for radio in form.result %}
+            <div class="form-check">
+              {{ radio.tag }}
+              <label class="form-check-label" for="exampleRadios2">
+                {{ radio.choice_label }}
+              </label>
+            </div>
+          {% endfor %}
+        {% endif %}
         <button type="submit" class="btn btn-primary my-3">
           Ответить
         </button>
