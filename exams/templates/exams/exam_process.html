@@ -5,112 +5,172 @@
   {{ question.exam.title }} - {{ question.category.title}}
 {% endblock %}
 {% block content %}
-  <a href="{% url 'exams:exam_list' %}?category={{ question.exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ question.exam.category.title }}</a>
-  <h3 class="fw-bold">{{ question.exam.title }}</h3>
-  <div class="pt-3">
-    {% for q in questions %}
-      <a href="{% url 'exams:exam_process' q.exam.slug forloop.counter %}" class="text-decoration-none">
-        <div class="d-inline-block pe-1 pb-1">
-          <div class="p-2 rounded-1
-            {% if stage == forloop.counter %}
-            bg-primary border border-primary
-            {% elif q.exam.show_results and q.corrected == 0 and q.finished != 0 %}
-            bg-danger border border-danger
-            {% elif stage > forloop.counter or progress.stage > forloop.counter %}
-            bg-success border border-success
-            {% else %}
-            bg-light border
-            {% endif %}">
-          </div>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
-  
-  {% if answer %}
-    <p class="py-2 pt-3 fs-5 {% if answer.correct %}text-success{% else %}text-danger{% endif %}">
-      {% if answer.correct %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-        </svg>
-      {% else %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-        </svg>
-      {% endif %}
-      {{ answer.question_text }}
-    </p>
-    {% if question.exam.show_results and question.success_message %}
-      <p class="py-3">
-        {{ question.success_message }}
-      </p>
-    {% endif %}
-  {% else %}
-    <div class="description py-2 pt-3 fs-5">
-      {{ question.text }}
-    </div>
-  {% endif %}
-
-  {% if progress.answers_quantity < stage %}
-  <form method="post">
-    {% csrf_token %}
-      <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
-        {% for error in form.non_field_errors %}
-          {{ error }}
+{% with question.exam as exam %}
+  <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
+  <h3 class="fw-bold">{{ exam.title }}</h3>
+  <div class="row">
+    <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
+      <div class="pt-3">
+        {% for q in questions %}
+          <a href="{% url 'exams:exam_process' q.exam.slug forloop.counter %}" class="text-decoration-none">
+            <div class="d-inline-block pe-1 pb-1">
+              <div class="p-2 rounded-1
+                {% if stage == forloop.counter %}
+                bg-primary border border-primary
+                {% elif q.exam.show_results and q.corrected == 0 and q.finished != 0 %}
+                bg-danger border border-danger
+                {% elif stage > forloop.counter or progress.stage > forloop.counter %}
+                bg-success border border-success
+                {% else %}
+                bg-light border
+                {% endif %}">
+              </div>
+            </div>
+          </a>
         {% endfor %}
       </div>
-    {% for field in form %}
-      {% if question.many_correct %}
-        <div class="form-check">
-          {{ field|addclass:'form-check-input' }}
-          <label class="form-check-label" for="flexCheckDefault">
-            {{ field.label }}
-          </label>
-        </div>
-      {% elif question.one_correct %}
-          {{ field|addclass:'list-unstyled p-0 m-0 mb-2' }}
-      {% endif %}
-    {% endfor %}
-    <button type="submit" class="btn btn-primary my-3">
-      Ответить
-    </button>
-  </form>
-  {% else %}
-
-  {% if question.exam.show_results %}
-    {% for variant in answer.variants.all %}
-      {% include '../includes/user_variants.html' %}
-    {% endfor %}
-    {% if not answer.correct and answer.selected_count == answer.corrected_count %}
-      <div class="d-inline-block pe-3 pb-3">
-        <div class="p-2 pe-3 text-danger">Недостаточно ответов</div>
-      </div>
-    {% endif %}
-  {% endif %}
-  {% endif %}
-  {% if answer %}
-  <div>
-    <p class="mini-info text-secondary">
-      {% if question.global_correct_percentage %}
-        В <span class="fw-bold">{{ question.global_correct_percentage }}%</span> прохождений на этот вопрос был дан верный ответ
+      
+      {% if answer %}
+        <p class="py-2 pt-3 fs-5 {% if answer.correct %}text-success{% else %}text-danger{% endif %}">
+          {% if answer.correct %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+          {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+            </svg>
+          {% endif %}
+          {{ answer.question_text }}
+        </p>
+        {% if exam.show_results and question.success_message %}
+          <p class="py-3">
+            {{ question.success_message }}
+          </p>
+        {% endif %}
       {% else %}
-        На этот вопрос еще никто не давал верного ответа
+        <div class="description py-2 pt-3 fs-5">
+          {{ question.text }}
+        </div>
       {% endif %}
-    </p>
-    {% if last_stage %}
-      <a href="{% url 'progress:progress_detail' progress.id %}" class="btn btn-success my-3 me-3">
-        Перейти к результатам
-      </a>
-    {% else %}
-      <a href="{% url 'exams:exam_process' question.exam.slug next_stage %}" class="btn btn-success my-3 me-3">
-        Следующий вопрос
-      </a>
-      {% if progress.finished %}
-        <a href="{% url 'progress:progress_detail' progress.id %}">
-          Перейти к результатам
-        </a>
+
+      {% if progress.answers_quantity < stage %}
+      <form method="post">
+        {% csrf_token %}
+          <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% for field in form %}
+          {% if question.many_correct %}
+            <div class="form-check">
+              {{ field|addclass:'form-check-input' }}
+              <label class="form-check-label" for="flexCheckDefault">
+                {{ field.label }}
+              </label>
+            </div>
+          {% elif question.one_correct %}
+              {{ field|addclass:'list-unstyled p-0 m-0 mb-2' }}
+          {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary my-3">
+          Ответить
+        </button>
+      </form>
+      {% else %}
+
+      {% if exam.show_results %}
+        {% for variant in answer.variants.all %}
+          {% include '../includes/user_variants.html' %}
+        {% endfor %}
+        {% if not answer.correct and answer.selected_count == answer.corrected_count %}
+          <div class="d-inline-block pe-3 pb-3">
+            <div class="p-2 pe-3 text-danger">Недостаточно ответов</div>
+          </div>
+        {% endif %}
       {% endif %}
-    {% endif %}
+      {% endif %}
+      {% if answer %}
+      <div>
+        <p class="mini-info text-secondary">
+          {% if question.global_correct_percentage %}
+            В <span class="fw-bold">{{ question.global_correct_percentage }}%</span> прохождений на этот вопрос был дан верный ответ
+          {% else %}
+            На этот вопрос еще никто не давал верного ответа
+          {% endif %}
+        </p>
+        {% if last_stage %}
+          <a href="{% url 'progress:progress_detail' progress.id %}" class="btn btn-success my-3 me-3">
+            Перейти к результатам
+          </a>
+        {% else %}
+          <a href="{% url 'exams:exam_process' exam.slug next_stage %}" class="btn btn-success my-3 me-3">
+            Следующий вопрос
+          </a>
+          {% if progress.finished %}
+            <a href="{% url 'progress:progress_detail' progress.id %}">
+              Перейти к результатам
+            </a>
+          {% endif %}
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-md-12 col-lg-6 col-xl-4">
+      <div class="exam-info p-4 py-3">
+        {% if remaining_time %}
+          <div class="remaining-time py-2 text-center">
+            <div id="timer" class="process-timer"></div>
+            <div id="timer-message">
+              {% if remaining_time < 0 %}
+                <span class="fw-bold text-danger">Время отведенное на прохождение истекло</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+        <div class="exam-rules mt-1">
+          {% include '../includes/exam_rules.html' %}
+        </div>
+      </div>
+    </div>
   </div>
+  {% if remaining_time > 0 %}
+    <script>
+      var hours = 0, 
+        minutes = 0,
+        seconds = '{{ remaining_time }}',
+        target = new Date(),
+        timerDiv = document.getElementById("timer"),
+        messageDiv = document.getElementById("timer-message"),
+        handler;
+
+      function init() { 
+        target.setHours(hours);
+        target.setMinutes(minutes);
+        target.setSeconds(seconds);
+        target.setMilliseconds(0);
+        timerDiv.innerHTML = target.toTimeString().split(" ")[0];
+      }
+
+      function updateTimer() {
+        var time = target.getTime();
+        target.setTime(time - 1000);
+        timerDiv.innerHTML = target.toTimeString().split(" ")[0];
+        if (
+          target.getHours() === 0 &&
+          target.getMinutes() === 0 &&
+          target.getSeconds() === 0
+        ) {
+          clearInterval(handler);
+          timerDiv.innerHTML = '00:00:00';
+          messageDiv.innerHTML = 'Время истекло';
+        }
+      }
+
+      handler = setInterval(updateTimer, 1000);
+      init();
+    </script>
   {% endif %}
+{% endwith %}
 {% endblock %}

@@ -166,6 +166,11 @@ body {
   border-color: #fff !important;
 }
 
+.process-timer {
+  font-size: 3em;
+  color: #5197ff;
+}
+
 .answer-icon {
   margin-top: -.2em;
 }

@@ -126,6 +126,12 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 )
         return progress
 
+    def get_remaining_time(self):
+        time_to_pass = self.question.exam.timer * 60
+        current = (timezone.now() - self.progress.started).total_seconds()
+        remaining_time = int(time_to_pass - current)
+        return remaining_time
+
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('users:signup')
@@ -160,12 +166,6 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 ))
             )
             .select_related('exam', 'exam__category')
-            .only(
-                'text', 'success_message', 'type', 'exam__show_results',
-                'exam__empty_answers', 'exam__timer', 'exam__required_percent',
-                'exam__shuffle_variants', 'exam__slug', 'exam__title',
-                'exam__category__title', 'exam__category__slug'
-            )
             .order_by('priority', 'id')
         )
 
@@ -207,6 +207,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         if self.question.exam.show_results and self.answered:
             answer = (
                 UserAnswer.objects
@@ -229,6 +230,10 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 'next_stage': self.stage + 1
             }
             context.update(extra_context)
+
+        if self.question.exam.timer:
+            context['remaining_time'] = self.get_remaining_time()
+
         context['questions'] = self.questions_queue
         context.update(self.initial_data)
         return context
@@ -257,6 +262,9 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 .get_percentage()
             )
 
+            if self.question.exam.timer and self.get_remaining_time() < 0:
+                update['passed'] = False
+
             try:
                 if (
                     self.question.exam.required_percent
@@ -269,11 +277,13 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
             actual_progress.update(**update)
 
-        if self.last_stage and not self.question.exam.show_results:
-            return redirect('progress:progress_detail', pk=self.progress.id)
-        elif not self.question.exam.show_results:
-            return redirect(
-                'exams:exam_process', slug=self.slug, pk=self.stage + 1)
+            if self.question.exam.show_results:
+                return redirect(
+                    'exams:exam_process', slug=self.slug, pk=self.stage)
+            else:
+                return redirect(
+                    'progress:progress_detail', pk=self.progress.id)
+
         else:
             return redirect(
-                'exams:exam_process', slug=self.slug, pk=self.stage)
+                'exams:exam_process', slug=self.slug, pk=self.stage + 1)
