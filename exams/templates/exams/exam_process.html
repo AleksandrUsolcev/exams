@@ -80,6 +80,12 @@
               </label>
             </div>
           {% endfor %}
+        {% elif question.text_answer %}
+          <div class="form-group mb-3 col-6">
+            {% for field in form %}
+              {{ field|addclass:'form-control' }}
+            {% endfor %}
+          </div>
         {% endif %}
         <button type="submit" class="btn btn-primary my-3">
           Ответить
@@ -125,7 +131,7 @@
       {% endif %}
     </div>
     <div class="col-md-12 col-lg-6 col-xl-4">
-      <div class="exam-info p-4 py-3">
+      <div class="container-light p-4 py-3">
         {% if remaining_time %}
           <div class="remaining-time py-2 text-center">
             <div id="timer" class="process-timer"></div>

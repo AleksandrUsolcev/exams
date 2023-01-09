@@ -212,11 +212,17 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
 
         if self.question.exam.show_results and self.answered:
+            filter_data = {
+                'answer': F('answer')
+            }
+            if self.question.text_answer:
+                filter_data['selected'] = True
+
             answer = (
                 UserAnswer.objects
                 .prefetch_related(Prefetch('variants', queryset=(
                     UserVariant.objects
-                    .filter(answer=F('answer'))
+                    .filter(**filter_data)
                     .order_by('-selected', '?')
                 )))
                 .filter(
@@ -251,10 +257,14 @@ class ExamProcessView(LoginRequiredMixin, FormView):
 
         if self.progress.stage < self.stage + 1:
             Progress.objects.filter(id=self.progress.id).update(**data)
-            if self.question.many_correct:
-                form.answer_with_many_correct()
-            elif self.question.one_correct:
-                form.answer_with_one_correct()
+
+            match True:
+                case self.question.many_correct:
+                    form.answer_with_many_correct()
+                case self.question.one_correct:
+                    form.answer_with_one_correct()
+                case self.question.text_answer:
+                    form.answer_with_text_answer()
 
         if self.last_stage:
             update = {

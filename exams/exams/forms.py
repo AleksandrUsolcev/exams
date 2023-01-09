@@ -21,8 +21,13 @@ class ExamProcessForm(forms.Form):
         if self.question.exam.shuffle_variants:
             self.variants = self.variants.order_by('?')
 
+        if self.question.text_answer:
+            value = 'text'
+        else:
+            value = 'id'
+
         self.corrected = self.variants.filter(
-            correct=True).values_list('id', flat=True)
+            correct=True).values_list(value, flat=True)
         self.add_variants_fields(self.variants)
 
     def add_variants_fields(self, variants_list: list) -> None:
@@ -38,9 +43,13 @@ class ExamProcessForm(forms.Form):
             for variant in variants_list:
                 radios.append((str(variant.id), variant.text))
             self.fields['result'] = forms.ChoiceField(
-                widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+                widget=forms.RadioSelect(
+                    attrs={'class': 'form-check-input'}),
                 choices=radios,
             )
+
+        if self.question.text_answer:
+            self.fields['answer'] = forms.CharField(max_length=200)
 
     def clean(self):
         v_count = [v for v in self.cleaned_data.values() if v is False]
@@ -48,7 +57,7 @@ class ExamProcessForm(forms.Form):
         if (
             self.question.many_correct
             and len(v_count) == len(self.cleaned_data.keys())
-                and self.question.exam.empty_answers is False
+            and self.question.exam.empty_answers is False
         ):
             raise ValidationError('Выберите хотя бы один вариант ответа')
         return self.cleaned_data
@@ -72,11 +81,18 @@ class ExamProcessForm(forms.Form):
             selected = False
             corrected = False
 
-            if variant.id in results:
-                selected = True
+            if self.question.text_answer:
+                if results[0].lower() in variant.text.lower():
+                    selected = True
 
-            if variant.id in self.corrected:
-                corrected = True
+                if variant.text in self.corrected:
+                    corrected = True
+            else:
+                if variant.id in results:
+                    selected = True
+
+                if variant.id in self.corrected:
+                    corrected = True
 
             for_create.append(
                 UserVariant(
@@ -87,6 +103,17 @@ class ExamProcessForm(forms.Form):
                     correct=corrected,
                 )
             )
+
+        if self.question.text_answer and correct is False:
+            for_create.append(
+                UserVariant(
+                    answer=answer,
+                    variant_text=results[0],
+                    selected=True,
+                    correct=False,
+                )
+            )
+
         UserVariant.objects.bulk_create(for_create)
 
     def answer_with_one_correct(self):
@@ -129,3 +156,14 @@ class ExamProcessForm(forms.Form):
 
         if results:
             self.add_results(results, correct)
+
+    def answer_with_text_answer(self):
+        correct = True
+        answer = [self.cleaned_data.get('answer')]
+        variant = self.variants.filter(text__iexact=answer[0], correct=True)
+
+        if not variant.exists():
+            correct = False
+
+        if answer:
+            self.add_results(answer, correct)

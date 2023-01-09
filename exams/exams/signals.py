@@ -45,9 +45,14 @@ def exam_active_change(sender, instance, raw, **kwargs):
     exam_active = instance.exam.questions.filter(
         active=True, visibility=True).exists()
     if instance.variants.count():
-        if (instance.one_correct
-                and instance.variants.filter(correct=True).count() == 1):
+        if (
+            instance.one_correct
+            and instance.variants.filter(correct=True).count() == 1
+        ):
             active = True
+        elif instance.text_answer:
+            variants = instance.variants.filter(correct=True)
+            active = variants.exists()
         elif instance.many_correct:
             if empty_status:
                 active = True
@@ -66,16 +71,22 @@ def exam_empty_answers_change(sender, instance, **kwargs):
     previous_stage = Exam.objects.get(id=instance.id)
     if previous_stage.empty_answers != instance.empty_answers:
         active = False
-        questions = instance.questions.prefetch_related('variants').annotate(
-            corrected_count=Count(
-                'variants__correct',
-                filter=Q(variants__correct=True)
+        questions = (
+            instance.questions
+            .prefetch_related('variants')
+            .annotate(
+                corrected_count=Count(
+                    'variants__correct',
+                    filter=Q(variants__correct=True)
+                )
             )
-        ).filter(
-            type='many_correct',
-            variants__isnull=False,
-            corrected_count=0
-        ).distinct()
+            .filter(
+                type='many_correct',
+                variants__isnull=False,
+                corrected_count=0
+            )
+            .distinct()
+        )
         if instance.empty_answers:
             active = True
         questions.update(active=active)

@@ -71,12 +71,17 @@ body {
   font-size: .5em;
 }
 
-.exam-card, .exam-info {
+.exam-card, .container-light {
   background: #f3f5fb;
   border-radius: 1em;
   border: none;
   transition: .3s;
   padding: .5em;
+}
+
+.container-light .form-control {
+  background-color: #fdfdfd;
+  border-color: #e8e8e8;
 }
 
 .exam-card .progress {

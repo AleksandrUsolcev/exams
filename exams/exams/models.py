@@ -187,10 +187,12 @@ class Question(models.Model):
 
     ONE_CORRECT = 'one_correct'
     MANY_CORRECT = 'many_correct'
+    TEXT_ANSWER = 'text_answer'
 
     TYPES = (
         (ONE_CORRECT, 'Допустим только один правильный ответ'),
-        (MANY_CORRECT, 'Допустимы несколько вариантов ответов')
+        (MANY_CORRECT, 'Допустимы несколько вариантов ответов'),
+        (TEXT_ANSWER, 'Текстовый ответ')
     )
 
     text = models.TextField(
@@ -223,7 +225,7 @@ class Question(models.Model):
         verbose_name='Тип',
         choices=TYPES,
         max_length=32,
-        default='many_correct'
+        default='one_correct'
     )
     active = models.BooleanField(
         verbose_name='Готов к публикации',
@@ -244,6 +246,10 @@ class Question(models.Model):
     @property
     def many_correct(self):
         return self.type == self.MANY_CORRECT
+
+    @property
+    def text_answer(self):
+        return self.type == self.TEXT_ANSWER
 
     class Meta:
         verbose_name = 'Вопрос'
