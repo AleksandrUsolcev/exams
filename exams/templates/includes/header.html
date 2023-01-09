@@ -1,4 +1,4 @@
-<div class="container-fluid header">
+<div class="container-fluid header mb-2">
   <div class="container">
     <div class="row py-4">
       <div class="col-3 col-lg-4">
@@ -13,9 +13,6 @@
         {% if request.user.is_authenticated %}
         <a href="{% url 'users:logout' %}" class="text-secondary text-decoration-none me-3 mt-2">Выход</a>
         <a href="{% url 'users:profile' request.user.username %}" class="fw-bold text-decoration-none me-4 mt-2">{{ request.user.username }}</a>
-        {% if request.user.is_superuser %}
-        <a href="{% url 'admin:index' %}" class="me-3 mt-2 text-primary text-decoration-none">Админ-панель</a>
-        {% endif %}
         {% else %}
         <a href="{% url 'users:signup' %}" class="btn btn-primary me-3 mt-2">Регистрация</a>
         <a href="{% url 'users:login' %}" class="btn btn-primary me-3 mt-2">Вход</a>

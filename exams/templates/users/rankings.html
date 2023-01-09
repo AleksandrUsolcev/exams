@@ -3,7 +3,7 @@
 {% load cache %}
 {% block title %}Рейтинг пользователей{% endblock %}
 {% block content %}
-<h3 class="fw-bold mb-4">Рейтинг пользователей</h3>
+{% include '../includes/navbar.html' %}
 <div class="mini-info text-secondary pb-3">Рейтинг обновляется каждый час</div>
 {% cache 3600 rankings %}
 <table class="table table-hover">
