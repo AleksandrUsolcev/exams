@@ -9,13 +9,30 @@
       <div id="search" class="col-4 col-lg-4 d-flex align-items-center main-search">
         <input type="search" name="query" class="form-control" placeholder="Поиск">
       </div>
-      <div class="col-5 col-lg-4 d-flex align-items-center flex-row-reverse">
+      <div class="col-5 col-lg-4 mt-2 d-flex align-items-center flex-row-reverse">
         {% if request.user.is_authenticated %}
-        <a href="{% url 'users:logout' %}" class="text-secondary text-decoration-none me-3 mt-2">Выход</a>
-        <a href="{% url 'users:profile' request.user.username %}" class="fw-bold text-decoration-none me-4 mt-2">{{ request.user.username }}</a>
+          <div class="dropdown">
+            <a class="dropdown-toggle fw-bold text-decoration-none me-4 mt-2" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-mortarboard-fill mb-1 me-1" viewBox="0 0 16 16">
+                <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917l-7.5-3.5Z"/>
+                <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Z"/>
+              </svg>
+              {{ request.user.username }}
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" href="{% url 'users:profile' request.user.username %}">Профиль</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:profile_edit' request.user.username %}">Настройки</a></li>
+              <li><a class="dropdown-item" href="{% url 'progress:progress_list' request.user.username %}">Прогресс</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'admin:index' %}">Админ-панель</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a></li>
+            </ul>
+          </div>
         {% else %}
-        <a href="{% url 'users:signup' %}" class="btn btn-primary me-3 mt-2">Регистрация</a>
-        <a href="{% url 'users:login' %}" class="btn btn-primary me-3 mt-2">Вход</a>
+          <a href="{% url 'users:signup' %}" class="btn btn-primary me-3 mt-2">Регистрация</a>
+          <a href="{% url 'users:login' %}" class="btn btn-primary me-3 mt-2">Вход</a>
         {% endif %}
       </div>
     </div>

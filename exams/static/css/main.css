@@ -19,6 +19,10 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#020024", endColorstr="#0a3c86", GradientType=1);
 }
 
+.header .dropdown-toggle::after {
+  display: none !important;
+}
+
 .logo {
   font-size: 4.5em;
   font-family: 'JosefinSans-SemiBold';
@@ -71,7 +75,8 @@ body {
   font-size: .5em;
 }
 
-.exam-card, .container-light {
+.exam-card,
+.container-light {
   background: #f3f5fb;
   border-radius: 1em;
   border: none;

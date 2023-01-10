@@ -58,6 +58,7 @@ class ProgressQuerySet(QuerySet):
                     .filter(progress=F('progress'))
                     .defer('question', 'date')
                     .get_counters()
+                    .order_by('date')
                 ),
                 Prefetch(
                     'answers__variants', queryset=variants.objects
