@@ -20,9 +20,10 @@ class Progress(models.Model):
         related_name='progress',
         on_delete=models.CASCADE
     )
-    exam_revision = models.PositiveIntegerField(
+    exam_revision = models.DateTimeField(
         verbose_name='Редакция тестирования',
         null=True,
+        blank=True
     )
     stage = models.PositiveIntegerField(
         verbose_name='Этап',
@@ -73,10 +74,6 @@ class UserAnswer(models.Model):
         related_name='answers',
         null=True,
         on_delete=models.SET_NULL
-    )
-    question_text = models.TextField(
-        verbose_name='Текст вопроса',
-        null=True
     )
     correct = models.BooleanField(
         verbose_name='Результат',
@@ -130,6 +127,3 @@ class UserVariant(models.Model):
         verbose_name = 'Вариант ответа пользователя'
         verbose_name_plural = 'Варианты ответов пользователей'
         ordering = ['-correct', '-selected']
-
-    def __str__(self):
-        return f'{self.variant_text}'

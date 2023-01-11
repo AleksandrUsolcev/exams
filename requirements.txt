@@ -2,7 +2,7 @@ Django==3.2.16
 django-ckeditor==6.5.1
 django-debug-toolbar==3.8.1
 django-filter==22.1
-django-nested-admin==4.0.2
+django-jazzmin==2.6.0
 django-widget-tweaks==1.4.12
 djangorestframework==3.14.0
 psycopg2-binary==2.9.5

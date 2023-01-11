@@ -71,7 +71,6 @@ class ExamProcessForm(forms.Form):
         answer = UserAnswer.objects.create(
             progress=self.progress,
             question=self.question,
-            question_text=self.question.text,
             correct=correct,
             no_answers=no_answers
         )

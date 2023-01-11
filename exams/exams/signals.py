@@ -1,20 +1,16 @@
-from django.db.models import Count, F, Q
+from django.db.models import Count, Q
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from .models import Exam, Question, Variant
 
 
-@receiver(post_save, sender=Variant)
 @receiver(post_save, sender=Question)
-@receiver(post_delete, sender=Variant)
 @receiver(post_delete, sender=Question)
 def exam_update_revision(sender, instance, **kwargs):
-    if (
-        instance.exam.active and instance.exam.visibility
-        and instance.exam.change_revision
-    ):
-        instance.exam.revision = F('revision') + 1
+    if (instance.exam.active and instance.exam.visibility):
+        instance.exam.revision = timezone.now()
         instance.exam.save()
 
 

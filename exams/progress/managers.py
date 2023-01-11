@@ -15,7 +15,9 @@ class UserAnswerQuerySet(QuerySet):
                 )),
                 selected_count=Count('variants', filter=Q(
                     variants__selected=True
-                ))
+                )),
+                question_text=F('question__text'),
+                question_type=F('question__type')
             )
         )
         return counters

@@ -15,6 +15,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -24,7 +25,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'django_filters',
-    'nested_admin',
     'core',
     'users',
     'progress',
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'widget_tweaks',
     'ckeditor',
+    'ckeditor_uploader',
     'api'
 ]
 
@@ -86,7 +87,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'my_cache_table',
+        'LOCATION': 'exams_cache_table',
     }
 }
 
@@ -124,6 +125,10 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
 
+CKEDITOR_RESTRICT_BY_DATE = True
+
+CKEDITOR_BROWSE_SHOW_DIRS = True
+
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
@@ -135,3 +140,93 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 
 LOGIN_REDIRECT_URL = 'exams:index'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'width': '100%',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Image', 'Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ]
+    }
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Exams",
+
+    "site_header": "Exams",
+
+    "site_brand": "Exams",
+
+    "site_logo": "images/logo-admin.png",
+
+    "login_logo": None,
+
+    "login_logo_dark": None,
+
+    "site_logo_classes": "img-circle",
+
+    "site_icon": None,
+
+    "welcome_sign": "Добро пожаловать",
+
+    "copyright": "exams",
+
+    "search_model": ["users.User", "exams.Exam"],
+
+    "user_avatar": None,
+
+    ############
+    # Top Menu #
+    ############
+    "topmenu_links": [
+
+        {"name": "Сайт", "url": "exams:index",
+            "permissions": ["auth.view_user"]},
+
+        {"name": "GitHub",
+         "url": "https://github.com/AleksandrUsolcev/exams",
+         "new_window": True},
+
+        {"model": "users.User"},
+
+    ],
+
+    #############
+    # Side Menu #
+    #############
+
+    "show_sidebar": True,
+
+    "navigation_expanded": True,
+
+    "hide_apps": [],
+
+    "hide_models": ['exams.Question'],
+
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    #################
+    # Related Modal #
+    #################
+
+    "related_modal_active": False,
+
+    #############
+    # UI Tweaks #
+    #############
+
+    "custom_css": None,
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+
+    ###############
+    # Change view #
+    ###############
+    "changeform_format": "horizontal_tabs"
+}

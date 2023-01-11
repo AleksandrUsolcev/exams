@@ -3,8 +3,6 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
-from nested_admin.nested import (NestedModelAdmin, NestedStackedInline,
-                                 NestedTabularInline)
 
 from .models import Category, Exam, Question, Variant
 
@@ -24,7 +22,7 @@ class CategoryAdmin(admin.ModelAdmin):
     exams_count.short_description = 'Тестирований'
 
 
-class VariantInline(NestedTabularInline):
+class VariantInline(admin.TabularInline):
     model = Variant
     extra = 1
     formfield_overrides = {
@@ -32,15 +30,15 @@ class VariantInline(NestedTabularInline):
     }
 
 
-class QuestionInline(NestedStackedInline):
+class QuestionInline(admin.StackedInline):
     model = Question
-    show_change_link = True
     extra = 1
     readonly_fields = ('active', 'variants_count')
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows': 4, 'cols': 40})},
     }
     inlines = (VariantInline,)
+    show_change_link = True
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -52,7 +50,7 @@ class QuestionInline(NestedStackedInline):
     variants_count.short_description = 'Вариантов ответа'
 
 
-class ExamAdmin(NestedModelAdmin):
+class ExamAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'author', 'revision',
                     'questions_count', 'active', 'visibility', 'created')
     list_editable = ('visibility',)
@@ -79,5 +77,11 @@ class ExamAdmin(NestedModelAdmin):
         obj.save()
 
 
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = (VariantInline,)
+    save_on_top = True
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Exam, ExamAdmin)
+admin.site.register(Question, QuestionAdmin)

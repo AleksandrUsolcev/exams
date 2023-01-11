@@ -1,11 +1,11 @@
 from random import randrange
 
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from slugify import slugify
-
 from users.models import User
 
 from . import managers
@@ -59,12 +59,10 @@ class Category(models.Model):
 
 
 class Exam(models.Model):
-    revision = models.PositiveIntegerField(
+    revision = models.DateTimeField(
         verbose_name='Редакция',
-        help_text=('Меняется автоматически при изменении/удалении вопросов '
-                   'и вариантов ответов, если тест готов к публикации и не '
-                   'скрыт'),
-        default=1,
+        null=True,
+        blank=True,
         editable=False
     )
     title = models.CharField(
@@ -82,7 +80,7 @@ class Exam(models.Model):
         max_length=340,
         verbose_name='ЧПУ'
     )
-    description = RichTextField(
+    description = RichTextUploadingField(
         verbose_name='Описание'
     )
     author = models.ForeignKey(
@@ -104,11 +102,6 @@ class Exam(models.Model):
     created = models.DateTimeField(
         verbose_name='Дата добавления',
         auto_now_add=True
-    )
-    change_revision = models.BooleanField(
-        verbose_name=('Менять версию редакции при сохранении теста, вопросов '
-                      'или вариантов ответов'),
-        default=False
     )
     timer = models.PositiveIntegerField(
         verbose_name='Время на выполнение (мин.)',
@@ -174,8 +167,8 @@ class Exam(models.Model):
             code = randrange(10000, 99999)
         else:
             code = self.slug[-5:]
-            if self.active and self.visibility and self.change_revision:
-                self.revision += 1
+            if self.active and self.visibility:
+                self.revision = timezone.now()
         self.slug = slugify(self.title) + '-' + str(code)
         super().save(*args, **kwargs)
 
@@ -194,7 +187,11 @@ class Question(models.Model):
         (MANY_CORRECT, 'Допустимы несколько вариантов ответов'),
         (TEXT_ANSWER, 'Текстовый ответ')
     )
-
+    description = RichTextUploadingField(
+        verbose_name='Подробное описание/информация',
+        blank=True,
+        null=True
+    )
     text = models.TextField(
         verbose_name='Вопрос'
     )

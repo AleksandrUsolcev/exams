@@ -1,11 +1,12 @@
 from django.conf import settings
+from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     path('api/1.0/', include('api.urls', namespace='api')),
     path('', include('exams.urls', namespace='exams')),
     path('', include('progress.urls', namespace='progress')),
