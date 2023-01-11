@@ -133,6 +133,12 @@ class Exam(models.Model):
                       'и по окончанию тестирования'),
         default=True
     )
+    show_correct = models.BooleanField(
+        verbose_name='Отображать пользователю верные варианты ответов',
+        help_text=('Только если активен параметр с отображением '
+                   'пользователю результатов'),
+        default=True
+    )
     shuffle_variants = models.BooleanField(
         verbose_name='Перемешивать варианты ответов, игнорируя приоритет',
         default=True
@@ -155,8 +161,8 @@ class Exam(models.Model):
     objects = managers.ExamManager()
 
     class Meta:
-        verbose_name = 'Тестирование'
-        verbose_name_plural = 'Тестирования'
+        verbose_name = 'Тест'
+        verbose_name_plural = 'Тесты'
         ordering = ['-created']
 
     def __str__(self):

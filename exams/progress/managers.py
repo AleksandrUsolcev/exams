@@ -17,7 +17,8 @@ class UserAnswerQuerySet(QuerySet):
                     variants__selected=True
                 )),
                 question_text=F('question__text'),
-                question_type=F('question__type')
+                question_type=F('question__type'),
+                exam_show_correct=F('question__exam__show_correct'),
             )
         )
         return counters

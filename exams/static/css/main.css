@@ -60,6 +60,7 @@ body {
 
 .main-content .description img {
   max-width: 100%;
+  height: auto !important;
   border-radius: .5em;
 }
 

@@ -78,8 +78,14 @@ class ExamAdmin(admin.ModelAdmin):
 
 
 class QuestionAdmin(admin.ModelAdmin):
+    fields = ('exam', 'visibility', 'active', 'priority',
+              'type', 'description', 'text', 'success_message')
+    list_display = ('text', 'exam', 'priority')
+    list_editable = ('priority',)
+    raw_id_fields = ('exam',)
     inlines = (VariantInline,)
     save_on_top = True
+    readonly_fields = ('active',)
 
 
 admin.site.register(Category, CategoryAdmin)

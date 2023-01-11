@@ -129,6 +129,8 @@ CKEDITOR_RESTRICT_BY_DATE = True
 
 CKEDITOR_BROWSE_SHOW_DIRS = True
 
+CKEDITOR_FORCE_JPEG_COMPRESSION = True
+
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
@@ -149,7 +151,8 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['Image', 'Link', 'Unlink'],
-            ['RemoveFormat', 'Source']
+            ['RemoveFormat', 'Source'],
+            ['Maximize']
         ]
     }
 }

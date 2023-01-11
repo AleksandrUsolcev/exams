@@ -49,7 +49,12 @@
           </p>
         {% endif %}
       {% else %}
-        <div class="description py-2 pt-3 fs-5">
+        {% if question.description %}
+          <div class="description">
+            {{ question.description|safe }}
+          </div>
+        {% endif %}
+        <div class="py-2 pt-3 fs-5 fw-bold">
           {{ question.text }}
         </div>
       {% endif %}
