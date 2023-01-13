@@ -23,6 +23,13 @@ body {
   display: none !important;
 }
 
+.header .dropdown-menu {
+  border-radius: .5em;
+  -webkit-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.15);
+  -moz-box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.15);
+  box-shadow: 0px 15px 13px 0px rgba(34, 60, 80, 0.15);
+}
+
 .logo {
   font-size: 4.5em;
   font-family: 'JosefinSans-SemiBold';
@@ -61,6 +68,7 @@ body {
 .main-content .description img {
   max-width: 100%;
   height: auto !important;
+  margin: .5em 0;
   border-radius: .5em;
 }
 
@@ -73,7 +81,8 @@ body {
 }
 
 .category-list .badge {
-  font-size: .5em;
+  font-size: .7em;
+  padding: .1em .5em .2em .5em;
 }
 
 .exam-card,
@@ -175,6 +184,37 @@ body {
   font-weight: none !important;
   color: #0d6efd !important;
   border-color: #fff !important;
+}
+
+.progress-counter {
+  padding: .1em .6em;
+  font-size: .8em;
+  margin-top: .4em;
+  opacity: .7;
+  font-weight: bold;
+  border: 1px solid #0D6EFD;
+}
+
+.progress-counter:hover {
+  opacity: 1;
+}
+
+.progress-counter.current {
+  background-color: #0D6EFD;
+  color: #fff;
+  opacity: 1;
+}
+
+.progress-counter.passed {
+  background-color: #48c55c;
+  border-color: #48c55c;
+  color: #fff;
+}
+
+.progress-counter.wrong {
+  background-color: #c54848;
+  border-color: #c54848;
+  color: #fff;
 }
 
 .process-timer {

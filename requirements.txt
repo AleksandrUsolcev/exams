@@ -5,6 +5,8 @@ django-filter==22.1
 django-jazzmin==2.6.0
 django-widget-tweaks==1.4.12
 djangorestframework==3.14.0
+Pillow==9.4.0
 psycopg2-binary==2.9.5
 python-dotenv==0.21.0
 python-slugify==7.0.0
+sorl-thumbnail==12.9.0

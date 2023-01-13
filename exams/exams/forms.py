@@ -81,7 +81,7 @@ class ExamProcessForm(forms.Form):
             corrected = False
 
             if self.question.text_answer:
-                if results[0].lower() in variant.text.lower():
+                if results[0].lower() == variant.text.lower():
                     selected = True
 
                 if variant.text in self.corrected:

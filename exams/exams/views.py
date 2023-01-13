@@ -215,8 +215,6 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             filter_data = {
                 'answer': F('answer')
             }
-            if self.question.text_answer:
-                filter_data['selected'] = True
 
             answer = (
                 UserAnswer.objects

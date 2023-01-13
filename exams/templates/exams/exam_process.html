@@ -10,20 +10,21 @@
   <h3 class="fw-bold">{{ exam.title }}</h3>
   <div class="row">
     <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
-      <div class="pt-3">
+      <div class="py-3">
         {% for q in questions %}
           <a href="{% url 'exams:exam_process' q.exam.slug forloop.counter %}" class="text-decoration-none">
             <div class="d-inline-block pe-1 pb-1">
-              <div class="p-2 rounded-1
+              <div class="progress-counter rounded-1
                 {% if stage == forloop.counter %}
-                bg-primary border border-primary
+                current
                 {% elif q.exam.show_results and q.corrected == 0 and q.finished != 0 %}
-                bg-danger border border-danger
+                wrong
                 {% elif stage > forloop.counter or progress.stage > forloop.counter %}
-                bg-success border border-success
+                passed
                 {% else %}
-                bg-light border
+                bg-light
                 {% endif %}">
+                {{ forloop.counter }}
               </div>
             </div>
           </a>

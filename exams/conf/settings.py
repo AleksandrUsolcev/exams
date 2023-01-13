@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'ckeditor',
     'ckeditor_uploader',
+    'sorl.thumbnail',
     'api'
 ]
 
@@ -130,6 +131,8 @@ CKEDITOR_RESTRICT_BY_DATE = True
 CKEDITOR_BROWSE_SHOW_DIRS = True
 
 CKEDITOR_FORCE_JPEG_COMPRESSION = True
+
+CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
