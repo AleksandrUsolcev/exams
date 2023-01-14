@@ -6,7 +6,7 @@ from django.forms import Textarea
 from nested_admin.nested import (NestedModelAdmin, NestedStackedInline,
                                  NestedTabularInline)
 
-from .models import Category, Exam, Question, Variant
+from .models import Category, Exam, Question, Variant, Sprint
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -22,6 +22,34 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.exams.filter(visibility=False, active=False).count()
 
     exams_count.short_description = 'Тестирований'
+
+
+class ExamInline(NestedStackedInline):
+    model = Exam
+    show_change_link = True
+    extra = 0
+    fieldsets = (
+        ('', {
+            'fields': ('title', 'visibility', 'priority', 'category', 'active')
+        }),
+    )
+    readonly_fields = ('title', 'category', 'active')
+
+
+class SprintAdmin(NestedModelAdmin):
+    list_display = ('title', 'active', 'exams_count', 'created')
+    inlines = (ExamInline,)
+    save_on_top = True
+    readonly_fields = ('created', 'active', 'slug')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('exams')
+
+    def exams_count(self, obj):
+        return obj.exams.all().count()
+
+    exams_count.short_description = 'Тестов'
 
 
 class VariantInline(NestedTabularInline):
@@ -61,6 +89,7 @@ class ExamAdmin(NestedModelAdmin):
 
     inlines = (QuestionInline,)
     save_on_top = True
+    raw_id_fields = ('sprint',)
     description = forms.CharField(widget=CKEditorWidget())
 
     def get_queryset(self, request):
@@ -80,4 +109,5 @@ class ExamAdmin(NestedModelAdmin):
 
 
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Sprint, SprintAdmin)
 admin.site.register(Exam, ExamAdmin)

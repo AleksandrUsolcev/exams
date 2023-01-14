@@ -58,6 +58,51 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
 
+class Sprint(models.Model):
+    title = models.CharField(
+        verbose_name='Название',
+        max_length=200
+    )
+    slug = models.SlugField(
+        unique=True,
+        editable=False,
+        max_length=340,
+        verbose_name='ЧПУ'
+    )
+    description = RichTextUploadingField(
+        verbose_name='Описание'
+    )
+    active = models.BooleanField(
+        verbose_name='Готов к публикации',
+        help_text=('Статус принимает положительное состояние, если есть '
+                   'хотя бы один не скрытый/готовый к публикации тест'),
+        default=False
+    )
+    any_order = models.BooleanField(
+        verbose_name='Разрешается решать тесты в произвольном порядке',
+        default=True
+    )
+    created = models.DateTimeField(
+        verbose_name='Дата добавления',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Спринт'
+        verbose_name_plural = 'Спринты'
+
+    def __str__(self):
+        return f'{self.title}'
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            code = randrange(10000, 99999)
+        else:
+            code = self.slug[-5:]
+        self.slug = slugify(self.title) + '-' + str(code)
+        super().save(*args, **kwargs)
+
+
 class Exam(models.Model):
     revision = models.DateTimeField(
         verbose_name='Редакция',
@@ -94,6 +139,14 @@ class Exam(models.Model):
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
+        related_name='exams',
+        null=True,
+        on_delete=models.SET_NULL,
+        db_index=True
+    )
+    sprint = models.ForeignKey(
+        Sprint,
+        verbose_name='Спринт',
         related_name='exams',
         null=True,
         on_delete=models.SET_NULL,
@@ -148,11 +201,23 @@ class Exam(models.Model):
         help_text='Только для типов вопросов с несколькими вариантами ответов',
         default=False
     )
+    priority = models.PositiveIntegerField(
+        verbose_name='Приоритет',
+        help_text=('Влияет на порядок выдачи теста, '
+                   'если он относится к спринту'),
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(99)
+        ]
+    )
     active = models.BooleanField(
         verbose_name='Готов к публикации',
         help_text=('Статус принимает положительное состояние, если есть '
                    'хотя бы один не скрытый/готовый к публикации вопрос'),
-        default=False)
+        default=False
+    )
     visibility = models.BooleanField(
         verbose_name='Опубликован',
         default=False

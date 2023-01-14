@@ -9,19 +9,7 @@
     <h3 class="fw-bold mb-4">
       Результаты тестирования
     </h3>
-      {% if progress.exam.success_message %}
-        <p class="py-3">
-          {{ progress.exam.success_message }}
-        </p>
-      {% endif %}
-      {% if progress.answers_quantity %}
-        <p>Верных ответов: <span class="fw-bold">{{ progress.correct_count }}</span> из <span class="fw-bold">{{ progress.answers_quantity }}</span>
-        {% if progress.correct_percentage > 0 %}
-          ({{ progress.correct_percentage }}%)
-        {% endif %}
-        </p>
-      {% endif %}
-    {% endif %}
+  {% endif %}
 
     {% if progress and progress.exam.show_results %}
       <div class="pb-4">
@@ -63,9 +51,19 @@
     <div class="container-light p-4 py-3">
       <h5 class="fw-bold">{{ progress.exam.title }}</h5>
       <a href="{% url 'exams:exam_list' %}?category={{ progress.exam.category.slug }}" class="text-decoration-none">{{ progress.exam.category.title }}</a>
-
-      <div class="exam-rules mt-1">
-        {% include '../includes/exam_rules.html' %}
+      <div class="mini-info pt-3">
+        {% if progress.exam.success_message %}
+          <p>
+            {{ progress.exam.success_message }}
+          </p>
+        {% endif %}
+        {% if progress.answers_quantity %}
+          <p>Верных ответов: <span class="fw-bold">{{ progress.correct_count }}</span> из <span class="fw-bold">{{ progress.answers_quantity }}</span>
+        {% if progress.correct_percentage > 0 %}
+          ({{ progress.correct_percentage }}%)
+        {% endif %}
+          </p>
+        {% endif %}
       </div>
       <div class="progress-info mt-4">
         <a class="btn btn-success my-3 me-2" href="{% url 'exams:exam_detail' progress.exam.slug %}">Детали теста</a>
