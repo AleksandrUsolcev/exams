@@ -1,8 +1,10 @@
+from uuid import uuid4
+
 from django.db import models
 from django.utils import timezone
+from users.models import User
 
 from exams.models import Exam, Question, Variant
-from users.models import User
 
 from . import managers
 
@@ -45,6 +47,13 @@ class Progress(models.Model):
         verbose_name='Зачтено',
         null=True
     )
+    guest_key = models.CharField(
+        verbose_name='Гостевой ключ',
+        null=True,
+        blank=True,
+        editable=False,
+        max_length=100
+    )
 
     objects = managers.ProgressManager()
 
@@ -58,6 +67,7 @@ class Progress(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding:
             self.started = timezone.now()
+            self.guest_key = str(uuid4())
         super().save(*args, **kwargs)
 
 

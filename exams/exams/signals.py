@@ -35,7 +35,7 @@ def question_active_change(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Question)
 @receiver(post_delete, sender=Question)
-def exam_active_change(sender, instance, raw, **kwargs):
+def exam_active_change(sender, instance, **kwargs):
     empty_status = instance.exam.empty_answers
     active = False
     exam_active = instance.exam.questions.filter(

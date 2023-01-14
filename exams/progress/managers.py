@@ -67,9 +67,9 @@ class ProgressQuerySet(QuerySet):
                     .defer('variant')
                     .order_by('-selected', '?')
                 ))
-            .only('user__username', 'exam__title', 'exam__show_results',
-                  'exam__success_message', 'exam__category__title',
-                  'exam__category__slug')
+            .only('answers_quantity', 'user__username', 'exam__title',
+                  'exam__slug', 'exam__show_results', 'exam__success_message',
+                  'exam__category__title', 'exam__category__slug')
             .annotate(
                 questions_count=Count(
                     'exam__questions', distinct=True, filter=Q(

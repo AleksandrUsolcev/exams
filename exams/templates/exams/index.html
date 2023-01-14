@@ -18,5 +18,10 @@
       {% if categories %}
         {% include '../includes/categories_list.html' %}
       {% endif %}
+      {% if more_link %}
+        <div class="col-12 py-4">
+          <a href="{% url 'exams:exam_list' %}" class="fw-bold text-decoration-none">Все тесты</a>
+        </div>
+      {% endif %}
     </div>
 {% endblock %}

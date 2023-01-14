@@ -26,9 +26,11 @@ class IndexView(ListView):
             .list_(user=self.request.user)
         )
         extra_context = {
-            'title': 'Exams - проверь свои знания',
+            'title': 'Exams',
             'exams': exams[:12]
         }
+        if len(exams) > 5:
+            extra_context['more_link'] = True
         context.update(extra_context)
         return context
 
