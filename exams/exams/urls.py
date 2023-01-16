@@ -16,7 +16,7 @@ urlpatterns = [
         name='sprint_list'
     ),
     path(
-        'sprints/<slug:slug>',
+        'sprints/<slug:slug>/',
         views.SprintDetailView.as_view(),
         name='sprint_detail'
     ),

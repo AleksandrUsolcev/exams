@@ -48,6 +48,24 @@ class SprintDetailView(ListView):
     model = Exam
     template_name = 'exams/sprint_detail.html'
     paginate_by = 18
+    context_object_name = 'exams'
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        queryset = (
+            Exam.objects
+            .filter(active=True, visibility=True, sprint__slug=slug)
+            .select_related('category')
+            .list_(user=self.request.user, in_sprint=True)
+        )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs.get('slug')
+        sprint = get_object_or_404(Sprint, slug=slug)
+        context['sprint'] = sprint
+        return context
 
 
 class ExamListView(ListView):
@@ -93,13 +111,14 @@ class ExamDetailView(DetailView):
 
     def get_object(self, *args, **kwargs):
         slug = self.kwargs.get('slug')
-        exam = (
+        self.exam = (
             Exam.objects
-            .select_related('category')
+            .select_related('category', 'sprint')
             .users_stats()
             .questions_count()
         )
-        return get_object_or_404(exam, slug=slug, active=True, visibility=True)
+        return get_object_or_404(
+            self.exam, slug=slug, active=True, visibility=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,6 +136,38 @@ class ExamDetailView(DetailView):
                 .first()
             )
             context.update({'progress': progress})
+
+            exam = (
+                self.exam
+                .filter(slug=slug, active=True, visibility=True)
+                .select_related('sprint')
+                .with_request_user_progress()
+                .first()
+            )
+
+            if exam.sprint and not exam.sprint.any_order and not exam.passed:
+                previous_exam = get_previous_exam_in_sprint(exam)
+                if previous_exam:
+                    previous_exam_passed = (
+                        Progress.objects
+                        .filter(
+                            user=self.request.user,
+                            exam=previous_exam,
+                            passed=True
+                        )
+                    ).exists()
+
+                    context['previous_exam_passed'] = previous_exam_passed
+                    context['previous_exam'] = previous_exam
+                else:
+                    context['previous_exam_passed'] = True
+
+            elif exam.sprint and exam.passed:
+                next_exam = get_next_exam_in_sprint(exam)
+                context['next_exam'] = next_exam
+
+            elif exam.sprint and exam.sprint.any_order:
+                context['previous_exam_passed'] = True
 
         if self.object.timer:
             context['humanize_time'] = get_humanize_time(self.object.timer)

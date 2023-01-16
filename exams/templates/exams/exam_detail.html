@@ -4,7 +4,11 @@
   {{ exam.title }} - {{ exam.category.title}}
 {% endblock %}
 {% block content %}
-  <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
+  {% if exam.sprint %}
+    <a href="{% url 'exams:sprint_detail' exam.sprint.slug %}" class="fw-bold text-decoration-none fs-5">{{ exam.sprint.title }}</a>
+  {% else %}
+    <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
+  {% endif %}
   <h3 class="fw-bold">{{ exam.title }}</h3>
   <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
   <div class="row">
@@ -39,7 +43,20 @@
       </div>
       <div class="container-light p-4 py-3">
         <div class="exam-rules mt-1">
-          <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
+          {% if request.user.is_authenticated %}
+            {% if previous_exam_passed or not exam.sprint %}
+              <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
+            {% else %}
+              <p>
+                Для того, чтобы начать прохождение этого теста необходимо успешно завершить 
+                <a href="{% url 'exams:exam_detail' previous_exam.slug %}" class="fw-bold text-decoration-none">{{ previous_exam.title }}</a>
+              </p>
+              <p>
+                Очередность прохождения тестов можно посмотреть на странице спринта 
+                <a href="{% url 'exams:sprint_detail' exam.sprint.slug %}" class="fw-bold text-decoration-none">{{ exam.sprint.title }}</a>
+              </p>
+            {% endif %}
+          {% endif %}
           {% include '../includes/exam_rules.html' %}
         </div>
         <div class="progress-info mt-4">
@@ -59,7 +76,9 @@
               <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' progress.slug progress.current_stage %}">Продолжить</a>
             {% endif %}
           {% else %}
-            <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' exam.slug 1 %}">Начать</a>
+            {% if previous_exam_passed or not exam.sprint %}
+              <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' exam.slug 1 %}">Начать</a>
+            {% endif %}
           {% endif %}
         </div>
       </div>

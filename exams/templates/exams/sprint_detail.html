@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  {{ sprint.title }}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <h3 class="fw-bold">
+    {{ sprint.title }}
+  </h3>
+  <span class="text-secondary">{{ sprint.created|date:"d.m.Y" }}</span>
+  {% if request.user.is_authenticated and request.user.hide_finished_exams %}
+    <div class="col-12 pt-0 mt-0 pb-4">
+      <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
+    </div>
+  {% endif %}
+  <div class="col-12">
+    <div>
+      {% if sprint.description %}
+        <div class="py-3">{{ sprint.description|safe }}</div>
+      {% endif %}
+      {% if exams %}
+        {% include '../includes/exams.html' %}
+      {% endif %}
+    </div>
+    {% include '../includes/paginator.html' %}
+  </div>
+</div>
+{% endblock %}

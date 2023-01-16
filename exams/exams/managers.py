@@ -85,12 +85,19 @@ class ExamQuerySet(QuerySet):
         )
         return progress
 
-    def list_(self, user: object = None, only_user: bool = False) -> object:
+    def list_(self, user: object = None, only_user: bool = False,
+              in_sprint: bool = False) -> object:
         filter_data = {
             'visibility': True,
             'active': True
         }
-        fields_only = ['title', 'slug', 'created', 'category__title']
+        fields_only = ['title', 'slug', 'created',
+                       'priority', 'category__title']
+
+        order_data = ['-created']
+
+        if in_sprint:
+            order_data = ['priority']
 
         try:
             user_progress = (
@@ -114,12 +121,19 @@ class ExamQuerySet(QuerySet):
                 )
 
                 if user.hide_finished_exams:
-                    return query_without_user.order_by('-created')
+                    return query_without_user.order_by(*order_data)
 
-                exams = sorted(
-                    list(chain(query_without_user, exams)),
-                    key=attrgetter('created'), reverse=True
-                )
+                if in_sprint:
+                    exams = sorted(
+                        list(chain(query_without_user, exams)),
+                        key=attrgetter('priority'), reverse=False
+                    )
+                else:
+                    exams = sorted(
+                        list(chain(query_without_user, exams)),
+                        key=attrgetter('created'), reverse=True
+                    )
+
                 return exams
             else:
                 return exams.only(*fields_only).questions_count()
@@ -133,7 +147,7 @@ class ExamQuerySet(QuerySet):
             .filter(**filter_data)
             .only(*fields_only)
             .questions_count()
-            .order_by('-created')
+            .order_by(*order_data)
         )
         return exams
 

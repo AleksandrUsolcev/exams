@@ -3,14 +3,11 @@
 {% block content %}
 
 <div class="row">
+  <a href="{% url 'users:profile' progress.user.username %}" class="text-decoration-none fs-5 fw-bold">{{ progress.user.username }}</a>
+  <h3 class="fw-bold mb-4">
+    Результаты тестирования
+  </h3>
   <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
-  {% if progress %}
-    <a href="{% url 'users:profile' progress.user.username %}" class="text-decoration-none fs-5 fw-bold">{{ progress.user.username }}</a>
-    <h3 class="fw-bold mb-4">
-      Результаты тестирования
-    </h3>
-  {% endif %}
-
     {% if progress and progress.exam.show_results %}
       <div class="pb-4">
         {% for answer in progress.answers.all %}
