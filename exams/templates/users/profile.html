@@ -20,28 +20,28 @@
   <div class="row col-md-12 col-xl-8 py-3 border-bottom">
     <div class="col-3 text-center">
       <div class="text-secondary">Пройдено тестов</div>
-      <h3 class="fw-bold py-3">
+      <h4 class="fw-bold py-3">
         {% if user.exams_count %}
           {{ user.exams_count }}
         {% else %}
         -
         {% endif %}
-      </h3>
+      </h4>
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Зачтено</div>
-      <h3 class="fw-bold py-3">
+      <h4 class="fw-bold py-3">
         {% if user.passed_count %}
           {{ user.passed_count }}
         {% else %}
         -
         {% endif %}
-      </h3>
+      </h4>
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Верных ответов</div>
       {% if user.correct_percentage %}
-        <h3 class="fw-bold py-3
+        <h4 class="fw-bold py-3
         {% if user.correct_percentage > 65 %}
         text-success
         {% elif user.correct_percentage > 32 %}
@@ -49,20 +49,20 @@
         {% else %}
         text-danger
         {% endif %}
-        ">{{ user.correct_percentage }}%</h3>
+        ">{{ user.correct_percentage }}%</h4>
       {% else %}
-        <h3 class="fw-bold py-3">-</h3>
+        <h4 class="fw-bold py-3">-</h4>
       {% endif %}
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Баллов</div>
-      <h3 class="fw-bold py-3">
+      <h4 class="fw-bold py-3">
         {% if user.points %}
           {{ user.points }}
         {% else %}
         -
         {% endif %}
-      </h3>
+      </h4>
     </div>
     <div class="col-12 text-center">
       <div class="mini-info text-secondary">Позиция в <a href="{% url 'users:users_rankings' %}">рейтинге</a>: <span class="fw-bold">{{ user.position_of_rankings }}</span></div>

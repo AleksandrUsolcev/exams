@@ -1,12 +1,38 @@
 from uuid import uuid4
 
 from django.db import models
-from django.utils import timezone
 from users.models import User
 
-from exams.models import Exam, Question, Variant
+from exams.models import Exam, Question, Sprint, Variant
 
 from . import managers
+
+
+class UserSprint(models.Model):
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        related_name='sprints',
+        on_delete=models.CASCADE
+    )
+    sprint = models.ForeignKey(
+        Sprint,
+        verbose_name='Спринт',
+        related_name='progress',
+        on_delete=models.CASCADE
+    )
+    started = models.DateTimeField(
+        verbose_name='Дата начала',
+        auto_now_add=True
+    )
+    finished = models.DateTimeField(
+        verbose_name='Дата завершения',
+        null=True
+    )
+
+    class Meta:
+        verbose_name = 'Пройденный спринт'
+        verbose_name_plural = 'Пройденные спринты'
 
 
 class Progress(models.Model):
@@ -37,7 +63,7 @@ class Progress(models.Model):
     )
     started = models.DateTimeField(
         verbose_name='Дата начала',
-        null=True
+        auto_now_add=True
     )
     finished = models.DateTimeField(
         verbose_name='Дата завершения',
@@ -66,7 +92,6 @@ class Progress(models.Model):
 
     def save(self, *args, **kwargs):
         if self._state.adding:
-            self.started = timezone.now()
             self.guest_key = str(uuid4())
         super().save(*args, **kwargs)
 

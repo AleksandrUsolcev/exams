@@ -20,6 +20,10 @@ class User(AbstractUser):
         verbose_name='Скрывать пройденные тесты',
         default=False
     )
+    hide_finished_sprints = models.BooleanField(
+        verbose_name='Скрывать пройденные спринты',
+        default=False
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 

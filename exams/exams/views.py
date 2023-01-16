@@ -5,11 +5,12 @@ from django.db.models.functions.comparison import NullIf
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView
-from progress.models import Progress, UserAnswer, UserVariant
+from progress.models import Progress, UserAnswer, UserSprint, UserVariant
 
 from .forms import ExamProcessForm
-from .models import Category, Exam, Question, Variant
-from .utils import get_humanize_time
+from .models import Category, Exam, Question, Sprint, Variant
+from .utils import (get_humanize_time, get_next_exam_in_sprint,
+                    get_previous_exam_in_sprint)
 
 
 class IndexView(ListView):
@@ -22,6 +23,7 @@ class IndexView(ListView):
         context = super().get_context_data(**kwargs)
         exams = (
             Exam.objects
+            .filter(active=True, visibility=True)
             .select_related('category')
             .list_(user=self.request.user)
         )
@@ -33,6 +35,19 @@ class IndexView(ListView):
             extra_context['more_link'] = True
         context.update(extra_context)
         return context
+
+
+class SprintListView(ListView):
+    model = Sprint
+    template_name = 'exams/sprint_list.html'
+    context_object_name = 'sprints'
+    paginate_by = 20
+
+
+class SprintDetailView(ListView):
+    model = Exam
+    template_name = 'exams/sprint_detail.html'
+    paginate_by = 18
 
 
 class ExamListView(ListView):
@@ -55,7 +70,10 @@ class ExamListView(ListView):
 
     def get_queryset(self):
         slug = self.request.GET.get('category')
-        filter_data = {}
+        filter_data = {
+            'active': True,
+            'visibility': True
+        }
 
         if slug:
             filter_data['category__slug'] = slug
@@ -120,10 +138,43 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         restart = self.request.GET.get('restart')
 
         if not progress or progress.finished and restart:
-            exam = get_object_or_404(
-                Exam, slug=self.slug, active=True, visibility=True
+            exam = (
+                Exam.objects
+                .filter(slug=self.slug, active=True, visibility=True)
+                .select_related('sprint')
+                .first()
             )
-            if not progress or exam.allow_retesting:
+
+            try:
+                any_order = exam.sprint.any_order
+            except AttributeError:
+                any_order = True
+
+            user_sprint = (
+                UserSprint.objects
+                .filter(user=self.request.user, sprint=exam.sprint)
+            )
+
+            if any_order and not progress or exam.allow_retesting:
+
+                if exam.sprint:
+                    previous_exam = get_previous_exam_in_sprint(exam)
+
+                    if previous_exam:
+                        previous_is_passed = (
+                            Progress.objects
+                            .filter(
+                                exam=previous_exam, user=self.request.user,
+                                passed=True
+                            )
+                        )
+                        if not previous_is_passed.exists():
+                            return False
+
+                if not user_sprint.exists() and exam.sprint:
+                    UserSprint.objects.create(
+                        user=self.request.user, sprint=exam.sprint
+                    )
                 progress = Progress.objects.create(
                     user=self.request.user,
                     exam=exam,
@@ -144,6 +195,9 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         self.slug = self.kwargs.get('slug')
         self.stage = self.kwargs.get('pk')
         self.progress = self.get_or_create_progress()
+
+        if self.progress is False:
+            return redirect('exams:exam_detail', self.slug)
 
         self.questions_queue = (
             Question.objects
@@ -291,6 +345,19 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 update['passed'] = False
 
             actual_progress.update(**update)
+
+            if update.get('passed') is True and self.question.exam.sprint:
+                next_exam = get_next_exam_in_sprint(self.question.exam)
+                user_sprint = (
+                    UserSprint.objects
+                    .filter(
+                        user=self.request.user,
+                        sprint=self.question.exam.sprint
+                    )
+                )
+
+                if not next_exam and user_sprint.exists():
+                    user_sprint.update(finished=timezone.now())
 
             return redirect('progress:progress_detail', pk=self.progress.id)
 

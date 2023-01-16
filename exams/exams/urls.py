@@ -11,6 +11,16 @@ urlpatterns = [
         name='index'
     ),
     path(
+        'sprints/',
+        views.SprintListView.as_view(),
+        name='sprint_list'
+    ),
+    path(
+        'sprints/<slug:slug>',
+        views.SprintDetailView.as_view(),
+        name='sprint_detail'
+    ),
+    path(
         'exams/',
         views.ExamListView.as_view(),
         name='exam_list'

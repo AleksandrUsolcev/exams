@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  Спринты
+{% endblock %}
+{% block content %}
+{% include '../includes/navbar.html' %}
+<div class="row pt-3">
+  {% for sprint in sprints %}
+  <div class="col-12 py-3 border-bottom">
+    <div class="col-6">
+      <a href="#" class="text-decoration-none">
+        <h5 class="d-inline">Тут должно быть какое то название спринта</h5>
+      </a>
+      <div class="mini-info text-secondary py-2">15.01.2023</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% include '../includes/paginator.html' %}
+</div>
+{% endblock %}

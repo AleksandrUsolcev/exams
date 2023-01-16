@@ -5,7 +5,11 @@
   {% else %}
     <a href="{% url 'exams:index' %}" class="text-decoration-none me-4">Новые тесты</a>
   {% endif %}
-  <a href="#" class="text-decoration-none me-4">Спринты</a>
+  {% if view_name == 'exams:sprint_list' %}
+  <span class="me-4">Спринты</span>
+  {% else %}
+    <a href="{% url 'exams:sprint_list' %}" class="text-decoration-none me-4">Спринты</a>
+  {% endif %}
   {% if view_name == 'users:users_rankings' %}
     <span class="me-4">Рейтинги</span>
   {% else %}

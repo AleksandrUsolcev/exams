@@ -6,7 +6,7 @@ from django.forms import Textarea
 from nested_admin.nested import (NestedModelAdmin, NestedStackedInline,
                                  NestedTabularInline)
 
-from .models import Category, Exam, Question, Variant, Sprint
+from .models import Category, Exam, Question, Sprint, Variant
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -19,7 +19,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return queryset.prefetch_related('exams')
 
     def exams_count(self, obj):
-        return obj.exams.filter(visibility=False, active=False).count()
+        return obj.exams.filter(visibility=True, active=True).count()
 
     exams_count.short_description = 'Тестирований'
 
@@ -34,6 +34,13 @@ class ExamInline(NestedStackedInline):
         }),
     )
     readonly_fields = ('title', 'category', 'active')
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.order_by('priority', 'id')
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class SprintAdmin(NestedModelAdmin):

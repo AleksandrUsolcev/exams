@@ -149,6 +149,7 @@ class Exam(models.Model):
         verbose_name='Спринт',
         related_name='exams',
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         db_index=True
     )

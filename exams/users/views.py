@@ -56,7 +56,8 @@ class UserProfileView(DetailView):
 
 class UserEditView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name', 'last_name', 'hide_finished_exams', 'about']
+    fields = ['first_name', 'last_name', 'hide_finished_exams',
+              'hide_finished_sprints', 'about']
     template_name = 'users/profile_edit.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
