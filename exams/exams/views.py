@@ -43,6 +43,14 @@ class SprintListView(ListView):
     context_object_name = 'sprints'
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = (
+            Sprint.objects
+            .all()
+            .with_stats(user=self.request.user)
+        )
+        return queryset
+
 
 class SprintDetailView(ListView):
     model = Exam
@@ -123,6 +131,7 @@ class ExamDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs.get('slug')
+        exam = self.object
 
         if self.request.user.is_authenticated:
             progress = (
@@ -138,7 +147,6 @@ class ExamDetailView(DetailView):
             context.update(
                 {'progress': progress, 'previous_exam_passed': True}
             )
-            exam = self.object
 
             if exam.sprint and not exam.sprint.any_order and not progress:
 

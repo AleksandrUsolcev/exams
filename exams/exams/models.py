@@ -87,9 +87,12 @@ class Sprint(models.Model):
         auto_now_add=True
     )
 
+    objects = managers.SprintManager()
+
     class Meta:
         verbose_name = 'Спринт'
         verbose_name_plural = 'Спринты'
+        ordering = ['-created']
 
     def __str__(self):
         return f'{self.title}'

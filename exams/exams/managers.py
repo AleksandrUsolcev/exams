@@ -1,8 +1,8 @@
 from itertools import chain
 from operator import attrgetter
 
-from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
-                              Manager, Q, QuerySet)
+from django.db.models import (Case, Count, DateTimeField, ExpressionWrapper, F,
+                              IntegerField, Manager, Q, QuerySet, When)
 from django.db.models.functions.comparison import NullIf
 
 
@@ -20,6 +20,71 @@ class CategoryManager(Manager):
             .order_by('priority', '-exams_count', 'title')
         )
         return count
+
+
+class SprintQuerySet(QuerySet):
+
+    def with_stats(self, user: object = None) -> object:
+
+        stats = (
+            self
+            .annotate(
+                exams_count=Count('exams', distinct=True, filter=Q(
+                    exams__active=True, exams__visibility=True
+                )),
+                questions_count=Count(
+                    'exams__questions', distinct=True, filter=Q(
+                        exams__questions__active=True,
+                        exams__questions__visibility=True
+                    )
+                ),
+            )
+            .order_by('-created')
+        )
+
+        if user.is_authenticated:
+            user_progress = (
+                self
+                .filter(progress__user=user)
+                .order_by('progress__id', '-progress__started')
+                .distinct('progress__id')
+                .values('progress__id')
+            )
+
+            user_started = Case(
+                When(progress__user=user, then=F('progress__started')),
+                default=None, output_field=DateTimeField())
+
+            user_finished = Case(
+                When(progress__user=user, then=F('progress__finished')),
+                default=None, output_field=DateTimeField())
+
+            user_annotates = {
+                'user_started': user_started,
+                'user_finished': user_finished
+            }
+
+            only_with_progress = (
+                stats
+                .filter(progress__id__in=user_progress)
+                .annotate(**user_annotates)
+            )
+            without_user = stats.exclude(progress__id__in=user_progress)
+            stats = sorted(
+                list(chain(only_with_progress, without_user)),
+                key=attrgetter('created'), reverse=True
+            )
+
+        return stats
+
+
+class SprintManager(Manager):
+
+    def get_queryset(self):
+        return SprintQuerySet(self.model, using=self._db)
+
+    def with_stats(self):
+        return self.get_queryset().with_stats()
 
 
 class ExamQuerySet(QuerySet):
