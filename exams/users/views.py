@@ -42,7 +42,7 @@ class UserProfileView(DetailView):
         context = super().get_context_data(**kwargs)
         exams = (
             Exam.objects
-            .select_related('category')
+            .select_related('category', 'sprint')
             .list_(user=self.object, only_user=True)
             .order_by('-started')
         )

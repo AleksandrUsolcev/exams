@@ -157,7 +157,7 @@ class ExamQuerySet(QuerySet):
             'active': True
         }
         fields_only = ['title', 'slug', 'created',
-                       'priority', 'category__title']
+                       'priority', 'category__title', 'sprint__title']
 
         order_data = ['-created']
 

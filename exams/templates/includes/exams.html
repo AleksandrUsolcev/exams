@@ -10,7 +10,13 @@
         <div class="card h-100 exam-card hover-shadow">
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ exam.title }}</h5>
-            <span>{{ exam.category.title }}</span>
+            <span>
+              {% if exam.sprint %}
+                {{ exam.sprint.title }}
+              {% else %}
+                {{ exam.category.title }}
+              {% endif %}
+            </span>
             {% if not exam.started %}
               <div class="pt-1">
                 <span class="text-secondary text-mini">

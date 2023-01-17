@@ -24,7 +24,7 @@ class IndexView(ListView):
         exams = (
             Exam.objects
             .filter(active=True, visibility=True)
-            .select_related('category')
+            .select_related('category', 'sprint')
             .list_(user=self.request.user)
         )
         extra_context = {
@@ -63,7 +63,7 @@ class SprintDetailView(ListView):
         queryset = (
             Exam.objects
             .filter(active=True, visibility=True, sprint__slug=slug)
-            .select_related('category')
+            .select_related('category', 'sprint')
             .list_(user=self.request.user, in_sprint=True)
         )
         return queryset
@@ -107,7 +107,7 @@ class ExamListView(ListView):
         queryset = (
             Exam.objects
             .filter(**filter_data)
-            .select_related('category')
+            .select_related('category', 'sprint')
             .list_(user=self.request.user)
         )
         return queryset

@@ -43,7 +43,7 @@ class ProgressListView(ListView):
         user = get_object_or_404(User, username=username, is_active=True)
         queryset = (
             Exam.objects
-            .select_related('category')
+            .select_related('category', 'sprint')
             .list_(user=user, only_user=True)
             .order_by('-started')
         )

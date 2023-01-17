@@ -32,7 +32,9 @@
           {% endif %}
           {% if answer.variants.all.count > 0 and answer.question_text %}
             {% for variant in answer.variants.all %}
-              {% include '../includes/user_variants.html' %}
+              {% with progress.exam as exam %}
+                {% include '../includes/user_variants.html' %}
+              {% endwith %}
             {% endfor %}
             {% if not answer.correct and answer.selected_count == answer.corrected_count %}
               <div class="d-inline-block pe-3 pb-3">
