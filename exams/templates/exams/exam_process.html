@@ -138,7 +138,7 @@
     </div>
     <div class="col-md-12 col-lg-6 col-xl-4">
       <div class="container-light p-4 py-3">
-        {% if remaining_time %}
+        {% if remaining_time and not progress.finished %}
           <div class="remaining-time pt-2">
             <div id="timer" class="process-timer text-center"></div>
             <div id="timer-message" class="mini-info fw-bold text-danger">

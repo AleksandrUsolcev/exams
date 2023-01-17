@@ -111,14 +111,14 @@ class ExamDetailView(DetailView):
 
     def get_object(self, *args, **kwargs):
         slug = self.kwargs.get('slug')
-        self.exam = (
+        exam = (
             Exam.objects
+            .filter(slug=slug, active=True, visibility=True)
             .select_related('category', 'sprint')
             .users_stats()
             .questions_count()
         )
-        return get_object_or_404(
-            self.exam, slug=slug, active=True, visibility=True)
+        return get_object_or_404(exam)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -135,42 +135,31 @@ class ExamDetailView(DetailView):
                 .order_by('-started')
                 .first()
             )
-            context.update({'progress': progress})
-
-            exam = (
-                self.exam
-                .filter(slug=slug, active=True, visibility=True)
-                .select_related('sprint')
-                .with_request_user_progress()
-                .first()
+            context.update(
+                {'progress': progress, 'previous_exam_passed': True}
             )
+            exam = self.object
 
-            if exam.sprint and not exam.sprint.any_order and not exam.passed:
-                previous_exam = get_previous_exam_in_sprint(exam)
-                if previous_exam:
-                    previous_exam_passed = (
-                        Progress.objects
-                        .filter(
-                            user=self.request.user,
-                            exam=previous_exam,
-                            passed=True
-                        )
-                    ).exists()
+            if exam.sprint and not exam.sprint.any_order and not progress:
 
-                    context['previous_exam_passed'] = previous_exam_passed
+                if exam.sprint:
+                    previous_exam = get_previous_exam_in_sprint(exam)
                     context['previous_exam'] = previous_exam
-                else:
-                    context['previous_exam_passed'] = True
 
-            elif exam.sprint and exam.passed:
-                next_exam = get_next_exam_in_sprint(exam)
-                context['next_exam'] = next_exam
+                    if previous_exam:
+                        previous_exam_passed = (
+                            Progress.objects
+                            .filter(
+                                user=self.request.user,
+                                exam=previous_exam,
+                                passed=True
+                            )
+                        ).exists()
 
-            elif exam.sprint and exam.sprint.any_order:
-                context['previous_exam_passed'] = True
+                        context['previous_exam_passed'] = previous_exam_passed
 
-        if self.object.timer:
-            context['humanize_time'] = get_humanize_time(self.object.timer)
+        if exam.timer:
+            context['humanize_time'] = get_humanize_time(exam.timer)
         return context
 
 
@@ -196,18 +185,15 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 .first()
             )
 
-            try:
-                any_order = exam.sprint.any_order
-            except AttributeError:
-                any_order = True
-
             user_sprint = (
                 UserSprint.objects
                 .filter(user=self.request.user, sprint=exam.sprint)
             )
 
-            if any_order and not progress or exam.allow_retesting:
-
+            if (
+                exam.sprint and not exam.sprint.any_order and not progress
+                or exam.allow_retesting
+            ):
                 if exam.sprint:
                     previous_exam = get_previous_exam_in_sprint(exam)
 
