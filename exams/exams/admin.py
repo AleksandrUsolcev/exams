@@ -5,8 +5,19 @@ from django.db import models
 from django.forms import Textarea
 from nested_admin.nested import (NestedModelAdmin, NestedStackedInline,
                                  NestedTabularInline)
+from progress.models import Progress, UserSprint
 
 from .models import Category, Exam, Question, Sprint, Variant
+
+
+@admin.action(description='Удалить связанный прогресс')
+def delete_exam_progress(modeladmin, request, queryset):
+    Progress.objects.filter(exam__in=queryset).delete()
+
+
+@admin.action(description='Удалить связанный прогресс')
+def delete_sprint_progress(modeladmin, request, queryset):
+    UserSprint.objects.filter(sprint__in=queryset).delete()
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -48,6 +59,7 @@ class SprintAdmin(NestedModelAdmin):
     inlines = (ExamInline,)
     save_on_top = True
     readonly_fields = ('created', 'slug')
+    actions = [delete_sprint_progress]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -98,6 +110,7 @@ class ExamAdmin(NestedModelAdmin):
     save_on_top = True
     raw_id_fields = ('sprint',)
     description = forms.CharField(widget=CKEditorWidget())
+    actions = [delete_exam_progress]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
