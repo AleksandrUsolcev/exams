@@ -6,28 +6,38 @@
 {% block content %}
 <div class="row">
   <h4 class="fw-bold mb-4">
+
     {% if category %}
       {{ category.title }}
     {% else %}
       Все тесты
     {% endif %}
+
   </h4>
+
   {% if request.user.is_authenticated and request.user.hide_finished_exams %}
     <div class="col-12 pt-0 mt-0 pb-1">
       <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
     </div>
   {% endif %}
+
   <div class="col-8 col-xl-10">
+
     {% if category %}
       <div class="col-12 col-xl-8 pb-4">{{ category.description }}</div>
     {% endif %}
+
     {% if exams %}
       {% include '../includes/exams.html' %}
     {% endif %}
+
     {% include '../includes/paginator.html' %}
+
   </div>
+
   {% if categories %}
     {% include '../includes/categories_list.html' %}
   {% endif %}
+
 </div>
 {% endblock %}

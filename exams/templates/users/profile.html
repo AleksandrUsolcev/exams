@@ -5,41 +5,51 @@
 <h3 class="fw-bold">{{ user.username }}</h3>
 <div class="row">
   <div class="col-md-6 col-xl-4">
+
     {% if user.first_name %}
       <h5>{{ user.first_name }} {{ user.last_name }}</h5>
     {% endif %}
+
     <p class="text-secondary mini-info">Зарегистрирован {{ user.date_joined|date:"d.m.Y" }}</p>
+
     {% if user.about %}
       <p class="text-secondary pe-3 pb-2">{{ user.about }}</p>
     {% endif %}
+
     {% if request.user.is_authenticated and request.user == user %}
       <a class="btn btn-primary my-2 me-2" href="{% url 'users:profile_edit' user.username %}">Редактировать профиль</a>
       <a class="btn btn-primary my-2" href="{% url 'users:password_change_form' %}">Смена пароля</a>
     {% endif %}
+
   </div>
   <div class="row col-md-12 col-xl-8 py-3 border-bottom">
     <div class="col-3 text-center">
       <div class="text-secondary">Пройдено тестов</div>
       <h4 class="fw-bold py-3">
+
         {% if user.exams_count %}
           {{ user.exams_count }}
         {% else %}
         -
         {% endif %}
+
       </h4>
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Зачтено</div>
       <h4 class="fw-bold py-3">
+
         {% if user.passed_count %}
           {{ user.passed_count }}
         {% else %}
         -
         {% endif %}
+
       </h4>
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Верных ответов</div>
+
       {% if user.correct_percentage %}
         <h4 class="fw-bold py-3
         {% if user.correct_percentage > 65 %}
@@ -53,15 +63,18 @@
       {% else %}
         <h4 class="fw-bold py-3">-</h4>
       {% endif %}
+
     </div>
     <div class="col-3 text-center">
       <div class="text-secondary">Баллов</div>
       <h4 class="fw-bold py-3">
+
         {% if user.points %}
           {{ user.points }}
         {% else %}
         -
         {% endif %}
+
       </h4>
     </div>
     <div class="col-12 text-center">
@@ -69,10 +82,12 @@
     </div>
   </div>
 </div>
+
 {% if exams %}
   <div class="py-4">
     <h4 class="fw-bold d-inline"><a href="{% url 'progress:progress_list' user.username %}" class="text-decoration-none">Прогресс</a></h4>
   </div>
   {% include '../includes/exams.html' %}
 {% endif %}
+
 {% endblock %}

@@ -14,7 +14,9 @@
   ">{{ variant.variant_text }}</div>
 </div>
 {% endif %}
+
 {% if exam.show_correct and answer.question_type == 'text_answer' and not answer.correct %}
+
   {% if forloop.counter == 2 %}
     <div class="d-inline-block pe-3 pb-3">
       <div class="bg-light p-2 ps-3 pe-3 border border-2 rounded-3 border-warning text-warning fw-bold">
@@ -22,4 +24,5 @@
       </div>
     </div>
   {% endif %}
+
 {% endif %}

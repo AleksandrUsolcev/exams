@@ -1,16 +1,22 @@
 <div class="col-4 col-xl-2">
   <ul class="list-group ps-2">
+
     {% for category in categories %}
+
       {% if category.exams_count > 0 or category.show_empty %}
         <li class="list-group-item category-list d-flex align-items-center border-0 ps-0">
           <a href="{% url 'exams:exam_list' %}?category={{ category.slug }}" class="fw-bold text-decoration-none">
             {{ category.title }}
           </a>
+
           {% if category.exams_count > 0 %}
             <span class="badge rounded-pill bg-primary ms-2">{{ category.exams_count }}</span>
           {% endif %}
+
         </li>
       {% endif %}
+
     {% endfor %}
+
   </ul>
 </div>

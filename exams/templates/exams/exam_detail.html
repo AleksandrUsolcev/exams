@@ -4,11 +4,13 @@
   {{ exam.title }} - {{ exam.category.title}}
 {% endblock %}
 {% block content %}
+
   {% if exam.sprint %}
     <a href="{% url 'exams:sprint_detail' exam.sprint.slug %}" class="fw-bold text-decoration-none fs-5">{{ exam.sprint.title }}</a>
   {% else %}
     <a href="{% url 'exams:exam_list' %}?category={{ exam.category.slug }}" class="text-decoration-none fs-5 fw-bold">{{ exam.category.title }}</a>
   {% endif %}
+
   <h3 class="fw-bold">{{ exam.title }}</h3>
   <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
   <div class="row">
@@ -24,6 +26,7 @@
           </svg>
           <span class="py-1 ps-1 pe-3">Количество вопросов: {{ exam.questions_count|intcomma }}</span>
         </div>
+
         {% if exam.users_count %}
           <div class="users-count py-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-people-fill pb-1" viewBox="0 0 16 16">
@@ -31,6 +34,7 @@
             </svg>
             <span class="py-1 ps-1 pe-3">Пользователей завершивших тест: {{ exam.users_count }}</span>
           </div>
+
           {% if exam.average_progress %}
             <div class="average-progress py-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-fire pb-1" viewBox="0 0 16 16">
@@ -39,14 +43,19 @@
               <span class="py-1 ps-1">Пользователями было дано {{ exam.average_progress }}% верных ответов</span>
             </div>
           {% endif %}
+
         {% endif %}
+
       </div>
       <div class="container-light p-4 py-3">
         <div class="exam-rules mt-1">
+
           {% if request.user.is_authenticated %}
+
             {% if previous_exam_passed or not exam.sprint %}
               <p>Перед началом прохождения теста <span class="fw-bold">ознакомьтесь</span> с условиями тестирования ниже</p>
             {% else %}
+
               <p>
                 Для того, чтобы начать прохождение этого теста необходимо успешно завершить 
                 <a href="{% url 'exams:exam_detail' previous_exam.slug %}" class="fw-bold text-decoration-none">{{ previous_exam.title }}</a>
@@ -55,30 +64,40 @@
                 Очередность прохождения тестов можно посмотреть на странице спринта 
                 <a href="{% url 'exams:sprint_detail' exam.sprint.slug %}" class="fw-bold text-decoration-none">{{ exam.sprint.title }}</a>
               </p>
+
             {% endif %}
+
           {% endif %}
           {% include '../includes/exam_rules.html' %}
+
         </div>
         <div class="progress-info mt-4">
+
           {% if progress %}
+
             {% if progress.finished %}
               <div class="mini-info text-secondary fw-bold">
                 Тест пройден {{ progress.finished|date:"d.m.Y в H:i" }}
               </div>
               <a class="btn btn-success my-3 me-2" href="{% url 'progress:progress_detail' progress.progress_id %}">Результаты</a>
+
               {% if progress.allow_retesting and progress.finished %}
                 <a class="btn btn-primary my-3 me-2" href="{% url 'exams:exam_process' exam.slug 1 %}?restart=true">Пройти заново</a>
               {% endif %}
+
             {% elif progress.started %}
               <div class="mini-info text-secondary fw-bold">
                 Тест начат {{ progress.started|date:"d.m.Y в H:i" }}
               </div>
               <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' progress.slug progress.current_stage %}">Продолжить</a>
             {% endif %}
+
           {% else %}
+
             {% if previous_exam_passed or not exam.sprint %}
               <a class="btn btn-primary my-3" href="{% url 'exams:exam_process' exam.slug 1 %}">Начать</a>
             {% endif %}
+
           {% endif %}
         </div>
       </div>

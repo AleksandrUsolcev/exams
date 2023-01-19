@@ -1,19 +1,23 @@
 {% with request.resolver_match.view_name as view_name %}
 <h4 class="fw-bold mb-4">
+
   {% if view_name == 'exams:index' %}
     <span class="me-4">Новые тесты</span>
   {% else %}
     <a href="{% url 'exams:index' %}" class="text-decoration-none me-4">Новые тесты</a>
   {% endif %}
+
   {% if view_name == 'exams:sprint_list' %}
   <span class="me-4">Спринты</span>
   {% else %}
     <a href="{% url 'exams:sprint_list' %}" class="text-decoration-none me-4">Спринты</a>
   {% endif %}
+
   {% if view_name == 'users:users_rankings' %}
     <span class="me-4">Рейтинги</span>
   {% else %}
     <a href="{% url 'users:users_rankings' %}" class="text-decoration-none me-4">Рейтинги</a>
   {% endif %}
+
 </h4>
 {% endwith %}

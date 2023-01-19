@@ -2,11 +2,15 @@
 {% load widget_tweaks %}
 {% csrf_token %}
 <div class="{% if form.non_field_errors %}invalid{% endif %} mb-3 text-danger fw-bold">
+
   {% for error in form.non_field_errors %}
     {{ error }}
   {% endfor %}
+
 </div>
+
 {% for field in form %}
+
   {% if field.field.widget.input_type == 'checkbox' %}
   <p class="mt-2 mb-2 py-2 fw-bold">
     {{ field|addclass:'form-check-input' }}
@@ -18,8 +22,10 @@
     {{ field|addclass:'form-control' }}
   </p>
   {% endif %}
+
   {% for error in field.errors %}
     <p class="help-block mt-2 text-danger fw-bold">{{ error }}</p>
   {% endfor %}
+
   <p class="fw-light">{{ field.help_text }}</p>
 {% endfor %}

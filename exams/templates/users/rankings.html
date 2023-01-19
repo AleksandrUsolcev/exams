@@ -5,6 +5,7 @@
 {% block content %}
 {% include '../includes/navbar.html' %}
 <div class="mini-info text-secondary pb-3">Рейтинг обновляется каждый час</div>
+
 {% cache 3600 rankings %}
 <table class="table table-hover">
   <thead>
@@ -18,36 +19,45 @@
     </tr>
   </thead>
   <tbody>
+
     {% for user in users %}
       <tr>
         <th scope="row">{{ user.rank }}</th>
         <td class="fw-bold"><a href="{% url 'users:profile' user.username %}" class="text-decoration-none">{{ user.username }}</a></td>
         <td class="text-center">
+
           {% if user.exams_count %}
             {{ user.exams_count }}
           {% else %}
             -
           {% endif %}
+
         </td>
         <td class="text-center">
+
           {% if user.passed_count %}
             {{ user.passed_count }}
           {% else %}
             -
           {% endif %}
+
         </td>
         <td class="text-center">
+
           {% if user.correct_percentage %}
             {{ user.correct_percentage }}%
           {% else %}
             -
           {% endif %}
+
         </td>
         <td class="text-center fw-bold">{{ user.points }}</td>
       </tr>
     {% endfor %}
+
   </tbody>
 </table>
 {% endcache %}
+
 {% include '../includes/paginator.html' %}
 {% endblock %}

@@ -222,6 +222,16 @@ body {
   color: #5197ff;
 }
 
+.guest-link .btn {
+  border-radius: 1em 0 0 1em !important;
+}
+
+.guest-link input {
+  border-radius: 0 1em 1em 0 !important;
+  border-color: #e8e8e8 !important;
+  background: #f3f5fb !important;
+}
+
 .answer-icon {
   margin-top: -.2em;
 }

@@ -1,22 +1,28 @@
 {% load humanize %}
 <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 g-4">
+
   {% for exam in exams %}
     <div class="col">
+
       {% if progress_url %}
         <a href="{% url 'progress:progress_detail' exam.progress_id %}" class="text-decoration-none text-dark">
       {% else %}
         <a href="{% url 'exams:exam_detail' exam.slug %}" class="text-decoration-none text-dark">
       {% endif %}
+
         <div class="card h-100 exam-card hover-shadow">
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ exam.title }}</h5>
             <span>
+
               {% if exam.sprint and not without_sprint_title %}
                 {{ exam.sprint.title }}
               {% else %}
                 {{ exam.category.title }}
               {% endif %}
+
             </span>
+
             {% if not exam.started %}
               <div class="pt-1">
                 <span class="text-secondary text-mini">
@@ -24,31 +30,40 @@
                 </span>
               </div>
             {% endif %}
+
           </div>
+
           {% if exam.started %}
             <div class="card-footer mb-2 pt-2">
               <div class="progress mt-2">
+
                 {% if exam.finished %}
                   <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
                 {% else %}
                   <div class="progress-bar" role="progressbar" style="width: {{ exam.percentage_answers }}%"></div>
                 {% endif %}
+
               </div>
               <div class="pb-3 pt-1">
                 <span class="text-secondary text-mini">
+
                   {% if exam.finished %}
                     {{ exam.finished|date:"d.m.Y  H:i" }} <br>
+
                     {% if exam.percentage_correct %}
                       <span class="fw-bold">{{ exam.percentage_correct }}%</span> верных ответов
                     {% else %}
                       Нет верных ответов
                     {% endif %}
+
                   {% else %}
                     Начат {{ exam.started|date:"d.m.Y  H:i" }} <br>
                     {{ exam.current_answers }} / {{ exam.questions_count }} 
                   {% endif %}
+
                 </span>
               </div>
+
               {% if exam.finished %}
                 {% if exam.passed %}
                   <span class="text-success fw-bold">Завершен</span>
@@ -58,7 +73,9 @@
               {% else %}
                 <span class="text-primary fw-bold">В процессе</span>
               {% endif %}
+
             </div>
+
           {% else %}
             <div class="card-footer mb-2 pt-2 text-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-card-checklist pb-1" viewBox="0 0 16 16">
@@ -66,22 +83,28 @@
                   <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
                 </svg>
                 <span class="py-1 ps-0 pe-3 fw-bold">{{ exam.questions_count|intcomma }}</span>
+
                 {% if exam.users_count %}
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-people-fill pb-1" viewBox="0 0 16 16">
                     <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
                   </svg>
                   <span class="py-1 ps-0 pe-3 fw-bold">{{ exam.users_count }}</span>
+
                   {% if exam.average_progress %}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-fire pb-1" viewBox="0 0 16 16">
                       <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16Zm0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15Z"/>
                     </svg>
                     <span class="py-1 fw-bold">{{ exam.average_progress }}%</span>
                   {% endif %}
+
                 {% endif %}
+
             </div>
           {% endif %}
+
         </div>
       </a>
     </div>
   {% endfor %}
+
 </div>

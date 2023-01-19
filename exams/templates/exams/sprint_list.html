@@ -5,12 +5,15 @@
 {% endblock %}
 {% block content %}
 {% include '../includes/navbar.html' %}
+
 {% if request.user.is_authenticated and request.user.hide_finished_sprints %}
   <div class="col-12 pt-0 mt-0 pb-4">
     <span class="mini-info text-secondary">Пройденные спринты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
   </div>
 {% endif %}
+
 <div class="row pt-3">
+
   {% for sprint in sprints %}
   <div class="row col-12 py-3 border-bottom">
     <div class="col-4">
@@ -38,34 +41,43 @@
       </div>
       <div class="col-3 text-center">
         <div class="mini-info text-secondary">
+
           {% if sprint.any_order %}
             Допускается прохождение тестов в любом порядке
           {% else %}
             Тесты необходимо проходить строго по порядку
           {% endif %}
+
         </div>
       </div>
+
       {% if request.user.is_authenticated and sprint.user_started %}
         <div class="col-3 text-center">
           <div class="mini-info text-secondary">
+
             {% if sprint.user_finished %}
               Завершен
             {% else %}
               Начат
             {% endif %}
+
           </div>
           <div class="fw-bold py-2">
+
             {% if sprint.user_finished %}
               {{ sprint.user_finished|date:"d.m.Y" }}
             {% else %}
               {{ sprint.user_started|date:"d.m.Y" }}
             {% endif %}
+
           </div>
         </div>
       {% endif %}
+
     </div>
   </div>
   {% endfor %}
+
   {% include '../includes/paginator.html' %}
 </div>
 {% endblock %}

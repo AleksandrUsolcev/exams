@@ -52,10 +52,12 @@
           {% endif %}
 
           {% if answer.variants.all.count > 0 and answer.question_text %}
+
             {% for variant in answer.variants.all %}
               {% with progress.exam as exam %}
                 {% include '../includes/user_variants.html' %}
               {% endwith %}
+
             {% endfor %}
 
             {% if not answer.correct and answer.selected_count == answer.corrected_count %}
@@ -96,24 +98,6 @@
 
       <div class="progress-info mt-4">
 
-        {% if progress.exam.show_results and progress.exam.only_guest_keys and progress.user == request.user %}
-          <div class="input-group">
-            <button class="btn btn-success" type="button" id="copyBottom" onclick="copyLink()">Скопировать</button>
-            <input id="uuidLink" value="{{ shared_url }}" type="text" class="form-control">
-          </div>
-          <div class="mini-info text-secondary mt-1 mb-2">Ссылка-приглашение на результат</div>
-          <script>
-            function copyLink() {
-              var copyText = document.getElementById("uuidLink"),
-              copyBottom = document.getElementById("copyBottom");
-              copyText.select();
-              copyText.setSelectionRange(0, 99999);
-              navigator.clipboard.writeText(copyText.value);
-              copyBottom.innerHTML = 'Скопировано';
-          }
-          </script>
-        {% endif %}
-
         {% if retesting %}
           <a class="btn btn-primary my-3 me-2" href="{% url 'exams:exam_process' progress.exam.slug 1 %}?restart=true">Пройти заново</a>
         {% endif %}
@@ -124,6 +108,26 @@
 
       </div>
     </div>
+    
+    {% if progress.exam.show_results and progress.exam.only_guest_keys and progress.user == request.user %}
+      <div class="guest-link input-group pt-4">
+        <button class="btn btn-success" type="button" id="copyBottom" onclick="copyLink()">Скопировать</button>
+        <input id="uuidLink" value="{{ shared_url }}" type="text" class="form-control text-secondary" readonly>
+      </div>
+      <div class="mini-info text-secondary mt-1 mb-2">Ссылка-приглашение на результат</div>
+
+      <script>
+        function copyLink() {
+          var copyText = document.getElementById("uuidLink"),
+          copyBottom = document.getElementById("copyBottom");
+          copyText.select();
+          copyText.setSelectionRange(0, 99999);
+          navigator.clipboard.writeText(copyText.value);
+          copyBottom.innerHTML = 'Скопировано';
+      }
+      </script>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}
