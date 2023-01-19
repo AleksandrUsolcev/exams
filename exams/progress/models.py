@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.db import models
+from django.urls import reverse
 from users.models import User
 
 from exams.models import Exam, Question, Sprint, Variant
@@ -94,6 +95,9 @@ class Progress(models.Model):
         if self._state.adding:
             self.guest_key = str(uuid4())
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('progress:progress_detail', kwargs={'pk': str(self.pk)})
 
 
 class UserAnswer(models.Model):

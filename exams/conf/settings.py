@@ -124,6 +124,12 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
+
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"

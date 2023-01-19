@@ -187,6 +187,12 @@ class Exam(models.Model):
                       'и по окончанию тестирования'),
         default=True
     )
+    only_guest_keys = models.BooleanField(
+        verbose_name=('Доступ для гостей к результатам только по '
+                      'ссылке-приглашению'),
+        help_text='При условии, что пользователю отображается результат',
+        default=False
+    )
     show_correct = models.BooleanField(
         verbose_name='Отображать пользователю верные варианты ответов',
         help_text=('Только если активен параметр с отображением '
