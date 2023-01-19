@@ -70,6 +70,12 @@ class SprintQuerySet(QuerySet):
                 .annotate(**user_annotates)
             )
             without_user = stats.exclude(progress__id__in=user_progress)
+
+            if user.hide_finished_sprints:
+                only_with_progress = only_with_progress.exclude(
+                    user_finished__isnull=False
+                )
+
             stats = sorted(
                 list(chain(only_with_progress, without_user)),
                 key=attrgetter('created'), reverse=True
@@ -185,15 +191,15 @@ class ExamQuerySet(QuerySet):
                     .questions_count()
                 )
 
-                if user.hide_finished_exams:
-                    return query_without_user.order_by(*order_data)
-
                 if in_sprint:
                     exams = sorted(
                         list(chain(query_without_user, exams)),
                         key=attrgetter('priority'), reverse=False
                     )
                 else:
+                    if user.hide_finished_exams:
+                        exams = exams.exclude(finished__isnull=False)
+
                     exams = sorted(
                         list(chain(query_without_user, exams)),
                         key=attrgetter('created'), reverse=True

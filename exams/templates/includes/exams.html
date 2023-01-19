@@ -11,7 +11,7 @@
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ exam.title }}</h5>
             <span>
-              {% if exam.sprint %}
+              {% if exam.sprint and not without_sprint_title %}
                 {{ exam.sprint.title }}
               {% else %}
                 {{ exam.category.title }}

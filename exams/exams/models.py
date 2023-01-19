@@ -69,14 +69,11 @@ class Sprint(models.Model):
         max_length=340,
         verbose_name='ЧПУ'
     )
-    description = RichTextUploadingField(
-        verbose_name='Описание'
-    )
-    active = models.BooleanField(
-        verbose_name='Готов к публикации',
-        help_text=('Статус принимает положительное состояние, если есть '
-                   'хотя бы один не скрытый/готовый к публикации тест'),
-        default=False
+    description = models.TextField(
+        verbose_name='Краткое описание',
+        null=True,
+        blank=True,
+        max_length=600
     )
     any_order = models.BooleanField(
         verbose_name='Разрешается решать тесты в произвольном порядке',

@@ -44,10 +44,10 @@ class ExamInline(NestedStackedInline):
 
 
 class SprintAdmin(NestedModelAdmin):
-    list_display = ('title', 'active', 'exams_count', 'created')
+    list_display = ('title', 'exams_count', 'created')
     inlines = (ExamInline,)
     save_on_top = True
-    readonly_fields = ('created', 'active', 'slug')
+    readonly_fields = ('created', 'slug')
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

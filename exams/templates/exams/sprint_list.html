@@ -5,6 +5,11 @@
 {% endblock %}
 {% block content %}
 {% include '../includes/navbar.html' %}
+{% if request.user.is_authenticated and request.user.hide_finished_sprints %}
+  <div class="col-12 pt-0 mt-0 pb-4">
+    <span class="mini-info text-secondary">Пройденные спринты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
+  </div>
+{% endif %}
 <div class="row pt-3">
   {% for sprint in sprints %}
   <div class="row col-12 py-3 border-bottom">

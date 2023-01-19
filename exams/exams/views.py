@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
                               Prefetch, Q)
@@ -31,6 +32,8 @@ class IndexView(ListView):
             'title': 'Exams',
             'exams': exams[:12]
         }
+        if settings.DEMO_MODE:
+            extra_context['title'] = 'Exams - Demo'
         if len(exams) > 5:
             extra_context['more_link'] = True
         context.update(extra_context)
@@ -73,6 +76,7 @@ class SprintDetailView(ListView):
         slug = self.kwargs.get('slug')
         sprint = get_object_or_404(Sprint, slug=slug)
         context['sprint'] = sprint
+        context['without_sprint_title'] = True
         return context
 
 

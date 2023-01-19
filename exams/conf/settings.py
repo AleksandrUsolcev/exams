@@ -12,6 +12,8 @@ SECRET_KEY = os.getenv(
 
 DEBUG = True
 
+DEMO_MODE = False
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-  <h3 class="fw-bold mb-4">
+  <h3 class="fw-bold mb-3">
     {% if category %}
       {{ category.title }}
     {% else %}
@@ -13,19 +13,17 @@
     {% endif %}
   </h3>
   {% if request.user.is_authenticated and request.user.hide_finished_exams %}
-    <div class="col-12 pt-0 mt-0 pb-4">
+    <div class="col-12 pt-0 mt-0 pb-1">
       <span class="mini-info text-secondary">Пройденные тесты <a href="{% url 'users:profile_edit' request.user.username %}">скрыты</a></span>
     </div>
   {% endif %}
   <div class="col-8 col-xl-10">
-    <div>
-      {% if category %}
-        <p class="py-3 fs-5">{{ category.description }}</p>
-      {% endif %}
-      {% if exams %}
-        {% include '../includes/exams.html' %}
-      {% endif %}
-    </div>
+    {% if category %}
+      <div class="col-12 col-xl-8 py-3">{{ category.description }}</div>
+    {% endif %}
+    {% if exams %}
+      {% include '../includes/exams.html' %}
+    {% endif %}
     {% include '../includes/paginator.html' %}
   </div>
   {% if categories %}
