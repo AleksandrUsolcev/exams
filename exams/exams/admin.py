@@ -48,7 +48,7 @@ class ExamInline(NestedStackedInline):
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        return queryset.order_by('priority', 'id')
+        return queryset.select_related('category').order_by('priority', 'id')
 
     def has_add_permission(self, request, obj=None):
         return False

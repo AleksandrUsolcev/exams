@@ -14,5 +14,10 @@ urlpatterns = [
         'progress/@<slug:username>/',
         views.ProgressListView.as_view(),
         name='progress_list'
+    ),
+    path(
+        'progress/tracker/',
+        views.ProgressTrackerView.as_view(),
+        name='progress_tracker'
     )
 ]

@@ -20,6 +20,7 @@ class ProgressDetailView(DetailView):
             Progress.objects
             .filter(id=progress_id)
             .select_related('exam__sprint')
+            .get_tracker_stats()
             .get_details(variants=UserVariant, answers=UserAnswer)
             .get_percentage()
         )
@@ -87,4 +88,35 @@ class ProgressListView(ListView):
             .list_(user=user, only_user=True)
             .order_by('-started')
         )
+        return queryset
+
+
+class ProgressTrackerView(ListView):
+    model = Progress
+    template_name = 'progress/progress_tracker.html'
+    context_object_name = 'tracker'
+    paginate_by = 20
+
+    def get_queryset(self):
+        user = self.request.GET.get('user')
+        exam = self.request.GET.get('exam')
+        queryset = (
+            Progress.objects
+            .filter(finished__isnull=False)
+            .select_related('exam', 'user', 'exam__category', 'exam__sprint')
+            .only('finished', 'passed', 'user__username', 'exam__title',
+                  'exam__slug', 'exam__category__title',
+                  'exam__category__slug', 'exam__sprint__title',
+                  'exam__sprint__slug')
+            .get_percentage()
+            .get_tracker_stats()
+            .order_by('-finished')
+        )
+
+        if exam:
+            queryset = queryset.filter(exam_id=exam)
+
+        if user:
+            queryset = queryset.filter(user__username=user)
+
         return queryset

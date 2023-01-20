@@ -1,5 +1,7 @@
-from django.db.models import (Count, ExpressionWrapper, F, IntegerField,
-                              Manager, Prefetch, Q, QuerySet)
+from django.db.models import (Count, DateTimeField, ExpressionWrapper, F,
+                              IntegerField, Manager, Prefetch, Q, QuerySet)
+from django.db.models.expressions import Window
+from django.db.models.functions import RowNumber
 from django.db.models.functions.comparison import NullIf
 
 
@@ -49,6 +51,23 @@ class ProgressQuerySet(QuerySet):
         )
         return percentage
 
+    def get_tracker_stats(self):
+        tracker_stats = (
+            self
+            .annotate(
+                time_difference=ExpressionWrapper(
+                    F('finished') - F('started'),
+                    output_field=DateTimeField()
+                ),
+                attempt=Window(
+                    expression=RowNumber(),
+                    partition_by=[F('user'), F('exam')],
+                    order_by=[F('finished')]
+                )
+            )
+        )
+        return tracker_stats
+
     def get_details(self, answers: object, variants: object) -> object:
         details = (
             self
@@ -90,6 +109,9 @@ class ProgressManager(Manager):
 
     def get_percentage(self):
         return self.get_queryset().get_percentage()
+
+    def get_tracker_stats(self):
+        return self.get_queryset().tracker_stats()
 
     def get_details(self, answers: object, variants: object) -> object:
         return self.get_queryset().get_details()

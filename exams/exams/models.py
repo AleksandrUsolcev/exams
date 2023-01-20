@@ -191,7 +191,7 @@ class Exam(models.Model):
         verbose_name=('Доступ для гостей к результатам только по '
                       'ссылке-приглашению'),
         help_text='При условии, что пользователю отображается результат',
-        default=False
+        default=True
     )
     show_correct = models.BooleanField(
         verbose_name='Отображать пользователю верные варианты ответов',

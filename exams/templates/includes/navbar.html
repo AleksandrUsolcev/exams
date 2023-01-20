@@ -13,10 +13,16 @@
     <a href="{% url 'exams:sprint_list' %}" class="text-decoration-none me-4">Спринты</a>
   {% endif %}
 
-  {% if view_name == 'users:users_rankings' %}
-    <span class="me-4">Рейтинги</span>
+  {% if view_name == 'progress:progress_tracker' %}
+  <span class="me-4">Прогресс</span>
   {% else %}
-    <a href="{% url 'users:users_rankings' %}" class="text-decoration-none me-4">Рейтинги</a>
+    <a href="{% url 'progress:progress_tracker' %}" class="text-decoration-none me-4">Прогресс</a>
+  {% endif %}
+
+  {% if view_name == 'users:users_rankings' %}
+    <span class="me-4">Рейтинг</span>
+  {% else %}
+    <a href="{% url 'users:users_rankings' %}" class="text-decoration-none me-4">Рейтинг</a>
   {% endif %}
 
 </h4>

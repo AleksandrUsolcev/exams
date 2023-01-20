@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load user_filters %}
 {% block title %}Прогресс{% endblock %}
 {% block content %}
 
@@ -85,14 +86,37 @@
 
       {% if progress.finished %}
         <div class="mini-info pt-3">
+          <p>Завершен: <span class="fw-bold">{{ progress.finished|date:"d.m.Y в H:i" }}</span></p>
+          <p>Время выполнения: <span class="fw-bold">{{ progress.time_difference }}</span></p>
+
           {% if progress.answers_quantity %}
             <p>Верных ответов: <span class="fw-bold">{{ progress.correct_count }}</span> из <span class="fw-bold">{{ progress.answers_quantity }}</span>
-          {% if progress.correct_percentage > 0 %}
-            ({{ progress.correct_percentage }}%)
-          {% endif %}
+            
+            {% if progress.correct_percentage > 0 %}
+              ({{ progress.correct_percentage }}%)
+            {% endif %}
+
             </p>
           {% endif %}
+          
+          <p class="fw-bold">
+            <a class="text-decoration-none" href="{% url 'progress:progress_tracker' %}?exam={{ progress.exam.id }}&user={{ progress.user.username }}">
+              Все попытки пользователя
+            </a>
+          </p>
+          <p class="fw-bold">
+            <a class="text-decoration-none" href="{% url 'progress:progress_tracker' %}?exam={{ progress.exam.id }}">
+              Общая статистика по тесту
+            </a>
+          </p>
 
+        </div>
+        <div class="fw-bold">
+          {% if progress.passed %}
+          <span class="text-success">Зачтено</span>
+          {% else %}
+            <span class="text-danger">Не зачтено</span>
+          {% endif %}
         </div>
       {% endif %}
 
@@ -111,7 +135,7 @@
     
     {% if progress.exam.show_results and progress.exam.only_guest_keys and progress.user == request.user %}
       <div class="guest-link input-group pt-4">
-        <button class="btn btn-success" type="button" id="copyBottom" onclick="copyLink()">Скопировать</button>
+        <button class="btn btn-success" type="button" id="copyBottom" onclick="copyLink()">Копировать</button>
         <input id="uuidLink" value="{{ shared_url }}" type="text" class="form-control text-secondary" readonly>
       </div>
       <div class="mini-info text-secondary mt-1 mb-2">Ссылка-приглашение на результат</div>

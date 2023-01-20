@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  Прогресс
+{% endblock %}
+{% block content %}
+{% include '../includes/navbar.html' %}
+<div class="row">
+
+  {% for progress in tracker %}
+    <div class="row col-12 py-3 border-bottom">
+      <div class="col-4">
+        <a href="{% url 'progress:progress_detail' progress.id %}" class="d-inline fw-bold text-decoration-none">
+          {{ progress.exam.title }}
+        </a>
+        <div class="mini-info text-secondary">
+          <div class="pb-2">
+            <a href="#" class="text-decoration-none fw-bold text-secondary">
+              {{ progress.exam.category.title }}
+            </a>
+          </div>
+
+          {% if progress.exam.sprint %}
+            <div class="py-1">
+              Входит в спринт: 
+              <a href="{% url 'exams:sprint_detail' progress.exam.sprint.slug %}" class="text-decoration-none">
+                {{ progress.exam.sprint.title }}
+              </a>
+            </div>
+          {% endif %}
+
+          <div class="pb-2 text-secondary">
+              Завершен: {{ progress.finished|date:"d.m.Y в H:i" }}
+          </div>
+        </div>
+        {% if progress.passed %}
+        <span class="fw-bold text-success">Зачтено</span>
+        {% else %}
+          <span class="fw-bold text-danger">Не зачтено</span>
+        {% endif %}
+      </div>
+      <div class="row col-8 pt-3">
+        <div class="col-3 text-center">
+          <div class="text-secondary mini-info">
+            Пользователь
+          </div>
+          <div class="fw-bold py-3">
+            <a href="{% url 'users:profile' progress.user.username %}" class="text-decoration-none">
+              {{ progress.user.username }}
+            </a>
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="text-secondary mini-info">
+            Попытка
+          </div>
+          <div class="fw-bold py-3">
+            {{ progress.attempt }}
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="text-secondary mini-info">
+            Верных ответов
+          </div>
+          <div class="fw-bold py-3">
+
+            {% if progress.correct_percentage %}
+              {{ progress.correct_percentage }}%
+            {% else %}
+              -
+            {% endif %}
+
+          </div>
+        </div>
+        <div class="col-3 text-center">
+          <div class="text-secondary mini-info">
+            Время выполнения
+          </div>
+          <div class="fw-bold py-3">
+            {{ progress.time_difference }}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="col-12">
+    {% include '../includes/paginator.html' %}
+  </div>
+</div>
+{% endblock %}
