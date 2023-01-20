@@ -10,11 +10,11 @@ SECRET_KEY = os.getenv(
     'DJANGO_SECRET_KEY',
     default="change-me-in-env-if-the-project-is-not-running-in-demo")
 
-DEBUG = True
+DEBUG = False
 
 DEMO_MODE = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
 
 INSTALLED_APPS = [
     'admin_interface',
@@ -116,9 +116,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 MEDIA_URL = '/media/'
 

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15.1-alpine
+    container_name: exam-postgres15
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  web:
+    container_name: exam-web
+    build: ../exams/
+    restart: always
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+
+  nginx:
+    container_name: exam-nginx
+    image: nginx:1.21.3-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - static:/var/html/static/
+      - media:/var/html/media/
+    depends_on:
+      - web
+
+volumes:
+  static:
+  media:
+  postgres:
