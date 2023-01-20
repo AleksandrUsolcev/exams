@@ -206,7 +206,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
                 exam.sprint and not exam.sprint.any_order and not progress
                 or exam.allow_retesting
             ):
-                if exam.sprint:
+                if exam.sprint and not exam.sprint.any_order:
                     previous_exam = get_previous_exam_in_sprint(exam)
 
                     if previous_exam:
@@ -352,6 +352,49 @@ class ExamProcessView(LoginRequiredMixin, FormView):
         context.update(self.initial_data)
         return context
 
+    def sprint_finished(self):
+
+        user_sprint = (
+            UserSprint.objects
+            .filter(
+                user=self.request.user,
+                sprint=self.question.exam.sprint
+            )
+        )
+
+        if not self.question.exam.sprint.any_order:
+            next_exam = get_next_exam_in_sprint(self.question.exam)
+
+            if not next_exam and not user_sprint.first().finished:
+                user_sprint.update(finished=timezone.now())
+
+        else:
+            progress_passed = (
+                Progress.objects
+                .filter(
+                    user=self.request.user,
+                    exam__sprint=self.question.exam.sprint,
+                    passed=True
+                )
+                .distinct('exam')
+                .count()
+            )
+            current_sprint_exams = (
+                Exam.objects
+                .filter(
+                    sprint=self.question.exam.sprint,
+                    active=True,
+                    visibility=True
+                )
+                .count()
+            )
+
+            if (
+                not user_sprint.first().finished
+                and progress_passed >= current_sprint_exams
+            ):
+                user_sprint.update(finished=timezone.now())
+
     def form_valid(self, form):
         data = {
             'stage': self.stage + 1,
@@ -396,17 +439,7 @@ class ExamProcessView(LoginRequiredMixin, FormView):
             actual_progress.update(**update)
 
             if update.get('passed') is True and self.question.exam.sprint:
-                next_exam = get_next_exam_in_sprint(self.question.exam)
-                user_sprint = (
-                    UserSprint.objects
-                    .filter(
-                        user=self.request.user,
-                        sprint=self.question.exam.sprint
-                    )
-                )
-
-                if not next_exam and user_sprint.exists():
-                    user_sprint.update(finished=timezone.now())
+                self.sprint_finished()
 
             return redirect('progress:progress_detail', pk=self.progress.id)
 

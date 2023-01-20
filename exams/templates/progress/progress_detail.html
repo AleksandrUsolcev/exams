@@ -113,14 +113,14 @@
         </div>
         <div class="fw-bold">
           {% if progress.passed %}
-          <span class="text-success">Зачтено</span>
+            <span class="text-success fs-4">Зачтено</span>
           {% else %}
-            <span class="text-danger">Не зачтено</span>
+            <span class="text-danger fs-4">Не зачтено</span>
           {% endif %}
         </div>
       {% endif %}
 
-      <div class="progress-info mt-4">
+      <div class="progress-info mt-3">
 
         {% if retesting %}
           <a class="btn btn-primary my-3 me-2" href="{% url 'exams:exam_process' progress.exam.slug 1 %}?restart=true">Пройти заново</a>

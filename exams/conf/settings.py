@@ -14,7 +14,7 @@ DEBUG = False
 
 DEMO_MODE = False
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split(' ')
 
 INSTALLED_APPS = [
     'admin_interface',
