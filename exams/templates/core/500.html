@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}500{% endblock %}
+{% block content %}
+  <h1 class="error-code">500</h1>
+  <p><a href="{% url 'exams:index' %}" class="text-decoration-none">
+    Вернуться на главную
+  </a></p>
+{% endblock %} 

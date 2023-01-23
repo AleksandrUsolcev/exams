@@ -236,6 +236,11 @@ body {
   margin-top: -.2em;
 }
 
+.error-code {
+  font-size: 3em;
+  color: #5197ff;
+}
+
 @media (max-width: 1200px) {
   h1.logo {
     font-size: 3.8em;

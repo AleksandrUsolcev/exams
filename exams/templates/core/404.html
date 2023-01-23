@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}404{% endblock %}
+{% block content %}
+  <h1 class="error-code">404</h1>
+  <p class="fs-5">Страница не найдена</p>
+  <p><a href="{% url 'exams:index' %}" class="text-decoration-none">
+    Вернуться на главную
+  </a></p>
+{% endblock %} 

@@ -192,10 +192,10 @@ class ExamQuerySet(QuerySet):
                 )
 
                 if in_sprint:
-                    exams = sorted(
-                        list(chain(query_without_user, exams)),
-                        key=attrgetter('priority'), reverse=False
-                    )
+                    exams = list(chain(
+                        query_without_user.order_by('priority', '-created'),
+                        exams.order_by('priority', '-created')
+                    ))
                 else:
                     if user.hide_finished_exams:
                         exams = exams.exclude(finished__isnull=False)
