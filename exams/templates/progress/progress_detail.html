@@ -18,6 +18,10 @@
       <div class="alert alert-warning" role="alert">
         Результаты другого пользователя можно смотреть только по ссылке-приглашению
       </div>
+    {% elif not progress.exam.show_results %}
+      <div class="alert alert-warning" role="alert">
+        Для данного теста недоступен просмотр подробных результатов
+      </div>
     {% endif %}
 
     {% if progress.exam.show_results and progress.finished and access_allowed %}

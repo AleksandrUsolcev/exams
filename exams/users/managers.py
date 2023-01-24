@@ -83,6 +83,9 @@ class UserManager(UserManager):
     def get_queryset(self):
         return UserQuerySet(self.model, using=self._db)
 
+    def get_by_natural_key(self, email):
+        return self.get(email__iexact=email)
+
     def with_progress(self):
         return self.get_queryset().with_progress()
 

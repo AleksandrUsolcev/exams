@@ -8,7 +8,9 @@ def get_humanize_time(minutes):
 
 
 def get_next_exam_in_sprint(exam: object) -> object or None:
-    exams_in_sprint = list(exam.sprint.exams.all().order_by('priority'))
+    exams_in_sprint = list(
+        exam.sprint.exams.all().order_by('priority', '-created')
+    )
     exam_index = exams_in_sprint.index(exam)
 
     if exam_index < len(exams_in_sprint) - 1:
@@ -20,7 +22,9 @@ def get_next_exam_in_sprint(exam: object) -> object or None:
 
 
 def get_previous_exam_in_sprint(exam: object) -> object or None:
-    exams_in_sprint = list(exam.sprint.exams.all().order_by('priority'))
+    exams_in_sprint = list(
+        exam.sprint.exams.all().order_by('priority', '-created')
+    )
     exam_index = exams_in_sprint.index(exam)
 
     if exam_index > 0:
