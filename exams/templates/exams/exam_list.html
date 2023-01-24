@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load user_filters %}
 {% block title %}
-  {{ category.title }}
+  {% if category %}
+    {{ category.title }}
+  {% else %}
+    Все тесты
+  {% endif %}
 {% endblock %}
 {% block content %}
 <div class="row">
