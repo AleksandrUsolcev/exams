@@ -15,7 +15,7 @@
         </a>
         <div class="mini-info text-secondary">
           <div class="pb-2">
-            <a href="#" class="text-decoration-none fw-bold text-secondary">
+            <a href="{% url 'exams:exam_list' %}?category={{ progress.exam.category.slug }}" class="text-decoration-none fw-bold text-secondary">
               {{ progress.exam.category.title }}
             </a>
           </div>
