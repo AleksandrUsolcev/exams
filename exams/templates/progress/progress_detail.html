@@ -8,74 +8,74 @@
   <h3 class="fw-bold mb-4">
     Результаты тестирования
   </h3>
-  <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
+  <div class="col-md-12 col-lg-6 col-xl-8">
+    <div class="col-lg-12 col-xl-11">
+      {% if not progress.finished %}
+        <div class="alert alert-info" role="alert">
+          Результаты будут доступны после прохождения теста
+        </div>
+      {% elif not access_allowed %}
+        <div class="alert alert-warning" role="alert">
+          Результаты другого пользователя можно смотреть только по ссылке-приглашению
+        </div>
+      {% elif not progress.exam.show_results %}
+        <div class="alert alert-warning" role="alert">
+          Для данного теста недоступен просмотр подробных результатов
+        </div>
+      {% endif %}
 
-    {% if not progress.finished %}
-      <div class="alert alert-info" role="alert">
-        Результаты будут доступны после прохождения теста
-      </div>
-    {% elif not access_allowed %}
-      <div class="alert alert-warning" role="alert">
-        Результаты другого пользователя можно смотреть только по ссылке-приглашению
-      </div>
-    {% elif not progress.exam.show_results %}
-      <div class="alert alert-warning" role="alert">
-        Для данного теста недоступен просмотр подробных результатов
-      </div>
-    {% endif %}
+      {% if progress.exam.show_results and progress.finished and access_allowed %}
+        <div class="pb-4">
 
-    {% if progress.exam.show_results and progress.finished and access_allowed %}
-      <div class="pb-4">
-
-        {% if progress.exam.success_message and progress.user == request.user %}
-          <p>{{ progress.exam.success_message }}</p>
-        {% endif %}
-
-        {% for answer in progress.answers.all %}
-          <p class="py-2 pt-3 fs-5 {% if answer.correct %}text-success{% else %}text-danger{% endif %}">
-
-            {% if answer.correct %}
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-              </svg>
-            {% else %}
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
-                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-              </svg>
-            {% endif %}
-
-            {% if answer.question_text %}
-              {{ answer.question_text }}
-            {% else %}
-              <span class="fw-light">Вопрос не найден, либо был удален</span>
-            {% endif %}
-
-          </p>
-
-          {% if answer.no_answers %}
-            <p>Не выбран ни один вариант</p>
+          {% if progress.exam.success_message and progress.user == request.user %}
+            <p>{{ progress.exam.success_message }}</p>
           {% endif %}
 
-          {% if answer.variants.all.count > 0 and answer.question_text %}
+          {% for answer in progress.answers.all %}
+            <p class="py-2 pt-3 fs-5 {% if answer.correct %}text-success{% else %}text-danger{% endif %}">
 
-            {% for variant in answer.variants.all %}
-              {% with progress.exam as exam %}
-                {% include '../includes/user_variants.html' %}
-              {% endwith %}
+              {% if answer.correct %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+              {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill me-1 answer-icon" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                </svg>
+              {% endif %}
 
-            {% endfor %}
+              {% if answer.question_text %}
+                {{ answer.question_text }}
+              {% else %}
+                <span class="fw-light">Вопрос не найден, либо был удален</span>
+              {% endif %}
 
-            {% if not answer.correct and answer.selected_count == answer.corrected_count %}
-              <div class="d-inline-block pe-3 pb-3">
-                <div class="p-2 pe-3 text-danger">Недостаточно ответов</div>
-              </div>
+            </p>
+
+            {% if answer.no_answers %}
+              <p>Не выбран ни один вариант</p>
             {% endif %}
-          {% endif %}
 
-        {% endfor %}
-      </div>
-    {% endif %}
+            {% if answer.variants.all.count > 0 and answer.question_text %}
 
+              {% for variant in answer.variants.all %}
+                {% with progress.exam as exam %}
+                  {% include '../includes/user_variants.html' %}
+                {% endwith %}
+
+              {% endfor %}
+
+              {% if not answer.correct and answer.selected_count == answer.corrected_count %}
+                <div class="d-inline-block pe-3 pb-3">
+                  <div class="p-2 pe-3 text-danger">Недостаточно ответов</div>
+                </div>
+              {% endif %}
+            {% endif %}
+
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
   </div>
   <div class="col-md-12 col-lg-6 col-xl-4">
     <div class="container-light p-4 py-3">

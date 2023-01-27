@@ -7,6 +7,36 @@
 {% include '../includes/navbar.html' %}
 <div class="row">
 
+  {% if filtered_exam or filtered_user %}
+    <div class="col-12 pb-3">
+
+      {% if filtered_exam %}
+        <div class="mini-info pt-2">
+          <span class="text-secondary">Тестирование:</span>
+          <a href="{% url 'exams:exam_detail' filtered_exam.slug %}" class="fw-bold text-decoration-none">
+            {{ filtered_exam.title }}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if filtered_user %}
+        <div class="mini-info pt-2">
+          <span class="text-secondary">Пользователь:</span>
+          <a href="{% url 'users:profile' filtered_user.username %}" class="fw-bold text-decoration-none">
+            {{ filtered_user.username }}
+          </a>
+        </div>
+      {% endif %}
+      
+      <div class="mini-info pt-3">
+        <a href="{% url 'progress:progress_tracker' %}" class="text-decoration-none">
+          сброс фильтра
+        </a>
+      </div>
+
+    </div>
+  {% endif %}
+
   {% for progress in tracker %}
     <div class="row col-12 py-3 border-bottom">
       <div class="col-4">

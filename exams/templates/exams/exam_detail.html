@@ -14,8 +14,10 @@
   <h3 class="fw-bold">{{ exam.title }}</h3>
   <span class="text-secondary">{{ exam.created|date:"d.m.Y" }}</span>
   <div class="row">
-    <div class="col-md-12 col-lg-6 col-xl-8 pe-5">
-      <div class="description py-3">{{ exam.description|safe }}</div>
+    <div class="col-md-12 col-lg-6 col-xl-8">
+      <div class="col-lg-12 col-xl-11">
+        <div class="description py-3">{{ exam.description|safe }}</div>
+      </div>
     </div>
     <div class="col-md-12 col-lg-6 col-xl-4">
       <div class="exam-stats pb-3">

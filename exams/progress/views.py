@@ -120,3 +120,17 @@ class ProgressTrackerView(ListView):
             queryset = queryset.filter(user__username=user)
 
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.GET.get('user')
+        exam = self.request.GET.get('exam')
+
+        if exam:
+            exam = get_object_or_404(Exam, id=exam)
+
+        if user:
+            user = get_object_or_404(User, username=user)
+
+        context.update({'filtered_user': user, 'filtered_exam': exam})
+        return context
