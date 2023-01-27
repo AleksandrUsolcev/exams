@@ -107,7 +107,7 @@
             Время выполнения
           </div>
           <div class="fw-bold py-3">
-            {{ progress.time_difference }}
+            {{ progress.time_difference|timedelta:4 }}
           </div>
         </div>
       </div>

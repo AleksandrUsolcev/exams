@@ -11,3 +11,8 @@ def addclass(field, css):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter
+def timedelta(timedelta, cut):
+    return str(timedelta)[:-cut]

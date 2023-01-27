@@ -16,7 +16,7 @@
         </div>
       {% elif not access_allowed %}
         <div class="alert alert-warning" role="alert">
-          Результаты другого пользователя можно смотреть только по ссылке-приглашению
+          Для данного теста результаты другого пользователя можно смотреть только по ссылке-приглашению
         </div>
       {% elif not progress.exam.show_results %}
         <div class="alert alert-warning" role="alert">
@@ -91,7 +91,7 @@
       {% if progress.finished %}
         <div class="mini-info pt-3">
           <p>Завершен: <span class="fw-bold">{{ progress.finished|date:"d.m.Y в H:i" }}</span></p>
-          <p>Время выполнения: <span class="fw-bold">{{ progress.time_difference }}</span></p>
+          <p>Время выполнения: <span class="fw-bold">{{ progress.time_difference|timedelta:4 }}</span></p>
 
           {% if progress.answers_quantity %}
             <p>Верных ответов: <span class="fw-bold">{{ progress.correct_count }}</span> из <span class="fw-bold">{{ progress.answers_quantity }}</span>
